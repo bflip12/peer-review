@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(//Users/bobbyfilippopoulos/portfolio/**)",
+      "Write(//Users/bobbyfilippopoulos/portfolio/**)"
+    ]
+  }
+}
