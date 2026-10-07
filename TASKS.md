@@ -45,7 +45,9 @@ suggestions. Link validation by domain.
 
 ## Milestone 3: Events and logs
 
-Log form, join-or-create event, lineup, overall and sub-ratings, public or private.
+Log form, join-or-create event (automatic for venue nights, "Is this your night?" for
+collective nights, event name required for a second event on the same date), lineup,
+overall and sub-ratings, public or private.
 
 ## Milestone 4: Pages
 
@@ -57,7 +59,9 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Report button, admin page (hide, merge, ban).
+Report button, admin page (hide, merge, ban). Event merge moves logs, combines lineups,
+redirects the old URL, and keeps each user's most recently edited log when they logged
+both events, listing the logs to be deleted before confirming.
 
 ## Milestone 7: Share previews
 

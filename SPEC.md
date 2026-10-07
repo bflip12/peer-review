@@ -42,9 +42,20 @@ Online scene communities across many cities. Two consequences:
 ### 3. Events
 - An event is a date (the night it starts), a city, and a venue or a collective. A
   collective without a venue covers warehouse parties with no fixed home.
-- Logging a venue and date that already exists joins that event instead of creating a new
-  one (ADR 0002).
 - Users add DJs to the lineup. Optional event name.
+
+**Venue nights.** Logging a venue and date that already exists joins that event instead of
+creating a new one (ADR 0002). The form shows the event it joined: venue, city, date,
+lineup so far, and how many people logged it. The user can add missing DJs.
+
+**Collective nights with no venue.** Two events by one collective on one date can be
+real (a day party and a night party), so the app asks instead of deciding:
+- If the collective already has an event on that date, the form asks "Is this your
+  night?" and shows that event's name, lineup, and log count.
+- "Yes, log this night" joins it. The user can add missing DJs.
+- "No, it was a different party" creates a new event. The event name is required in this
+  case, so the two events can be told apart.
+- With no match, the form goes straight to the lineup and ratings.
 
 ### 4. Logs
 - One log per user per event. Editable.
@@ -65,8 +76,17 @@ Online scene communities across many cities. Two consequences:
 - Search by name across venues, DJs, collectives, and users.
 
 ### 7. Moderation
-- Report button on logs, comments, venues, DJs, and collectives.
-- Admin page: report queue, hide content, merge duplicate entries, ban users.
+- Report button on logs, comments, events, venues, DJs, and collectives. Reasons include
+  "Duplicate".
+- Admin page: report queue, hide content, merge duplicate entries (events, venues, DJs,
+  collectives), ban users.
+
+**Merging two events.** The admin picks the event to keep and the one to merge in.
+- Logs move to the kept event, and the lineups combine without repeating a DJ.
+- The merged event's URL redirects to the kept event, so shared links keep working.
+- A user with a log on both events keeps only their most recently edited log. The other
+  is deleted. The merge screen lists these users and the logs that will be deleted before
+  the admin confirms.
 - Admin is a role flag on the profile.
 
 ### 8. Share previews
