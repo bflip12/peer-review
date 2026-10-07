@@ -60,8 +60,11 @@ Follow, feed, likes, comments.
 ## Milestone 6: Moderation
 
 Report button, admin page (hide, merge, ban). Event merge moves logs, combines lineups,
-redirects the old URL, and keeps each user's most recently edited log when they logged
-both events, listing the logs to be deleted before confirming.
+and redirects the old URL. When a user logged both events, their most recently edited log
+stays and the other is archived; the merge screen lists both before confirming. In-app
+notices table and banner, with the "Keep the one showing" and "Switch to the other"
+choices. An `archived` state on logs, with RLS tests that archived logs never appear in
+averages, feeds, or stats.
 
 ## Milestone 7: Share previews
 

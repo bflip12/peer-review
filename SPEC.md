@@ -80,22 +80,32 @@ real (a day party and a night party), so the app asks instead of deciding:
   "Duplicate".
 - Admin page: report queue, hide content, merge duplicate entries (events, venues, DJs,
   collectives), ban users.
+- Admin is a role flag on the profile.
 
 **Merging two events.** The admin picks the event to keep and the one to merge in.
 - Logs move to the kept event, and the lineups combine without repeating a DJ.
 - The merged event's URL redirects to the kept event, so shared links keep working.
-- A user with a log on both events keeps only their most recently edited log. The other
-  is deleted. The merge screen lists these users and the logs that will be deleted before
-  the admin confirms.
-- Admin is a role flag on the profile.
+- A user with a log on both events keeps their most recently edited log on the event. The
+  other log is archived: hidden from everyone and left out of averages, feeds, and stats,
+  but still stored. The merge screen lists these users and both of their logs before the
+  admin confirms.
+- The user gets an in-app notice showing both logs, with two choices: "Keep the one
+  showing" deletes the archived log, and "Switch to the other" puts the archived log on the
+  event and deletes the newer one. If the user never answers, the newer log stays and the
+  archived one stays hidden.
+
+### 9. In-app notices
+- A banner the user sees on their next visit, shown until they act on it or dismiss it.
+- v1 uses it only for event merges. It is the base for any later notifications.
 
 ### 8. Share previews
 - Open Graph metadata and image for log, venue, and DJ pages.
 
 ## Aggregation rules
 
-- Averages use public, non-hidden logs from non-banned users only.
+- Averages use public, non-hidden, non-archived logs from non-banned users only.
 - Private logs count toward the owner's own profile stats and nowhere else.
+- Archived logs count nowhere until the owner restores one.
 
 ## Privacy
 
@@ -113,7 +123,7 @@ real (a day party and a night party), so the app asks instead of deciding:
 - Venue addresses and maps (ADR 0003)
 - Upcoming event listings
 - Natural-language search
-- DMs, email or push notifications
+- DMs, email or push notifications (in-app notices only)
 - Custom lists, want-to-go list
 - Followers-only visibility
 - Verified or claimed venue and DJ pages
@@ -132,9 +142,10 @@ real (a day party and a night party), so the app asks instead of deciding:
 | `collectives` | Name, city, links |
 | `events` | Date, `city_id`, `venue_id` or `collective_id`, optional name. Unique on venue and date when a venue is set |
 | `lineup_slots` | One row per DJ per event: who played that night |
-| `logs` | A user's log of an event. Unique on user and event |
+| `logs` | A user's log of an event, with an `archived` flag. Unique on user and event among non-archived logs |
 | `set_ratings` | A log's rating of one lineup slot |
 | `follows`, `likes`, `comments`, `reports` | Social and moderation |
+| `notices` | In-app notices for a user, with the action taken and when |
 
 ## Stack and budget
 
