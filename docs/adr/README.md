@@ -45,3 +45,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0004](0004-privacy-model.md) | Handles, hidden email, public logs with a private toggle | Accepted |
 | [0005](0005-no-media-in-v1.md) | No photos or video in v1 | Accepted |
 | [0006](0006-no-ai-in-v1.md) | No AI features in v1 | Accepted |
+| [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted |

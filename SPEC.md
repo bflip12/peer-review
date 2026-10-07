@@ -43,6 +43,9 @@ Online scene communities across many cities. Two consequences:
 - An event is a date (the night it starts), a city, and a venue or a collective. A
   collective without a venue covers warehouse parties with no fixed home.
 - Users add DJs to the lineup. Optional event name.
+- Event pages never show who created the event.
+- An event dated in the future is not listed on venue, DJ, or collective pages until its
+  date has passed. It is reachable through the log and Going forms only.
 
 **Venue nights.** Logging a venue and date that already exists joins that event instead of
 creating a new one (ADR 0002). The form shows the event it joined: venue, city, date,
@@ -59,6 +62,7 @@ real (a day party and a night party), so the app asks instead of deciding:
 
 ### 4. Logs
 - One log per user per event. Editable.
+- A log can only be created for an event dated today or earlier.
 - Overall rating required: 0.5 to 5 in half steps.
 - Optional sub-ratings: sound, venue, and each DJ set in the lineup.
 - Optional review text.
@@ -83,7 +87,8 @@ real (a day party and a night party), so the app asks instead of deciding:
 - Admin is a role flag on the profile.
 
 **Merging two events.** The admin picks the event to keep and the one to merge in.
-- Logs move to the kept event, and the lineups combine without repeating a DJ.
+- Logs and Going markers move to the kept event, and the lineups combine without
+  repeating a DJ.
 - The merged event's URL redirects to the kept event, so shared links keep working.
 - A user with a log on both events keeps their most recently edited log on the event. The
   other log is archived: hidden from everyone and left out of averages, feeds, and stats,
@@ -94,11 +99,25 @@ real (a day party and a night party), so the app asks instead of deciding:
   event and deletes the newer one. If the user never answers, the newer log stays and the
   archived one stays hidden.
 
-### 9. In-app notices
+### 8. In-app notices
 - A banner the user sees on their next visit, shown until they act on it or dismiss it.
-- v1 uses it only for event merges. It is the base for any later notifications.
+- v1 uses it for event merges and Going prompts. It is the base for any later
+  notifications.
 
-### 8. Share previews
+### 9. Going
+- On an event dated today or later, the user taps "Going". If the event does not exist,
+  it is created with the same matching rules as logging: venue nights join automatically,
+  collective nights get "Is this your night?". Users can add DJs to the lineup in advance.
+- No note. The marker is the whole feature.
+- Only the user sees their markers. No public count, no feed item, nothing on the event
+  page. Markers appear in an "Upcoming" list on the user's own profile, visible only to
+  them (ADR 0007).
+- The morning after the event date, an in-app notice asks "You marked going to <event>.
+  How was it?" with two choices: "Log it" opens the log form with the event filled in, and
+  "I didn't go" removes the marker. Ignoring the notice leaves the marker in place.
+- Markers do not count toward stats.
+
+### 10. Share previews
 - Open Graph metadata and image for log, venue, and DJ pages.
 
 ## Aggregation rules
@@ -114,14 +133,15 @@ real (a day party and a night party), so the app asks instead of deciding:
 - Known limit: the Supabase project owner can read `auth.users`. Hiding emails from the
   operator entirely needs sign-in with no email at all (passkeys only, no account
   recovery). Not in v1.
-- Deleting an account deletes the user's logs, comments, likes, and follows.
+- Deleting an account deletes the user's logs, comments, likes, follows, and Going
+  markers.
 
 ## Not in v1
 
 - AI features (ADR 0006)
 - Photos and video (ADR 0005)
 - Venue addresses and maps (ADR 0003)
-- Upcoming event listings
+- Public upcoming event listings
 - Natural-language search
 - DMs, email or push notifications (in-app notices only)
 - Custom lists, want-to-go list
@@ -145,6 +165,7 @@ real (a day party and a night party), so the app asks instead of deciding:
 | `logs` | A user's log of an event, with an `archived` flag. Unique on user and event among non-archived logs |
 | `set_ratings` | A log's rating of one lineup slot |
 | `follows`, `likes`, `comments`, `reports` | Social and moderation |
+| `going` | A user's private Going marker on an event. Unique on user and event |
 | `notices` | In-app notices for a user, with the action taken and when |
 
 ## Stack and budget

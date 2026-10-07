@@ -47,7 +47,8 @@ suggestions. Link validation by domain.
 
 Log form, join-or-create event (automatic for venue nights, "Is this your night?" for
 collective nights, event name required for a second event on the same date), lineup,
-overall and sub-ratings, public or private.
+overall and sub-ratings, public or private. The log form accepts only events dated today or
+earlier.
 
 ## Milestone 4: Pages
 
@@ -66,11 +67,19 @@ notices table and banner, with the "Keep the one showing" and "Switch to the oth
 choices. An `archived` state on logs, with RLS tests that archived logs never appear in
 averages, feeds, or stats.
 
-## Milestone 7: Share previews
+## Milestone 7: Going
+
+"Going" on events dated today or later, with join-or-create using the same matching rules
+as logging. Private "Upcoming" list on the user's own profile. Morning-after notice with
+"Log it" (opens the log form with the event filled in) and "I didn't go" (removes the
+marker). Future events left off venue, DJ, and collective pages. RLS tests that no one but
+the owner can read a marker. Event merge moves markers.
+
+## Milestone 8: Share previews
 
 Open Graph metadata and images for log, venue, and DJ pages.
 
-## Milestone 8: Launch
+## Milestone 9: Launch
 
 Privacy page, PWA manifest, production deploy, sound systems seed. A credit line with
 a link to geonames.org on the about or privacy page (required by the GeoNames CC BY 4.0
@@ -83,5 +92,5 @@ license for the cities data).
 - Photos
 - Want-to-go list, custom lists
 - Natural-language search ("clubs with Funktion-One")
-- Upcoming events
+- Public upcoming event listings
 - Notifications
