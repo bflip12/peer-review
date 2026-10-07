@@ -9,8 +9,6 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **City dataset.** The GeoNames cities export is the candidate for the seeded `cities`
-  table. Confirm its license and attribution terms before loading it (unverified).
 - **Design direction.** Collect 3 to 5 reference screenshots of sites, apps, or record
   sleeves. Then install the frontend-design plugin and use them with it.
 - **Name and domain.** Check that "Peer Review" and a domain are available.
@@ -41,9 +39,9 @@ note, RLS tests proving email is never exposed, account deletion.
 
 ## Milestone 2: Venues, DJs, collectives
 
-Cities seed and autocomplete. Venues with name, city, links, and sound tags. DJs and
-collectives. Search-first creation with fuzzy duplicate suggestions. Link validation by
-domain.
+Cities seed from the GeoNames cities export, with autocomplete. Venues with name, city,
+links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
+suggestions. Link validation by domain.
 
 ## Milestone 3: Events and logs
 
@@ -67,7 +65,9 @@ Open Graph metadata and images for log, venue, and DJ pages.
 
 ## Milestone 8: Launch
 
-Privacy page, PWA manifest, production deploy, sound systems seed.
+Privacy page, PWA manifest, production deploy, sound systems seed. A credit line with
+a link to geonames.org on the about or privacy page (required by the GeoNames CC BY 4.0
+license for the cities data).
 
 ## Later
 
