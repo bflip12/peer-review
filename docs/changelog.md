@@ -2,6 +2,16 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-08
+
+- Added `docs/ai-log.md`, a public record of how AI is used to build the app and which calls
+  are Bobby's. Reason: ADRs record product decisions and this file records rule changes;
+  neither shows the process. Backfilled from the work of 2026-10-06 and 2026-10-07.
+- Added the `ai-log` skill (`.claude/skills/ai-log/SKILL.md`) and rule 10 in `CLAUDE.md`:
+  before committing a finished task, the session checks whether the work qualifies for an
+  entry and adds one if it does. Routine work is skipped. Reason: Bobby wants notable steps
+  logged without having to ask each time.
+
 ## 2026-10-07
 
 Planning session. Product decisions are in `docs/adr/` and `SPEC.md`; the entries below are
