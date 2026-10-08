@@ -22,6 +22,7 @@ Added by the scaffold task. Do not guess a command that is not listed here.
    says what and why. Push only when asked.
 8. Architecture, new technology, or a major scope change: write an ADR in `docs/adr/`.
 9. Rule or workflow change: update the owning file, add a dated line to `docs/changelog.md`.
+10. Before committing a finished task, run the `ai-log` skill. It updates `docs/ai-log.md`.
 
 ## Where the rest lives
 - `.claude/rules/voice.md`: writing voice for UI copy, docs, commits, and replies.
