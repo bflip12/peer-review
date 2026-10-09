@@ -8,6 +8,36 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Reviewing the logging flow against similar apps (2026-10-09)
+
+**Goal.** Check that logging a night feels natural, and that duplicate nights are avoided
+or fixed without friction.
+
+**How I used AI.** Claude reviewed the spec's logging, event, and merge rules against apps
+with community-built catalogs (Untappd, setlist.fm, Concert Archives, MusicBrainz), using
+web research and flagging what it could not verify. It ranked where the flow would feel
+jarring, mocked up a single night picker as text, and laid out options for each gap over
+several rounds.
+
+**My calls.**
+- A collective's party at a club is one event, so an event can have both a venue and a
+  collective.
+- Venue and collective nights follow one rule, with a required name for a second party at
+  the same place and date.
+- Party hopping is allowed up to 3 logs per date, not the 2 I first suggested, to cover a
+  day party. Going markers stay unlimited.
+- Moving a log to another night carries everything over.
+- A b2b set counts toward each DJ in it, but its rating is stored so solo and b2b can be
+  shown apart later.
+- The venue rating on a night with no venue stays, because it shows how the collective
+  picked the space.
+- Sets are picked under "Which sets did you listen to?". I chose "Listened" over the
+  suggested "Heard".
+
+**Output.** [ADR 0008](adr/0008-night-picker-and-lineup-slots.md), which supersedes
+[ADR 0002](adr/0002-event-identity.md). `SPEC.md` sections 2, 3, 4, 6, 7, and 9 and the
+data model. Milestones 2, 3, 4, 6, and 7 in `TASKS.md`.
+
 ## This log (2026-10-08)
 
 **Goal.** Keep a record of how AI is used on this project, next to the decisions it produced.

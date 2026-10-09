@@ -41,18 +41,28 @@ note, RLS tests proving email is never exposed, account deletion.
 
 Cities seed from the GeoNames cities export, with autocomplete. Venues with name, city,
 links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
-suggestions. Link validation by domain.
+suggestions. Link validation by domain. DJ names containing "b2b" are refused.
 
 ## Milestone 3: Events and logs
 
-Log form, join-or-create event (automatic for venue nights, "Is this your night?" for
-collective nights, event name required for a second event on the same date), lineup,
-overall and sub-ratings, public or private. The log form accepts only events dated today or
-earlier.
+Events with a venue, a collective, or both (ADR 0008). The night picker: date first,
+one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
+night" groups, nights one day either side, a required name for a second night at the same
+place and date, and the past-midnight line. Events created only when a log is saved, with
+the concurrent-save case joining instead of failing. Lineup slots with one or more artists,
+b2b detection in DJ search, and slot removal by the user who added it. Log form with the
+overall rating, review, and privacy first, and a collapsed section for sound, venue, and
+"Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.
+"Change night" on a log, carrying everything over. Deletion of events left with no logs
+and no Going markers, with a redirect when a move caused it. The log form accepts only
+events dated today or earlier.
 
 ## Milestone 4: Pages
 
-Log, event, venue, DJ, collective, profile with stats, search by name.
+Log, event, venue, DJ, collective, profile with stats, search by name. Venue, DJ, and
+collective pages list only events with at least one public log. Artist averages computed
+solo, b2b, and combined, with the combined one shown. "Most listened to DJs" counts picked
+sets.
 
 ## Milestone 5: Social
 
@@ -60,20 +70,22 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Report button, admin page (hide, merge, ban). Event merge moves logs, combines lineups,
-and redirects the old URL. When a user logged both events, their most recently edited log
-stays and the other is archived; the merge screen lists both before confirming. In-app
-notices table and banner, with the "Keep the one showing" and "Switch to the other"
-choices. An `archived` state on logs, with RLS tests that archived logs never appear in
-averages, feeds, or stats.
+Report button, admin page (hide, merge, ban). Lineup slots are reportable with the reason
+"Didn't play", and an admin can remove a slot. Event merge moves logs, combines lineups by
+set, moves set picks to the matching slot, fills in a missing venue, collective, or name
+from the merged event, and redirects the old URL. When a user logged both events, their
+most recently edited log stays and the other is archived; the merge screen lists both
+before confirming. In-app notices table and banner, with the "Keep the one showing" and
+"Switch to the other" choices. An `archived` state on logs, with RLS tests that archived
+logs never appear in averages, feeds, or stats.
 
 ## Milestone 7: Going
 
-"Going" on events dated today or later, with join-or-create using the same matching rules
-as logging. Private "Upcoming" list on the user's own profile. Morning-after notice with
-"Log it" (opens the log form with the event filled in) and "I didn't go" (removes the
-marker). Future events left off venue, DJ, and collective pages. RLS tests that no one but
-the owner can read a marker. Event merge moves markers.
+"Going" on events dated today or later, using the night picker from Milestone 3. No limit
+on markers per date. Private "Upcoming" list on the user's own profile. Morning-after
+notice with "Log it" (opens the log form with the event filled in) and "I didn't go"
+(removes the marker). Future events left off venue, DJ, and collective pages. RLS tests
+that no one but the owner can read a marker. Event merge moves markers.
 
 ## Milestone 8: Share previews
 

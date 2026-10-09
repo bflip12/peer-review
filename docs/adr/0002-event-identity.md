@@ -1,7 +1,7 @@
 # 0002: An event is a date plus a venue or a collective
 
 - Date: 2026-10-07
-- Status: Accepted
+- Status: Superseded by 0008
 
 ## Context
 The core thing a user logs is a night out. Several people log the same night, and their
