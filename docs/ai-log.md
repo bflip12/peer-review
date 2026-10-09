@@ -30,9 +30,19 @@ clear.
 - Merges can be undone. I suggested snapshotting with new activity staying on the kept
   entry; we kept that rule but record each change instead of a snapshot, so later edits are
   not overwritten.
+- When undo would put back a name that now collides with another night, the person undoing
+  chooses what happens. Claude first had the current name stay.
+- Venue merges ask about same-date nights instead of merging them, because two separate
+  venues never prompted anyone to name a second party.
+- Creators can fix their own venue, DJ, or collective until someone else uses it, with no
+  time limit.
+- "Duplicate" reports ask the reporter to describe the place or night. Claude suggested
+  evidence like matching links; I changed it to what a regular would recognize, since
+  venues have no address and a local can verify a description of the room.
 
 **Output.** [ADR 0009](adr/0009-locals-and-reversible-merges.md). `SPEC.md` sections 2, 3,
-7, and 8, aggregation rules, and the data model. Milestone 6 in `TASKS.md`.
+7, and 8, aggregation rules, and the data model. Milestones 2 and 6 in `TASKS.md`. Rule 7
+in `CLAUDE.md`: draft PRs from a task's first commit, squash-merged.
 
 ## Reviewing the logging flow against similar apps (2026-10-09)
 

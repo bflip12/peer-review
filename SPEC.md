@@ -151,6 +151,25 @@ Three roles: user, local, and admin (ADR 0009). Admins can do everything locals 
     they select several edits and revert them together.
   - A revert is itself an edit, so it shows in the history and can be reverted.
 
+**Duplicate reports.** A wrong merge moves real logs to the wrong place, for example when
+someone confuses two real venues. The report gives the local what they need to check.
+- "Which one is it a duplicate of?" Required. A search of the same type: venues for a
+  venue, nights for a night. The merge screen opens with both entries filled in.
+- A description, required, with a label and help text per type:
+  - Venue, "Describe the place": "What would a regular recognize? The entrance, the
+    layout, where the bar or booth is, anything specific to that room. Two different names
+    can still be one place."
+  - Night, "Describe the night": "Who played and when, which room, anything that shows
+    both listings are the same party."
+  - Collective, "Describe the parties": "Where they run them, what the nights are like,
+    anything that shows both listings are the same crew."
+  - DJ, "Describe how you know": "An alias they play under, a set you saw billed under both
+    names, anything that shows it's one person."
+- The local sees the two entries side by side (city, links, recent nights and lineups),
+  with matching links highlighted, and the description without the reporter's name. They
+  choose "Merge", which opens the merge summary, or "Not a duplicate", which closes the
+  report.
+
 **Merge summary.** Every merge and every undo shows a summary before it is confirmed.
 - Merge: each pair of events that will merge (date, venue, collective, name, lineup, log
   count), the users with a log on both, the slots that combine, and the fields where the

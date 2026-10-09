@@ -73,8 +73,10 @@ Follow, feed, likes, comments.
 
 Roles (ADR 0009): `user`, `local`, and `admin` on the profile, with cities stored on locals
 and shown as "Berlin local" but not enforced. Report button, including lineup slots with
-"Didn't play". A catalog report queue for locals (reporters not shown) and a queue for
-reports on logs, comments, and users for admins. Locals and admins edit venues, DJs,
+"Didn't play". "Duplicate" reports require the entry it duplicates and a description, with
+help text per type, shown to the local beside both entries. A catalog report queue for
+locals (reporters not shown) and a queue for reports on logs, comments, and users for
+admins. Locals and admins edit venues, DJs,
 collectives, and set event fields, with a history list and "Revert" per entry, and a
 "Recent edits" page for admins with bulk revert. Admins hide content,
 ban users, and assign roles.
