@@ -18,8 +18,9 @@ Added by the scaffold task. Do not guess a command that is not listed here.
 4. No stubs. Every file runs, is typed, and is tested.
 5. Verify library behaviour against its source or by running it. Flag what is unverified.
 6. Run typecheck, lint, and tests before calling a task done.
-7. Commit once per finished task as Bobby Filippopoulos <bflip12@gmail.com>. The message
-   says what and why. Push only when asked.
+7. Work on a branch, never `main`. Commit once per finished task, saying what and why, as
+   author Bobby Filippopoulos <bflip12@gmail.com> (committer stays Claude in cloud sessions,
+   so GitHub verifies it). Push the branch after each commit. Merge to `main` by PR.
 8. Architecture, new technology, or a major scope change: write an ADR in `docs/adr/`.
 9. Rule or workflow change: update the owning file, add a dated line to `docs/changelog.md`.
 10. Before committing a finished task, run the `ai-log` skill. It updates `docs/ai-log.md`.
