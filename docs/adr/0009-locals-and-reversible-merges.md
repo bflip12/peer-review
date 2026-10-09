@@ -55,6 +55,12 @@ For undo:
   - Remove lineup slots.
   - Merge and undo merges of events, venues, DJs, and collectives.
 - Admins only: reports on logs, comments, and users, hiding content, bans, and roles.
+- The user who created a venue, DJ, or collective can edit it until another user picks it
+  in a form: joins or starts a night at the venue or with the collective, or adds or picks
+  the DJ on a lineup. This matches lineup slots, which their adder can remove until someone
+  else picks them. A time limit was rejected: it would allow renaming an entry others
+  already use if they used it inside the window, and block fixing a typo nobody else has
+  seen once the window ends.
 - Every edit to a venue, DJ, collective, or event is recorded: who, which field, the old
   value, the new one, and when. Each entry has a history list with a "Revert" button on
   each row, for locals and admins. Admins also have a "Recent edits" page across the
@@ -138,6 +144,7 @@ For undo:
   entries redirect through `merged_into_id`.
 - City scope for locals can be enforced later with one policy change, once there are enough
   locals for it to matter.
-- Data model: `profiles.role`, `local_cities`, `merged_into_id` on events, venues, artists,
+- Data model: `profiles.role`, `local_cities`, `created_by` and `used_by_others_at` on
+  venues, artists, and collectives, `merged_into_id` on events, venues, artists,
   and collectives, `logs.archived_merge_id` (the merge that archived the log, in place of
   the `archived` flag), `merges`, `merge_changes`, and `catalog_edits`.

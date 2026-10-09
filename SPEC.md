@@ -23,8 +23,10 @@ Online scene communities across many cities. Two consequences:
 
 ### 2. Venues, DJs, collectives
 - Search first. If nothing matches, the user creates the entry. No verification.
-- After creation, locals and admins edit venues, DJs, and collectives (section 7). Users
-  report mistakes.
+- The user who created a venue, DJ, or collective can edit it until another user picks it
+  in a form: joins or starts a night at the venue or with the collective, or adds or picks
+  the DJ on a lineup. No time limit. After that, locals and admins edit it (section 7), and
+  users report mistakes.
 - Duplicate suggestions use fuzzy name matching (Postgres `pg_trgm`), so "Tresor" and
   "Tresor Club" in the same city are flagged before a second entry is created.
 - A venue has separate fields: a name (typed), a city (picked from the city list), optional
@@ -264,11 +266,11 @@ Three roles: user, local, and admin (ADR 0009). Admins can do everything locals 
 | `profiles` | Handle, optional display name, `role` (`user`, `local`, `admin`). Never the email |
 | `local_cities` | The cities on a local's profile. Not enforced in v1 |
 | `cities` | Seeded list of world cities |
-| `venues` | Name, `city_id`, links, `merged_into_id`. No location |
+| `venues` | Name, `city_id`, links, `created_by`, `used_by_others_at`, `merged_into_id`. No location |
 | `sound_systems` | Seeded list of sound system brands |
 | `venue_sound_systems` | Which sound systems a venue has |
-| `artists` | One row per DJ: name, links, `merged_into_id` |
-| `collectives` | Name, city, links, `merged_into_id` |
+| `artists` | One row per DJ: name, links, `created_by`, `used_by_others_at`, `merged_into_id` |
+| `collectives` | Name, city, links, `created_by`, `used_by_others_at`, `merged_into_id` |
 | `events` | Date, `city_id`, nullable `venue_id` and `collective_id` (at least one set), optional name, `merged_into_id`. Per venue and date: one unnamed event, and named events with distinct names, among events not merged |
 | `event_redirects` | Old event ID to new event ID, for events deleted after a log move emptied them. Merged events redirect through `merged_into_id` |
 | `lineup_slots` | One row per set on an event, with who added it |

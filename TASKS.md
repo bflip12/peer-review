@@ -41,7 +41,8 @@ note, RLS tests proving email is never exposed, account deletion.
 
 Cities seed from the GeoNames cities export, with autocomplete. Venues with name, city,
 links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
-suggestions. Link validation by domain. DJ names containing "b2b" are refused.
+suggestions. Link validation by domain. DJ names containing "b2b" are refused. The creator edits their
+entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger.
 
 ## Milestone 3: Events and logs
 
