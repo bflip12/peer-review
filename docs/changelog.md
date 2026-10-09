@@ -4,6 +4,13 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-09
 
+- Rule 7: commits happen as work progresses, and PRs are squash-merged so `main` still gets
+  one commit per task (was: one commit per finished task). Rule 10 and the `ai-log` skill
+  now run before a task's PR is marked ready. Reason: a draft PR from the start of a task
+  only backs up work if work in progress is committed.
+- ADRs can be edited freely until their PR merges (`docs/adr/README.md`). Reason: Bobby
+  confirmed that a pending ADR is still a draft. The no-rewrite rule protects decisions
+  already merged.
 - Rule 7: a draft PR opens with a task's first commit and is marked ready when the task is
   done (was: a PR at the end). Reason: Bobby wants work backed up and visible online from
   the start of a task.

@@ -18,14 +18,14 @@ Added by the scaffold task. Do not guess a command that is not listed here.
 4. No stubs. Every file runs, is typed, and is tested.
 5. Verify library behaviour against its source or by running it. Flag what is unverified.
 6. Run typecheck, lint, and tests before calling a task done.
-7. Work on a branch, never `main`. Commit once per finished task, saying what and why, as
-   author Bobby Filippopoulos <bflip12@gmail.com> (committer stays Claude in cloud sessions,
-   so GitHub verifies it). Push the branch after each commit. Open a draft PR with a task's
-   first commit, so the work is backed up and visible; mark it ready when the task is done.
-   Merge to `main` by PR.
+7. Work on a branch, never `main`. Commit as work progresses, as author Bobby
+   Filippopoulos <bflip12@gmail.com> (committer stays Claude in cloud sessions, so GitHub
+   verifies it), and push after each commit. Open a draft PR with a task's first commit;
+   mark it ready when the task is done. PRs are squash-merged, so `main` gets one commit per
+   task, and the squash message says what and why.
 8. Architecture, new technology, or a major scope change: write an ADR in `docs/adr/`.
 9. Rule or workflow change: update the owning file, add a dated line to `docs/changelog.md`.
-10. Before committing a finished task, run the `ai-log` skill. It updates `docs/ai-log.md`.
+10. Before marking a task's PR ready, run the `ai-log` skill. It updates `docs/ai-log.md`.
 
 ## Where the rest lives
 - `.claude/rules/voice.md`: writing voice for UI copy, docs, commits, and replies.

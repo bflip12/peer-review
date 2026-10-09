@@ -56,7 +56,10 @@ For undo:
   - Merge and undo merges of events, venues, DJs, and collectives.
 - Admins only: reports on logs, comments, and users, hiding content, bans, and roles.
 - Every edit to a venue, DJ, collective, or event is recorded: who, which field, the old
-  value, and the new one. Locals and admins see the history and can revert an edit.
+  value, the new one, and when. Each entry has a history list with a "Revert" button on
+  each row, for locals and admins. Admins also have a "Recent edits" page across the
+  catalog, filtered by person, where they select several edits and revert them together.
+  A revert is itself an edit.
 
 **Merge summary.**
 - Every merge shows a summary before it is confirmed: each pair of events that will merge
@@ -76,11 +79,13 @@ For undo:
   the more recently edited one on the event, and the other is archived. The kept event takes
   the other's venue, collective, or name when it has none. When both have a different
   value, the merger picks. The 3 logs per date limit does not apply.
-- Venues: events move to the kept venue. Two events that would then break the
-  one-unnamed-night rule or share a name merge too, as part of the venue merge.
+- Venues: events move to the kept venue. Nights at both venues on the same date that would
+  then both be unnamed, or share a name, are listed with "Merge" selected. For each pair,
+  the merger either merges the two nights or names one of them. The venues were separate,
+  so nothing asked anyone to name a second party, and the two nights can be a day party and
+  a night party.
 - Collectives: events move to the kept collective. Nights of both collectives on the same
-  date with no venue are listed, and the merger either merges each pair or names one of the
-  two nights.
+  date with no venue are listed the same way.
 - DJs: lineup slots point at the kept DJ. A b2b slot that ends up with the same DJ twice
   becomes a solo set. Two slots on one event that end up with the same artists combine, and
   a log that picked both keeps its pick on the kept slot.
@@ -103,7 +108,10 @@ For undo:
 - A change is reversed only when the row is still as the merge left it. Anything changed
   since keeps its later state: a log moved to another night with "Change night" stays
   there, a log its owner deleted stays deleted, and a field edited since keeps the new
-  value. When restoring a value would break a unique rule, the current value stays.
+  value.
+- When putting a value back would break a unique rule, the undo summary asks the person
+  undoing to choose: keep the current value, or put it back and either name or merge the
+  night it collides with.
 - Logs, slots, and edits added to the kept entry after the merge stay on it.
 - A moved log that picked a slot added after the merge takes that DJ with it: the DJ is
   added to the original event's lineup, as "Change night" does.
@@ -111,7 +119,7 @@ For undo:
   merged, and a child merge only together with its parent.
 - Undo shows a summary before it is confirmed: logs going back and to which night,
   archived logs coming back, slots recreated, DJs added to a lineup, what stays on the kept
-  entry, fields that keep a later value, logs that cannot come back because their owners
+  entry, fields that keep a later value, values that collide (see above), logs that cannot come back because their owners
   deleted them, and who gets a notice. Private logs are a count, as in the merge summary.
 - Users whose logs move back or come out of the archive get a notice. A merge notice still
   open is closed.

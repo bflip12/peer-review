@@ -142,14 +142,20 @@ Three roles: user, local, and admin (ADR 0009). Admins can do everything locals 
 - Admins also handle reports on logs, comments, and users, hide content, ban users, and
   assign roles.
 - Every edit to a venue, DJ, collective, or event is recorded with who made it, the field,
-  the old value, and the new one. Locals and admins see the history and can revert an edit.
+  the old value, the new one, and when.
+  - Each entry has a history list with a "Revert" button on each row, for locals and
+    admins.
+  - Admins also have a "Recent edits" page across the catalog, filtered by person, where
+    they select several edits and revert them together.
+  - A revert is itself an edit, so it shows in the history and can be reverted.
 
 **Merge summary.** Every merge and every undo shows a summary before it is confirmed.
 - Merge: each pair of events that will merge (date, venue, collective, name, lineup, log
   count), the users with a log on both, the slots that combine, and the fields where the
   merger picks a value.
 - Undo: logs going back and to which night, archived logs coming back, slots recreated,
-  DJs added to a lineup, what stays on the kept entry, fields that keep a later value, logs
+  DJs added to a lineup, what stays on the kept entry, fields that keep a later value,
+  values that collide with another night, logs
   that cannot come back because their owners deleted them, and who gets a notice.
 - Public logs are shown in full. Private logs are shown only as a count, to locals and
   admins alike.
@@ -163,11 +169,11 @@ Three roles: user, local, and admin (ADR 0009). Admins can do everything locals 
   repeating a set. Set picks and ratings move to the kept event's slot with the same
   artists. The kept event takes the other's venue, collective, or name when it has none.
   When both have a different value, the merger picks.
-- Venues: events move to the kept venue. Two events that would then both be the unnamed
-  night on a date, or share a name, merge as part of the venue merge.
+- Venues: events move to the kept venue. Nights at both venues on the same date that would
+  then both be unnamed, or share a name, are listed with "Merge" selected. For each pair,
+  the merger either merges the two nights or names one of them.
 - Collectives: events move to the kept collective. Nights of both collectives on the same
-  date with no venue are listed, and the merger either merges each pair or names one of the
-  two nights.
+  date with no venue are listed the same way.
 - DJs: lineup slots point at the kept DJ. A b2b slot that ends up with the same DJ twice
   becomes a solo set. Two slots on one event that end up with the same artists combine, and
   a log that picked both keeps its pick on the kept slot.
@@ -187,8 +193,11 @@ Three roles: user, local, and admin (ADR 0009). Admins can do everything locals 
   merged entry opens again under its old URL.
 - A change is put back only when the row is still as the merge left it. A log moved since
   with "Change night" stays where it is, a log its owner deleted stays deleted, and a field
-  edited since keeps the new value. When putting a value back would break a unique rule,
-  the current value stays.
+  edited since keeps the new value.
+- When putting a value back would break a unique rule, the undo summary asks: keep the
+  current value, or put it back and either name or merge the night it collides with.
+  Example: a merge gave Tresor's unnamed 4 Oct night the name "Day party", and someone then
+  started a new unnamed Tresor night on 4 Oct.
 - Logs, slots, and edits added to the kept entry after the merge stay on it.
 - A log going back that picked a set added after the merge brings that DJ with it: the DJ
   is added to the original night's lineup, as "Change night" does.
