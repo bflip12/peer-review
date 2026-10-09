@@ -70,14 +70,28 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Report button, admin page (hide, merge, ban). Lineup slots are reportable with the reason
-"Didn't play", and an admin can remove a slot. Event merge moves logs, combines lineups by
-set, moves set picks to the matching slot, fills in a missing venue, collective, or name
-from the merged event, and redirects the old URL. When a user logged both events, their
-most recently edited log stays and the other is archived; the merge screen lists both
-before confirming. In-app notices table and banner, with the "Keep the one showing" and
-"Switch to the other" choices. An `archived` state on logs, with RLS tests that archived
-logs never appear in averages, feeds, or stats.
+Roles (ADR 0009): `user`, `local`, and `admin` on the profile, with cities stored on locals
+and shown as "Berlin local" but not enforced. Report button, including lineup slots with
+"Didn't play". A catalog report queue for locals (reporters not shown) and a queue for
+reports on logs, comments, and users for admins. Locals and admins edit venues, DJs,
+collectives, and set event fields, with an edit history and revert. Admins hide content,
+ban users, and assign roles.
+
+Merges of events, venues, DJs, and collectives, by locals and admins, each with a summary
+before confirming (private logs as a count only). Merged entries keep their row with
+`merged_into_id`, redirect, and refuse anything new; unique indexes ignore them. Event
+merges move logs and markers, combine lineups by set, move set picks, and fill in missing
+fields. Venue merges merge colliding events as child merges; collective merges list
+same-date nights to merge or name; DJ merges combine matching slots. When a user logged
+both events, the more recently edited log stays and the other is archived with
+`archived_merge_id`. In-app notices table and banner, with "Keep the one showing" and
+"Switch to the other", neither deleting a log. An "Archived" section on the owner's profile.
+RLS tests that archived logs never appear in averages, feeds, or stats.
+
+Undo: `merges` and `merge_changes` written from the first merge. Undo with a summary,
+newest first, children only with their parent, putting back only rows still as the merge
+left them, and moving DJs picked after the merge onto the original lineup. Tests for every
+undo rule in ADR 0009.
 
 ## Milestone 7: Going
 
