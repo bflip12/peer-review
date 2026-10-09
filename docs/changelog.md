@@ -4,6 +4,9 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-09
 
+- Rule 7: a draft PR opens with a task's first commit and is marked ready when the task is
+  done (was: a PR at the end). Reason: Bobby wants work backed up and visible online from
+  the start of a task.
 - Rule 7: work happens on a branch, never on `main`, and the branch is pushed after each
   commit. It merges to `main` by PR when the work is finished (was: push only when asked).
   Reason: the work is saved on GitHub throughout, and cloud containers are deleted after
