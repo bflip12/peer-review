@@ -1,6 +1,6 @@
 ---
 name: ai-log
-description: Decide whether the current session's work belongs in docs/ai-log.md, the public record of how Bobby uses AI to build Peer Review, and add an entry if it does. Use after finishing a task, before its commit, or when Bobby asks to update the AI log.
+description: Decide whether the current session's work belongs in docs/ai-log.md, the public record of how Bobby uses AI to build Peer Review, and add an entry if it does. Use after finishing a task, before its PR is marked ready, or when Bobby asks to update the AI log.
 ---
 
 # AI log entry
@@ -51,6 +51,7 @@ Rules:
 
 ## 3. Commit
 
-After a finished task, the entry goes in that task's commit. Run on its own, commit it
+After a finished task, the entry goes in the task's last commit, before its PR is marked
+ready. Run on its own, commit it
 alone as Bobby Filippopoulos <bflip12@gmail.com> with the message "Add AI log entry: <title>".
 In the reply, say in one line that an entry was added, with its title.

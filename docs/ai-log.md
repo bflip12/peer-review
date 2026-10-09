@@ -8,6 +8,42 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Locals, and merges that can be undone (2026-10-09)
+
+**Goal.** Decide whether catalog fixes and moderation of people should be separate roles,
+and make merges safe enough to hand to more people.
+
+**How I used AI.** I brought the idea of a second role. Claude checked it against the spec,
+found that nobody could edit a venue or DJ name after creation, traced how one venue merge
+cascades into event merges and archived logs, and walked through undo designs and their
+edge cases (later edits, merge chains, unique rules) in plain examples until each rule was
+clear.
+
+**My calls.**
+- Two roles: locals fix venues, DJs, collectives, and events; admins handle reports on
+  people, hiding, and bans. I named them "Local".
+- Locals have cities on their profile, stored but not enforced yet.
+- Locals confirm merges themselves after a summary of what will change. Claude first
+  suggested that admins confirm any merge that touches users' logs.
+- Archived logs are kept, shown to their owner in an Archived section with the reason, and
+  answering the merge notice no longer deletes a log. I questioned why the spec deleted it.
+- Merges can be undone. I suggested snapshotting with new activity staying on the kept
+  entry; we kept that rule but record each change instead of a snapshot, so later edits are
+  not overwritten.
+- When undo would put back a name that now collides with another night, the person undoing
+  chooses what happens. Claude first had the current name stay.
+- Venue merges ask about same-date nights instead of merging them, because two separate
+  venues never prompted anyone to name a second party.
+- Creators can fix their own venue, DJ, or collective until someone else uses it, with no
+  time limit.
+- "Duplicate" reports ask the reporter to describe the place or night. Claude suggested
+  evidence like matching links; I changed it to what a regular would recognize, since
+  venues have no address and a local can verify a description of the room.
+
+**Output.** [ADR 0009](adr/0009-locals-and-reversible-merges.md). `SPEC.md` sections 2, 3,
+7, and 8, aggregation rules, and the data model. Milestones 2 and 6 in `TASKS.md`. Rule 7
+in `CLAUDE.md`: draft PRs from a task's first commit, squash-merged.
+
 ## Reviewing the logging flow against similar apps (2026-10-09)
 
 **Goal.** Check that logging a night feels natural, and that duplicate nights are avoided

@@ -23,6 +23,10 @@ Online scene communities across many cities. Two consequences:
 
 ### 2. Venues, DJs, collectives
 - Search first. If nothing matches, the user creates the entry. No verification.
+- The user who created a venue, DJ, or collective can edit it until another user picks it
+  in a form: joins or starts a night at the venue or with the collective, or adds or picks
+  the DJ on a lineup. No time limit. After that, locals and admins edit it (section 7), and
+  users report mistakes.
 - Duplicate suggestions use fuzzy name matching (Postgres `pg_trgm`), so "Tresor" and
   "Tresor Club" in the same city are flagged before a second entry is created.
 - A venue has separate fields: a name (typed), a city (picked from the city list), optional
@@ -48,7 +52,7 @@ Online scene communities across many cities. Two consequences:
 - Per venue and date: one unnamed event, plus any number of named events with distinct
   names. This covers a day party and a night party at one club.
 - Anyone logging an event can set its collective or name when it has none. Changing a value
-  that is already set is admin only.
+  that is already set is for locals and admins (section 7).
 - An event is created when the first log or Going marker on it is saved, never earlier. If
   two users create the same event at the same moment, the second save joins the first.
 - Event pages never show who created the event.
@@ -87,7 +91,8 @@ collective nights work the same way.
   exactly matches an existing DJ, with an undo. Otherwise the form suggests "Add as a b2b
   set: A + B". "&", "vs", and "x" only suggest, because duo names contain them.
 - The user who added a slot can remove it until someone else has picked it in their log.
-  After that, users report it with the reason "Didn't play" and an admin removes it.
+  After that, users report it with the reason "Didn't play" and a local or admin removes
+  it.
   Removing a slot removes its picks and ratings. The logs stay.
 
 ### 4. Logs
@@ -124,33 +129,108 @@ collective nights work the same way.
 - Search by name across venues, DJs, collectives, and users.
 
 ### 7. Moderation
+Three roles: user, local, and admin (ADR 0009). Admins can do everything locals can.
+
 - Report button on logs, comments, events, lineup slots, venues, DJs, and collectives.
   Reasons include "Duplicate" and, for lineup slots, "Didn't play".
-- Admin page: report queue, hide content, merge duplicate entries (events, venues, DJs,
-  collectives), ban users.
-- Admin is a role flag on the profile.
+- Locals fix the catalog. Each local has one or more cities, shown on their profile as
+  "Berlin local". In v1 the cities are not enforced, and a local can act anywhere. Locals:
+  - Edit venues, DJs, and collectives: name, city, links, sound tags.
+  - Change an event's venue, collective, or name when it is already set.
+  - Work the catalog report queue: "Duplicate", "Didn't play", and any report on a venue,
+    DJ, collective, event, or lineup slot. Reporters are not shown.
+  - Remove lineup slots.
+  - Merge and undo merges of events, venues, DJs, and collectives.
+- Admins also handle reports on logs, comments, and users, hide content, ban users, and
+  assign roles.
+- Every edit to a venue, DJ, collective, or event is recorded with who made it, the field,
+  the old value, the new one, and when.
+  - Each entry has a history list with a "Revert" button on each row, for locals and
+    admins.
+  - Admins also have a "Recent edits" page across the catalog, filtered by person, where
+    they select several edits and revert them together.
+  - A revert is itself an edit, so it shows in the history and can be reverted.
 
-**Merging two events.** The admin picks the event to keep and the one to merge in.
-- Logs and Going markers move to the kept event, and the lineups combine without
+**Duplicate reports.** A wrong merge moves real logs to the wrong place, for example when
+someone confuses two real venues. The report gives the local what they need to check.
+- "Which one is it a duplicate of?" Required. A search of the same type: venues for a
+  venue, nights for a night. The merge screen opens with both entries filled in.
+- A description, required, with a label and help text per type:
+  - Venue, "Describe the place": "What would a regular recognize? The entrance, the
+    layout, where the bar or booth is, anything specific to that room. Two different names
+    can still be one place."
+  - Night, "Describe the night": "Who played and when, which room, anything that shows
+    both listings are the same party."
+  - Collective, "Describe the parties": "Where they run them, what the nights are like,
+    anything that shows both listings are the same crew."
+  - DJ, "Describe how you know": "An alias they play under, a set you saw billed under both
+    names, anything that shows it's one person."
+- The local sees the two entries side by side (city, links, recent nights and lineups),
+  with matching links highlighted, and the description without the reporter's name. They
+  choose "Merge", which opens the merge summary, or "Not a duplicate", which closes the
+  report.
+
+**Merge summary.** Every merge and every undo shows a summary before it is confirmed.
+- Merge: each pair of events that will merge (date, venue, collective, name, lineup, log
+  count), the users with a log on both, the slots that combine, and the fields where the
+  merger picks a value.
+- Undo: logs going back and to which night, archived logs coming back, slots recreated,
+  DJs added to a lineup, what stays on the kept entry, fields that keep a later value,
+  values that collide with another night, logs
+  that cannot come back because their owners deleted them, and who gets a notice.
+- Public logs are shown in full. Private logs are shown only as a count, to locals and
+  admins alike.
+
+**Merging.** The merger picks the entry to keep and the one to merge in.
+- The merged entry keeps its row with `merged_into_id` set to the kept entry. Its URL
+  redirects to the kept entry, so shared links keep working. It is left out of search, the
+  night picker, and pages, and nothing new can point at it: no log, Going marker, slot,
+  event, or edit.
+- Events: logs and Going markers move to the kept event, and the lineups combine without
   repeating a set. Set picks and ratings move to the kept event's slot with the same
-  artists.
-- The kept event takes the other's venue, collective, or name when it has none. When both
-  have a different value, the admin picks.
-- The 3 logs per date limit does not block a merge.
-- The merged event's URL redirects to the kept event, so shared links keep working.
+  artists. The kept event takes the other's venue, collective, or name when it has none.
+  When both have a different value, the merger picks.
+- Venues: events move to the kept venue. Nights at both venues on the same date that would
+  then both be unnamed, or share a name, are listed with "Merge" selected. For each pair,
+  the merger either merges the two nights or names one of them.
+- Collectives: events move to the kept collective. Nights of both collectives on the same
+  date with no venue are listed the same way.
+- DJs: lineup slots point at the kept DJ. A b2b slot that ends up with the same DJ twice
+  becomes a solo set. Two slots on one event that end up with the same artists combine, and
+  a log that picked both keeps its pick on the kept slot.
+- The 3 logs per date limit does not block a merge or an undo.
 - A user with a log on both events keeps their most recently edited log on the event. The
   other log is archived: hidden from everyone and left out of averages, feeds, and stats,
-  but still stored. The merge screen lists these users and both of their logs before the
-  admin confirms.
+  but still stored.
 - The user gets an in-app notice showing both logs, with two choices: "Keep the one
-  showing" deletes the archived log, and "Switch to the other" puts the archived log on the
-  event and deletes the newer one. If the user never answers, the newer log stays and the
-  archived one stays hidden.
+  showing" closes the notice, and "Switch to the other" swaps which of the two is archived.
+  Neither choice deletes a log.
+- An "Archived" section on the user's own profile, visible only to them, lists archived
+  logs with the reason ("Archived when two listings of this night were merged"), a link to
+  the night, and "Switch to the other". The user can delete an archived log there.
+
+**Undoing a merge.**
+- Undo puts back what the merge changed, for the merge and the event merges it caused. The
+  merged entry opens again under its old URL.
+- A change is put back only when the row is still as the merge left it. A log moved since
+  with "Change night" stays where it is, a log its owner deleted stays deleted, and a field
+  edited since keeps the new value.
+- When putting a value back would break a unique rule, the undo summary asks: keep the
+  current value, or put it back and either name or merge the night it collides with.
+  Example: a merge gave Tresor's unnamed 4 Oct night the name "Day party", and someone then
+  started a new unnamed Tresor night on 4 Oct.
+- Logs, slots, and edits added to the kept entry after the merge stay on it.
+- A log going back that picked a set added after the merge brings that DJ with it: the DJ
+  is added to the original night's lineup, as "Change night" does.
+- Undo runs newest first. A merge can be undone only while its kept entry is not itself
+  merged. An event merge caused by a venue, collective, or DJ merge is undone only with it.
+- Users whose logs go back or come out of the archive get a notice. An open merge notice is
+  closed.
 
 ### 8. In-app notices
 - A banner the user sees on their next visit, shown until they act on it or dismiss it.
-- v1 uses it for event merges and Going prompts. It is the base for any later
-  notifications.
+- v1 uses it for event merges, undone merges, and Going prompts. It is the base for any
+  later notifications.
 
 ### 9. Going
 - On an event dated today or later, the user taps "Going". The event is picked or started
@@ -172,7 +252,7 @@ collective nights work the same way.
 
 - Averages use public, non-hidden, non-archived logs from non-banned users only.
 - Private logs count toward the owner's own profile stats and nowhere else.
-- Archived logs count nowhere until the owner restores one.
+- Archived logs count nowhere until the owner switches to one or its merge is undone.
 
 ## Privacy
 
@@ -195,26 +275,31 @@ collective nights work the same way.
 - Custom lists, want-to-go list
 - Followers-only visibility
 - Verified or claimed venue and DJ pages
+- Limiting locals to their cities
 - Native app
 
 ## Data model sketch
 
 | Table | Holds |
 |---|---|
-| `profiles` | Handle, optional display name, admin flag. Never the email |
+| `profiles` | Handle, optional display name, `role` (`user`, `local`, `admin`). Never the email |
+| `local_cities` | The cities on a local's profile. Not enforced in v1 |
 | `cities` | Seeded list of world cities |
-| `venues` | Name, `city_id`, links. No location |
+| `venues` | Name, `city_id`, links, `created_by`, `used_by_others_at`, `merged_into_id`. No location |
 | `sound_systems` | Seeded list of sound system brands |
 | `venue_sound_systems` | Which sound systems a venue has |
-| `artists` | One row per DJ: name, links |
-| `collectives` | Name, city, links |
-| `events` | Date, `city_id`, nullable `venue_id` and `collective_id` (at least one set), optional name. Per venue and date: one unnamed event, and named events with distinct names |
-| `event_redirects` | Old event ID to new event ID, written by merges and by log moves that empty an event |
+| `artists` | One row per DJ: name, links, `created_by`, `used_by_others_at`, `merged_into_id` |
+| `collectives` | Name, city, links, `created_by`, `used_by_others_at`, `merged_into_id` |
+| `events` | Date, `city_id`, nullable `venue_id` and `collective_id` (at least one set), optional name, `merged_into_id`. Per venue and date: one unnamed event, and named events with distinct names, among events not merged |
+| `event_redirects` | Old event ID to new event ID, for events deleted after a log move emptied them. Merged events redirect through `merged_into_id` |
 | `lineup_slots` | One row per set on an event, with who added it |
 | `slot_artists` | The artists in a slot. More than one row means a b2b set |
-| `logs` | A user's log of an event, with an `archived` flag. Unique on user and event among non-archived logs. At most 3 non-archived logs per user per date, enforced by a trigger |
+| `logs` | A user's log of an event, with `archived_merge_id` (the merge that archived it, null when not archived). Unique on user and event among non-archived logs. At most 3 non-archived logs per user per date, enforced by a trigger |
 | `set_listens` | A log's pick of one lineup slot under "Which sets did you listen to?", with an optional rating |
 | `follows`, `likes`, `comments`, `reports` | Social and moderation |
+| `catalog_edits` | Each edit to a venue, DJ, collective, or event: who, field, old value, new value |
+| `merges` | One row per merge: type, kept and merged IDs, parent merge, who merged, who undid it and when |
+| `merge_changes` | Each change a merge made, in order, so undo can put it back |
 | `going` | A user's private Going marker on an event. Unique on user and event |
 | `notices` | In-app notices for a user, with the action taken and when |
 
