@@ -4,6 +4,9 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-09
 
+- Rule 7: a branch is deleted after its PR merges, and the next task starts a new branch
+  from `main`. Reason: a squash merge leaves the branch's commits outside `main`, so reusing
+  the branch needs a force push.
 - Rule 7: commits happen as work progresses, and PRs are squash-merged so `main` still gets
   one commit per task (was: one commit per finished task). Rule 10 and the `ai-log` skill
   now run before a task's PR is marked ready. Reason: a draft PR from the start of a task

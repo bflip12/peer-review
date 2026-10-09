@@ -22,7 +22,8 @@ Added by the scaffold task. Do not guess a command that is not listed here.
    Filippopoulos <bflip12@gmail.com> (committer stays Claude in cloud sessions, so GitHub
    verifies it), and push after each commit. Open a draft PR with a task's first commit;
    mark it ready when the task is done. PRs are squash-merged, so `main` gets one commit per
-   task, and the squash message says what and why.
+   task, and the squash message says what and why. After the merge, delete the branch; the
+   next task starts a new one from `main` (in cloud sessions, the session's branch name).
 8. Architecture, new technology, or a major scope change: write an ADR in `docs/adr/`.
 9. Rule or workflow change: update the owning file, add a dated line to `docs/changelog.md`.
 10. Before marking a task's PR ready, run the `ai-log` skill. It updates `docs/ai-log.md`.
