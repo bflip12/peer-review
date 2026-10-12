@@ -50,5 +50,7 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0006](0006-no-ai-in-v1.md) | No AI features in v1 | Accepted |
 | [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted |
 | [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010 |
-| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010 |
+| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010 and 0012 |
 | [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted |
+| [0011](0011-creation-caps-and-dj-notes.md) | Daily caps on new catalog entries, and notes for DJs with the same name | Accepted |
+| [0012](0012-merge-undo-after-launch.md) | Merge undo ships after launch, and merges are admin-only until then | Accepted |
