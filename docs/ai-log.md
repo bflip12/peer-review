@@ -8,6 +8,37 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Designing the data model (2026-10-12)
+
+**Goal.** Turn the spec into a v1 data model, and flag what is hard to change once users
+have shared links and logged nights.
+
+**How I used AI.** Claude read the spec and ADRs, asked me about every ambiguity one at a
+time, and explained the Postgres behaviour behind each choice as we went. It ran the key
+rules on a local Postgres to check them, which caught that two unnamed nights both save
+under a plain unique rule. Partway through, it merged in decisions from two parallel
+sessions and listed where they disagreed.
+
+**My calls.**
+- Collectives on an event are equal co-hosts, so a shared party shows on both profiles.
+- Averages are calculated but not shown in v1. I want the app to feel like a community, not
+  a place to find the best-rated club.
+- Log owners cannot delete comments on their logs. Claude had proposed they could; I want
+  people to own what they say and be able to answer back. Edits show "edited".
+- URLs use a short ID plus the name, since IDs survive renames and merges.
+- City search needs English names like "Cologne". Claude had suggested skipping alternate
+  names at first.
+- I asked which yes or no columns should be enums before they need a second value, and
+  for a rule so every schema change gets the same check.
+- I questioned why "no name" needed converting to blank text. Postgres 15 can compare
+  missing values directly, so events use that, and the blank key stays only where the
+  database needs it to enforce the co-host rule.
+- The role is `moderator` in code and "Local" in the app.
+
+**Output.** [`docs/DATA_MODEL.md`](DATA_MODEL.md), [ADR 0010](adr/0010-data-model.md),
+[`.claude/rules/database.md`](../.claude/rules/database.md). `SPEC.md` sections 2, 3, 5, 6,
+7, and 9, and `TASKS.md` Milestones 0, 2, 3, and 6.
+
 ## Locals, and merges that can be undone (2026-10-09)
 
 **Goal.** Decide whether catalog fixes and moderation of people should be separate roles,

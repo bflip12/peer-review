@@ -1,7 +1,7 @@
 # 0009: Locals, and merges that can be undone
 
 - Date: 2026-10-09
-- Status: Accepted
+- Status: Accepted, amended by 0010
 
 ## Context
 `SPEC.md` had one role besides users: admin, a flag on the profile. Admins handled

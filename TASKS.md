@@ -11,7 +11,10 @@ order.
 
 - **Design direction.** Collect 3 to 5 reference screenshots of sites, apps, or record
   sleeves. Then install the frontend-design plugin and use them with it.
-- **Name and domain.** Check that "Peer Review" and a domain are available.
+- **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
+  environment's network settings.
+
+Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
@@ -23,7 +26,10 @@ order.
 3. Add a screenshot script that captures a page at 375px and 1280px.
 4. Add CI on GitHub Actions: typecheck, lint, test, build.
 5. Create the Supabase project and local dev setup, a migrations folder, a way to test RLS
-   policies, and `.claude/rules/supabase.md`.
+   policies, and `.claude/rules/supabase.md`. Confirm Supabase runs Postgres 15 or later
+   (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
+   that generated types turn enums into unions, and pick the `short_id` length and
+   alphabet.
 6. Add to `docs/code-style.md`: server component data fetching, and the Next.js
    default-export exception for route files.
 7. Write the rules not covered yet: where state lives and what may not hold it, when a new
@@ -39,14 +45,19 @@ note, RLS tests proving email is never exposed, account deletion.
 
 ## Milestone 2: Venues, DJs, collectives
 
-Cities seed from the GeoNames cities export, with autocomplete. Venues with name, city,
+Cities seed from the GeoNames cities export, with autocomplete. Pick the file (cities1000
+is the current lean), leave out district entries, and add `city_names` with English and
+local names so "Cologne" and "Köln" both match. Venues with name, city,
 links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
-suggestions. Link validation by domain. DJ names containing "b2b" are refused. The creator edits their
-entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger.
+suggestions. Links in a `links` table, validated by domain per
+platform. DJ names containing "b2b" are refused. The creator edits their
+entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger
+and the creator read from `creations` (ADR 0010).
 
 ## Milestone 3: Events and logs
 
-Events with a venue, a collective, or both (ADR 0008). The night picker: date first,
+Events with a venue, one or more co-host collectives, or both (ADR 0008, ADR 0010), with
+the venue and collective unnamed-night rules enforced by unique indexes. The night picker: date first,
 one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
 night" groups, nights one day either side, a required name for a second night at the same
 place and date, and the past-midnight line. Events created only when a log is saved, with
@@ -71,8 +82,9 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Roles (ADR 0009): `user`, `local`, and `admin` on the profile, with cities stored on locals
-and shown as "Berlin local" but not enforced. Report button, including lineup slots with
+Roles (ADR 0009, ADR 0010): `user`, `moderator`, and `admin` on the profile, with
+`moderator` shown as "Local" and cities in `moderator_cities`, shown as "Berlin local" but
+not enforced. Report button, including lineup slots with
 "Didn't play". "Duplicate" reports require the entry it duplicates and a description, with
 help text per type, shown to the local beside both entries. A catalog report queue for
 locals (reporters not shown) and a queue for reports on logs, comments, and users for

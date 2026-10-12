@@ -2,6 +2,17 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-12
+
+- Added `.claude/rules/database.md`, loaded for migrations and `docs/DATA_MODEL.md`: use an
+  enum for any state that could gain a value, check each schema change against the "Not in
+  v1" and "Later" lists, store missing values as `NULL`, and keep "who did what" off public
+  rows. Reason: Bobby wants future-proofing checked on every schema change, not only in the
+  data model session.
+- ADRs gain the status "Accepted, amended by NNNN" for a later ADR that replaces part of
+  one (`docs/adr/README.md`). ADRs 0008 and 0009 now carry it for ADR 0010. Reason: ADR
+  0010 changes parts of both, and "Superseded" would mark their other decisions as void.
+
 ## 2026-10-09
 
 - Rule 7: a branch is deleted after its PR merges, and the next task starts a new branch
