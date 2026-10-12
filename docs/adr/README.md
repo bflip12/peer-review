@@ -14,7 +14,7 @@ File name: `NNNN-short-title.md`, numbered in order.
 # NNNN: Title
 
 - Date: YYYY-MM-DD
-- Status: Accepted | Superseded by NNNN
+- Status: Accepted | Accepted, amended by NNNN | Superseded by NNNN
 
 ## Context
 What problem or question forced the decision.
@@ -35,6 +35,8 @@ What this makes easier, what it rules out, what has to be revisited and when.
 - After its PR merges, an ADR is never rewritten. Typos aside, the text stays as decided.
 - A reversal is a new ADR. The old one's status changes to "Superseded by NNNN", and that
   status line is the only edit allowed.
+- A partial change is also a new ADR, which names the parts it replaces. The old one's
+  status changes to "Accepted, amended by NNNN"; the rest of it still stands.
 
 ## Index
 
@@ -47,6 +49,6 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0005](0005-no-media-in-v1.md) | No photos or video in v1 | Accepted |
 | [0006](0006-no-ai-in-v1.md) | No AI features in v1 | Accepted |
 | [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted |
-| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted |
-| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted |
+| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010 |
+| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010 |
 | [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted |

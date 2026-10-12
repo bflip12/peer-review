@@ -9,6 +9,9 @@ Dated record of rule and style changes, newest first. Each entry says what chang
   v1" and "Later" lists, store missing values as `NULL`, and keep "who did what" off public
   rows. Reason: Bobby wants future-proofing checked on every schema change, not only in the
   data model session.
+- ADRs gain the status "Accepted, amended by NNNN" for a later ADR that replaces part of
+  one (`docs/adr/README.md`). ADRs 0008 and 0009 now carry it for ADR 0010. Reason: ADR
+  0010 changes parts of both, and "Superseded" would mark their other decisions as void.
 
 ## 2026-10-09
 
