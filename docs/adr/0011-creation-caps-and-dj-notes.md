@@ -74,5 +74,6 @@ add more tomorrow."
 - Checked on PostgreSQL 16: the index refuses a second unnoted "DJ Rush" (any case or
   spacing), allows one with a note, refuses the same note twice, ignores merged rows, and
   refuses unmerging into a taken name. The cap trigger refuses the 11th venue in 24 hours,
-  counts each kind apart, ignores rows older than 24 hours, and lets moderators past it.
+  counts each kind apart, ignores rows older than 24 hours, lets moderators past it, and
+  refuses the second of two inserts made at the same moment (a per-user advisory lock).
 - Unverified: Supabase Auth's own sign-up rate limits. Checked in Milestone 0 task 5.
