@@ -8,6 +8,38 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Reviewing the community-built catalog (2026-10-12)
+
+**Goal.** Check that logging stays quick and community-run, with no verification, without
+leaving the catalog open to abuse.
+
+**How I used AI.** I asked Claude to review the logging design against that goal. It read
+the spec and ADRs, said what already works (join first, users fix their own mistakes,
+undoable merges, hidden averages), and ranked five gaps. For the same-name DJ fix it drew
+the forms and search results as text so I could judge the flow before anything was written.
+It ran the new database rules on a local Postgres, including two inserts at the same moment
+against the daily cap.
+
+**My calls.**
+- Aliases stay allowed. Blocking them would not work, and the privacy model wants them.
+- Daily caps per account on new venues, DJs, collectives, and events. I wasn't worried
+  about anyone reaching them and considered starting lower and raising them on request. I
+  kept them well above normal use, so the first users in each city, who add most of the
+  catalog, never hit them.
+- DJs with the same name get a short note to tell them apart, asked for only when a new
+  name matches an existing one.
+- I turned down hiding nights from DJ pages until a second person confirms the set. The app
+  needs visibility to gain traction first, so it waits in Later.
+- Merge undo moves to after launch. Merges stay recorded from the first one, and only
+  admins merge until undo ships.
+- Averages need a minimum number of logs from different users, plus a rule for new
+  accounts, before they are shown.
+
+**Output.** [ADR 0011](adr/0011-creation-caps-and-dj-notes.md),
+[ADR 0012](adr/0012-merge-undo-after-launch.md). `SPEC.md` sections 2 and 7, "Aggregation
+rules", and "Not in v1", [`docs/DATA_MODEL.md`](DATA_MODEL.md), and `TASKS.md` Milestones
+0, 2, 3, 6, and 10.
+
 ## Designing the data model (2026-10-12)
 
 **Goal.** Turn the spec into a v1 data model, and flag what is hard to change once users
