@@ -31,3 +31,6 @@ Added by the scaffold task. Do not guess a command that is not listed here.
 ## Where the rest lives
 - `.claude/rules/voice.md`: writing voice for UI copy, docs, commits, and replies.
 - `.claude/rules/react.md`: loads for `src/**`. Code style, colors, Next.js exceptions.
+- `.claude/rules/database.md`: loads for `supabase/**` and `docs/DATA_MODEL.md`. Enums,
+  future-proofing checks, and value conventions for the schema.
+- `docs/DATA_MODEL.md`: tables, constraints, indexes, and RLS visibility rules.

@@ -49,3 +49,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted |
 | [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted |
 | [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted |
+| [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted |

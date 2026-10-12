@@ -37,7 +37,8 @@ Online scene communities across many cities. Two consequences:
   database is set up. Users pick from it with autocomplete, so every Berlin night points at
   the same Berlin.
 - DJs and collectives have a name and optional links (Instagram, Resident Advisor,
-  SoundCloud, Bandcamp, website).
+  SoundCloud, Bandcamp, website). A collective has an optional home city, used for display
+  and search, never to match events.
 - A DJ name containing "b2b" is refused, with a pointer to the "b2b with" button on the
   lineup. b2b sets are lineup slots, not DJs (section 3).
 - Each link field accepts only its own domain. The Instagram field accepts only
@@ -46,11 +47,18 @@ Online scene communities across many cities. Two consequences:
   d&b audiotechnik, Danley, Martin Audio, Other.
 
 ### 3. Events
-- An event is a date (the night it started), a city, a venue, a collective, or both, and an
-  optional name (ADR 0008). A collective without a venue covers warehouse parties with no
-  fixed home. A collective's party at a club has both.
-- Per venue and date: one unnamed event, plus any number of named events with distinct
-  names. This covers a day party and a night party at one club.
+- An event is a date (the night it started), a city, a venue, one or more collectives, or
+  both, and an optional name (ADR 0008, ADR 0010). A collective without a venue covers
+  warehouse parties with no fixed home. A collective's party at a club has both.
+- Collectives on an event are equal co-hosts. The event shows on each of their pages.
+- Per venue and date, among events not merged: one unnamed event, plus any number of named
+  events with distinct names. This covers a day party and a night party at one club.
+- Per collective and date, for events with no venue, among events not merged: one unnamed
+  event, plus any number of named events with distinct names, counting every co-host.
+  Collective nights at a venue fall under the venue rule.
+- Names compare ignoring case and surrounding spaces.
+- Dates are read in the event city's timezone. "Today" in any rule means today in that
+  city.
 - Anyone logging an event can set its collective or name when it has none. Changing a value
   that is already set is for locals and admins (section 7).
 - An event is created when the first log or Going marker on it is saved, never earlier. If
@@ -117,19 +125,28 @@ collective nights work the same way.
 - Follow users.
 - Feed of followed users' public logs, newest first.
 - Likes and comments on logs.
+- Comments are flat. The author can edit a comment, which shows "edited", or delete it,
+  which leaves "Comment deleted". The log owner cannot delete other people's comments;
+  reports go to admins.
 
 ### 6. Pages
-- Log, event (with "12 listened to this set" per set), venue (averages, sound tags, links,
-  recent logs), DJ (average set rating, links, recent logs, b2b sets labelled "b2b with
-  B"), collective (with the average venue rating of its nights with no venue).
-- A b2b set's rating counts toward each artist in it. Artist averages are computed solo,
-  b2b, and combined. Pages show the combined average in v1.
+- Log, event (with "12 listened to this set" per set), venue (sound tags, links, recent
+  logs), DJ (links, recent logs, b2b sets labelled "b2b with B"), collective.
+- Averages are calculated but not shown in v1: venue rating per venue, set rating per DJ
+  (solo, b2b, and combined, a b2b rating counting toward each artist in it), and venue
+  rating of a collective's nights with no venue. Pages focus on logs and people, not
+  scores (ADR 0010).
+- URLs: `/venues/<id>/<name>`, `/djs/<id>/<name>`, `/collectives/<id>/<name>`,
+  `/events/<id>/<name>`, `/logs/<id>`, `/@handle`. The short ID finds the page, and an
+  outdated name part redirects. A handle change does not redirect the old profile URL.
 - Profile with stats: nights logged, top venues, most listened to DJs (sets picked under
   "Which sets did you listen to?", b2b sets counting for each artist), this year.
 - Search by name across venues, DJs, collectives, and users.
 
 ### 7. Moderation
-Three roles: user, local, and admin (ADR 0009). Admins can do everything locals can.
+Three roles: user, local, and admin (ADR 0009). Admins can do everything locals can. In the
+data model and code the local role is `moderator`; "Local" is its label in the app (ADR
+0010).
 
 - Report button on logs, comments, events, lineup slots, venues, DJs, and collectives.
   Reasons include "Duplicate" and, for lineup slots, "Didn't play".
@@ -188,8 +205,8 @@ someone confuses two real venues. The report gives the local what they need to c
   event, or edit.
 - Events: logs and Going markers move to the kept event, and the lineups combine without
   repeating a set. Set picks and ratings move to the kept event's slot with the same
-  artists. The kept event takes the other's venue, collective, or name when it has none.
-  When both have a different value, the merger picks.
+  artists. The kept event takes the collectives of both. It takes the other's venue or
+  name when it has none, and when both have a different one, the merger picks.
 - Venues: events move to the kept venue. Nights at both venues on the same date that would
   then both be unnamed, or share a name, are listed with "Merge" selected. For each pair,
   the merger either merges the two nights or names one of them.
@@ -240,8 +257,8 @@ someone confuses two real venues. The report gives the local what they need to c
 - Only the user sees their markers. No public count, no feed item, nothing on the event
   page. Markers appear in an "Upcoming" list on the user's own profile, visible only to
   them (ADR 0007).
-- The morning after the event date, an in-app notice asks "You marked going to <event>.
-  How was it?" with two choices: "Log it" opens the log form with the event filled in, and
+- At 12:00 on the day after the event date, in the event city's time, an in-app notice
+  asks "You marked going to <event>. How was it?" with two choices: "Log it" opens the log form with the event filled in, and
   "I didn't go" removes the marker. Ignoring the notice leaves the marker in place.
 - Markers do not count toward stats.
 
@@ -278,30 +295,9 @@ someone confuses two real venues. The report gives the local what they need to c
 - Limiting locals to their cities
 - Native app
 
-## Data model sketch
+## Data model
 
-| Table | Holds |
-|---|---|
-| `profiles` | Handle, optional display name, `role` (`user`, `local`, `admin`). Never the email |
-| `local_cities` | The cities on a local's profile. Not enforced in v1 |
-| `cities` | Seeded list of world cities |
-| `venues` | Name, `city_id`, links, `created_by`, `used_by_others_at`, `merged_into_id`. No location |
-| `sound_systems` | Seeded list of sound system brands |
-| `venue_sound_systems` | Which sound systems a venue has |
-| `artists` | One row per DJ: name, links, `created_by`, `used_by_others_at`, `merged_into_id` |
-| `collectives` | Name, city, links, `created_by`, `used_by_others_at`, `merged_into_id` |
-| `events` | Date, `city_id`, nullable `venue_id` and `collective_id` (at least one set), optional name, `merged_into_id`. Per venue and date: one unnamed event, and named events with distinct names, among events not merged |
-| `event_redirects` | Old event ID to new event ID, for events deleted after a log move emptied them. Merged events redirect through `merged_into_id` |
-| `lineup_slots` | One row per set on an event, with who added it |
-| `slot_artists` | The artists in a slot. More than one row means a b2b set |
-| `logs` | A user's log of an event, with `archived_merge_id` (the merge that archived it, null when not archived). Unique on user and event among non-archived logs. At most 3 non-archived logs per user per date, enforced by a trigger |
-| `set_listens` | A log's pick of one lineup slot under "Which sets did you listen to?", with an optional rating |
-| `follows`, `likes`, `comments`, `reports` | Social and moderation |
-| `catalog_edits` | Each edit to a venue, DJ, collective, or event: who, field, old value, new value |
-| `merges` | One row per merge: type, kept and merged IDs, parent merge, who merged, who undid it and when |
-| `merge_changes` | Each change a merge made, in order, so undo can put it back |
-| `going` | A user's private Going marker on an event. Unique on user and event |
-| `notices` | In-app notices for a user, with the action taken and when |
+Tables, constraints, indexes, and visibility rules are in `docs/DATA_MODEL.md`.
 
 ## Stack and budget
 
