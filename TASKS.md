@@ -29,8 +29,23 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
    policies, and `.claude/rules/supabase.md`. Confirm Supabase runs Postgres 15 or later
    (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
    that generated types turn enums into unions, check Supabase Auth's sign-up rate limits
-   per IP (ADR 0011), and pick the `short_id` length and alphabet.
-6. Write an ADR on styling and data fetching. `docs/code-style.md` sections 8 to 10 assume
+   per IP (ADR 0011), and pick the `short_id` length and alphabet. Also check, all
+   unverified so far: the built-in email sender's limits (believed to be a low hourly cap
+   and, on newer projects, team members' addresses only), and which backups the free tier
+   keeps and whether they can be downloaded.
+   `.claude/rules/supabase.md` includes the function security rules:
+   - Internal helper functions live in a schema the API does not expose.
+   - Functions the app calls are `security invoker` unless they must bypass RLS.
+   - A `security definer` function sets `search_path = ''`, checks `auth.uid()` and the
+     caller's role itself, and has `EXECUTE` revoked from `PUBLIC` and `anon` (Postgres
+     grants `EXECUTE` to `PUBLIC` by default, and Supabase serves every function in
+     `public` over its API).
+   - Each exposed function has a test that calls it as `anon` and as a plain user.
+6. Deploy before any feature: Vercel production on `peerreview.club` and preview deploys
+   per PR, a hosted Supabase project, and migrations applied by CI, never by hand. Auth
+   redirects, cookies, OAuth callbacks, and link previews are then tested on the real
+   domain from Milestone 1.
+7. Write an ADR on styling and data fetching. `docs/code-style.md` sections 8 to 10 assume
    styled-components, client-side React Query (in its pre-v5 API), Sentry, and atoms, none
    of which are in the stack, and styled-components needs client components in the App
    Router. Proposal to weigh: CSS Modules with the token file, server components read,
@@ -39,27 +54,36 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
    Next.js default-export exception for route files, and the error and loading
    conventions. Rules for new dependencies and for committed versus generated files are
    written when the first case comes up (Supabase generated types, task 5).
-7. Create the token file and `docs/style-guide.md` with the first styled component (the app
+8. Create the token file and `docs/style-guide.md` with the first styled component (the app
    shell).
 
 ## Milestone 1: Accounts
 
 Sign-in with magic link and Google, handle and display name setup, the sign-in privacy
-note, RLS tests proving email is never exposed, account deletion.
+note, RLS tests proving email is never exposed, account deletion. Custom SMTP for magic
+links on `peerreview.club` with SPF and DKIM, on a free tier (for example Resend or
+Postmark), with an ADR (new service). The handle and display name fields start empty;
+nothing is copied from the Google profile. The privacy page, since Google's consent screen
+asks for a privacy policy link (unverified for basic scopes). Column write tests for
+`profiles`: a user cannot change their own `role` or `account_status`
+(`docs/DATA_MODEL.md` "Column writes"). Every later milestone that adds a table adds its
+column write tests the same way.
 
 ## Milestone 2: Venues, DJs, collectives
 
 Cities seed from the GeoNames cities export, with autocomplete. Pick the file (cities1000
 is the current lean), leave out district entries, and add `city_names` with English and
-local names so "Cologne" and "Köln" both match. Venues with name, city,
-links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
-suggestions. Links in a `links` table, validated by domain per
-platform. DJ names containing "b2b" are refused. An optional home city on DJs, required when
-a new DJ's name matches one with no city, shown in DJ search and on the DJ page, with the
-unique index on name and city (ADR 0011). Daily caps per user on new venues, DJs, and
-collectives, by a trigger on `creations` (ADR 0011). The creator edits their
-entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger
-and the creator read from `creations` (ADR 0010).
+local names so "Cologne" and "Köln" both match. A credit line with a link to geonames.org
+on the privacy page (required by the GeoNames CC BY 4.0 license). Sound systems seed.
+Venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
+with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
+platform. DJ names containing "b2b" are refused. An optional home city on DJs, required
+when a new DJ's name matches one with no city, shown in DJ search and on the DJ page, with
+the unique index on name and city (ADR 0011). Daily caps per user on new venues, DJs, and
+collectives, by a trigger on `creations` (ADR 0011). The creator edits their entry until
+another user picks it (ADR 0009), with `used_by_others_at` set by a trigger and the
+creator read from `creations` (ADR 0010). Every edit writes a `catalog_edits` row from
+the first one (ADR 0009), so history and "Revert" in Milestone 6 have data to show.
 
 ## Milestone 3: Events and logs
 
@@ -121,9 +145,9 @@ Open Graph metadata and images for log, venue, and DJ pages.
 
 ## Milestone 9: Launch
 
-Privacy page, PWA manifest, production deploy, sound systems seed. A credit line with
-a link to geonames.org on the about or privacy page (required by the GeoNames CC BY 4.0
-license for the cities data).
+PWA manifest. Backups: if the free tier keeps nothing downloadable (Milestone 0 task 5),
+a scheduled `pg_dump` of the app schemas, never `auth`, to private storage, with a tested
+restore.
 
 ## Milestone 10: Merges and undo
 

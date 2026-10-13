@@ -18,6 +18,8 @@ Online scene communities across many cities. Two consequences:
 ### 1. Accounts
 - Sign in with an email magic link or Google.
 - Handle required. Display name optional; the user decides what goes in it.
+- The handle and display name fields start empty. Nothing is copied from the Google
+  profile (name or photo).
 - Under the sign-in form: "Your email is only used to sign in. It is never shown to other
   users. Any address works, including an alias."
 
