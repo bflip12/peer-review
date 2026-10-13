@@ -28,8 +28,8 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 5. Create the Supabase project and local dev setup, a migrations folder, a way to test RLS
    policies, and `.claude/rules/supabase.md`. Confirm Supabase runs Postgres 15 or later
    (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
-   that generated types turn enums into unions, and pick the `short_id` length and
-   alphabet.
+   that generated types turn enums into unions, check Supabase Auth's sign-up rate limits
+   per IP (ADR 0011), and pick the `short_id` length and alphabet.
 6. Add to `docs/code-style.md`: server component data fetching, and the Next.js
    default-export exception for route files.
 7. Write the rules not covered yet: where state lives and what may not hold it, when a new
@@ -50,7 +50,10 @@ is the current lean), leave out district entries, and add `city_names` with Engl
 local names so "Cologne" and "Köln" both match. Venues with name, city,
 links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
 suggestions. Links in a `links` table, validated by domain per
-platform. DJ names containing "b2b" are refused. The creator edits their
+platform. DJ names containing "b2b" are refused. An optional home city on DJs, required when
+a new DJ's name matches one with no city, shown in DJ search and on the DJ page, with the
+unique index on name and city (ADR 0011). Daily caps per user on new venues, DJs, and
+collectives, by a trigger on `creations` (ADR 0011). The creator edits their
 entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger
 and the creator read from `creations` (ADR 0010).
 
@@ -61,8 +64,10 @@ the venue and collective unnamed-night rules enforced by unique indexes. The nig
 one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
 night" groups, nights one day either side, a required name for a second night at the same
 place and date, and the past-midnight line. Events created only when a log is saved, with
-the concurrent-save case joining instead of failing. Lineup slots with one or more artists,
-b2b detection in DJ search, and slot removal by the user who added it. Log form with the
+the concurrent-save case joining instead of failing, and counting toward the daily event cap
+(ADR 0011). Lineup slots with one or more artists,
+b2b detection in DJ search, "b2b with" and slot removal by the user who added it until
+someone else picks it, with removal setting `removed_at` (ADR 0013). Log form with the
 overall rating, review, and privacy first, and a collapsed section for sound, venue, and
 "Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.
 "Change night" on a log, carrying everything over. Deletion of events left with no logs
@@ -82,19 +87,23 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Roles (ADR 0009, ADR 0010): `user`, `moderator`, and `admin` on the profile, with
+Roles (ADR 0009, ADR 0010, ADR 0012): `user`, `moderator`, and `admin` on the profile, with
 `moderator` shown as "Local" and cities in `moderator_cities`, shown as "Berlin local" but
 not enforced. Report button, including lineup slots with
 "Didn't play". "Duplicate" reports require the entry it duplicates and a description, with
-help text per type, shown to the local beside both entries. A catalog report queue for
-locals (reporters not shown) and a queue for reports on logs, comments, and users for
-admins. Locals and admins edit venues, DJs,
+help text per type, shown to the admin beside both entries. A catalog report queue for
+locals (reporters not shown) and a queue for "Duplicate" reports and reports on logs,
+comments, and users for admins. Locals and admins edit venues, DJs,
 collectives, and set event fields, with a history list and "Revert" per entry, and a
-"Recent edits" page for admins with bulk revert. Admins hide content,
+"Recent edits" page for admins with bulk revert. Lineup corrections by locals (ADR 0013):
+remove a slot, remove one DJ from a b2b slot, or switch to a same-name DJ, each in the
+event's history with "Revert", and reverts refused when they would duplicate a slot.
+"Didn't play" reports with an optional "Who played instead?". Hidden DJs left out of
+lineups and stats. Admins hide content,
 ban users, and assign roles.
 
-Merges of events, venues, DJs, and collectives, by locals and admins, each with a summary
-before confirming (private logs as a count only). Merged entries keep their row with
+Merges of events, venues, DJs, and collectives, by admins only (ADR 0012), each with a
+summary before confirming (private logs as a count only). Merged entries keep their row with
 `merged_into_id`, redirect, and refuse anything new; unique indexes ignore them. Event
 merges move logs and markers, combine lineups by set, move set picks, and fill in missing
 fields. Venue and collective merges list same-date nights to merge (as child merges) or
@@ -104,11 +113,8 @@ both events, the more recently edited log stays and the other is archived with
 "Switch to the other", neither deleting a log. An "Archived" section on the owner's profile.
 RLS tests that archived logs never appear in averages, feeds, or stats.
 
-Undo: `merges` and `merge_changes` written from the first merge. Undo with a summary,
-newest first, children only with their parent, putting back only rows still as the merge
-left them, asking what to do when a value would collide, and moving DJs picked after the
-merge onto the original lineup. Tests for every
-undo rule in ADR 0009.
+`merges` and `merge_changes` written from the first merge, in the format undo will need
+(ADR 0009, ADR 0012). Undo itself is Milestone 10.
 
 ## Milestone 7: Going
 
@@ -128,10 +134,27 @@ Privacy page, PWA manifest, production deploy, sound systems seed. A credit line
 a link to geonames.org on the about or privacy page (required by the GeoNames CC BY 4.0
 license for the cities data).
 
+## Milestone 10: Undo merges
+
+After launch (ADR 0012). Undo with a summary, newest first, children only with their
+parent, putting back only rows still as the merge left them, asking what to do when a value
+would collide, and moving DJs picked after the merge onto the original lineup. Adds
+`merges.undone_by`, `merges.undone_at`, and the `merge_undone` notice kind. Tests for every
+undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to their queue.
+
 ## Later
 
 - Venue-claimed pages, with an opt-in public location
 - AI features: venue review summaries, log assist, visiting a city
+- Show averages. Each needs a minimum number of public logs from different users and a rule
+  for logs from new accounts (SPEC "Aggregation rules"). The numbers go in the ADR that
+  turns averages on.
+- DJ pages list a night only once someone other than the person who added the DJ's slot
+  has picked it in a public log.
+- "Played:" in DJ search: venues and collectives the DJ played, taken from lineups. Only
+  nights with at least one public log, the same rule as DJ pages. Stops one user
+  putting a DJ on a night they did not play. Wait until the app has enough traffic that
+  this does not hide real nights.
 - Photos
 - Want-to-go list, custom lists
 - Natural-language search ("clubs with Funktion-One")

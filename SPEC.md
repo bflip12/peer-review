@@ -41,6 +41,20 @@ Online scene communities across many cities. Two consequences:
   and search, never to match events.
 - A DJ name containing "b2b" is refused, with a pointer to the "b2b with" button on the
   lineup. b2b sets are lineup slots, not DJs (section 3).
+- DJs have an optional home city, picked from the city list, labelled "Where they're
+  based" with the help text "Not where you saw them. Check their RA or Instagram if
+  unsure." It tells apart two artists with the same name (ADR 0011). Empty means unknown;
+  there is no "No home city" choice.
+- When a new DJ's name matches an existing DJ exactly, ignoring case and surrounding
+  spaces, the form shows "There's already a DJ called DJ Rush." above each existing one with
+  its city, links, and "Use this DJ", then "Different person?" with the city field and "Add
+  as a new DJ". The city is required when an existing DJ with that name has no city, and
+  optional otherwise. Two DJs with the same name and city are refused.
+- DJ search results show the city and the DJ's link sites beside the name. The DJ page
+  shows the city under the name.
+- Per user, over the last 24 hours, at most 10 venues, 10 collectives, 50 DJs, and 20 new
+  events (ADR 0011). Locals and admins are exempt. At a cap the form shows "You've added 10
+  venues today. You can add more tomorrow."
 - Each link field accepts only its own domain. The Instagram field accepts only
   instagram.com links.
 - Sound system tags come from a seeded list: Funktion-One, Void Acoustics, L-Acoustics,
@@ -94,14 +108,20 @@ collective nights work the same way.
 - A lineup slot is one set and holds one or more artists. A slot with several artists is a
   b2b set, shown as "A b2b B" with each name linking to its DJ page.
 - Users add DJs to the lineup from the log or Going form. Each slot has a "b2b with" button
-  that adds another artist to it.
+  that adds another artist to it, until someone other than the person who added the slot
+  has picked it. After that, a different b2b is a new slot.
 - Typing "A b2b B" (also "B2B" and "b3b") in DJ search makes a b2b slot when every name
   exactly matches an existing DJ, with an undo. Otherwise the form suggests "Add as a b2b
   set: A + B". "&", "vs", and "x" only suggest, because duo names contain them.
+- A slot never gets a different DJ, so a rating given to A never counts for B (ADR 0013).
+  A wrong slot is removed and the right one added as a new slot.
 - The user who added a slot can remove it until someone else has picked it in their log.
-  After that, users report it with the reason "Didn't play" and a local or admin removes
-  it.
-  Removing a slot removes its picks and ratings. The logs stay.
+  After that, users report it with the reason "Didn't play", with an optional "Who played
+  instead?", and a local or admin corrects the lineup (section 7).
+- A removed slot is left out of the lineup, and its picks and ratings stop counting and
+  are left out of logs. They stay stored, and reverting the removal brings them back. The
+  logs and their reviews are not changed.
+- Lineups leave out hidden DJs. A slot whose DJs are all hidden is left out.
 
 ### 4. Logs
 - One log per user per event. Editable.
@@ -154,22 +174,29 @@ data model and code the local role is `moderator`; "Local" is its label in the a
   "Berlin local". In v1 the cities are not enforced, and a local can act anywhere. Locals:
   - Edit venues, DJs, and collectives: name, city, links, sound tags.
   - Change an event's venue, collective, or name when it is already set.
-  - Work the catalog report queue: "Duplicate", "Didn't play", and any report on a venue,
-    DJ, collective, event, or lineup slot. Reporters are not shown.
-  - Remove lineup slots.
-  - Merge and undo merges of events, venues, DJs, and collectives.
-- Admins also handle reports on logs, comments, and users, hide content, ban users, and
-  assign roles.
-- Every edit to a venue, DJ, collective, or event is recorded with who made it, the field,
-  the old value, the new one, and when.
+  - Work the catalog report queue: "Didn't play", and any report on a venue, DJ,
+    collective, event, or lineup slot other than "Duplicate". Reporters are not shown.
+  - Correct lineups in three ways: remove a slot, remove one DJ from a b2b slot, or switch
+    a DJ to another entry with the same name. Removing one DJ is refused when the slot
+    would then match another slot on that night: "A is already listed solo on this night.
+    Remove this slot instead."
+- Admins also merge events, venues, DJs, and collectives, handle "Duplicate" reports and
+  reports on logs, comments, and users, hide content, ban users, and assign roles.
+- Merges are admin-only in v1, and cannot be undone yet. Every merge is recorded so it can
+  be undone once undo ships after launch, when locals can merge too (ADR 0012).
+- Every edit to a venue, DJ, collective, event, or lineup slot is recorded with who made
+  it, the field, the old value, the new one, and when. Slot changes are listed in their
+  event's history.
   - Each entry has a history list with a "Revert" button on each row, for locals and
     admins.
   - Admins also have a "Recent edits" page across the catalog, filtered by person, where
     they select several edits and revert them together.
   - A revert is itself an edit, so it shows in the history and can be reverted.
+  - A revert that would put two slots with the same DJs on one night is refused. The local
+    removes the other slot first.
 
 **Duplicate reports.** A wrong merge moves real logs to the wrong place, for example when
-someone confuses two real venues. The report gives the local what they need to check.
+someone confuses two real venues. The report gives the admin what they need to check.
 - "Which one is it a duplicate of?" Required. A search of the same type: venues for a
   venue, nights for a night. The merge screen opens with both entries filled in.
 - A description, required, with a label and help text per type:
@@ -182,21 +209,16 @@ someone confuses two real venues. The report gives the local what they need to c
     anything that shows both listings are the same crew."
   - DJ, "Describe how you know": "An alias they play under, a set you saw billed under both
     names, anything that shows it's one person."
-- The local sees the two entries side by side (city, links, recent nights and lineups),
+- The admin sees the two entries side by side (city, links, recent nights and lineups),
   with matching links highlighted, and the description without the reporter's name. They
   choose "Merge", which opens the merge summary, or "Not a duplicate", which closes the
   report.
 
-**Merge summary.** Every merge and every undo shows a summary before it is confirmed.
-- Merge: each pair of events that will merge (date, venue, collective, name, lineup, log
-  count), the users with a log on both, the slots that combine, and the fields where the
-  merger picks a value.
-- Undo: logs going back and to which night, archived logs coming back, slots recreated,
-  DJs added to a lineup, what stays on the kept entry, fields that keep a later value,
-  values that collide with another night, logs
-  that cannot come back because their owners deleted them, and who gets a notice.
-- Public logs are shown in full. Private logs are shown only as a count, to locals and
-  admins alike.
+**Merge summary.** Every merge shows a summary before it is confirmed.
+- Each pair of events that will merge (date, venue, collective, name, lineup, log count),
+  the users with a log on both, the slots that combine, and the fields where the merger
+  picks a value.
+- Public logs are shown in full. Private logs are shown only as a count, to admins too.
 
 **Merging.** The merger picks the entry to keep and the one to merge in.
 - The merged entry keeps its row with `merged_into_id` set to the kept entry. Its URL
@@ -215,7 +237,7 @@ someone confuses two real venues. The report gives the local what they need to c
 - DJs: lineup slots point at the kept DJ. A b2b slot that ends up with the same DJ twice
   becomes a solo set. Two slots on one event that end up with the same artists combine, and
   a log that picked both keeps its pick on the kept slot.
-- The 3 logs per date limit does not block a merge or an undo.
+- The 3 logs per date limit does not block a merge.
 - A user with a log on both events keeps their most recently edited log on the event. The
   other log is archived: hidden from everyone and left out of averages, feeds, and stats,
   but still stored.
@@ -226,27 +248,9 @@ someone confuses two real venues. The report gives the local what they need to c
   logs with the reason ("Archived when two listings of this night were merged"), a link to
   the night, and "Switch to the other". The user can delete an archived log there.
 
-**Undoing a merge.**
-- Undo puts back what the merge changed, for the merge and the event merges it caused. The
-  merged entry opens again under its old URL.
-- A change is put back only when the row is still as the merge left it. A log moved since
-  with "Change night" stays where it is, a log its owner deleted stays deleted, and a field
-  edited since keeps the new value.
-- When putting a value back would break a unique rule, the undo summary asks: keep the
-  current value, or put it back and either name or merge the night it collides with.
-  Example: a merge gave Tresor's unnamed 4 Oct night the name "Day party", and someone then
-  started a new unnamed Tresor night on 4 Oct.
-- Logs, slots, and edits added to the kept entry after the merge stay on it.
-- A log going back that picked a set added after the merge brings that DJ with it: the DJ
-  is added to the original night's lineup, as "Change night" does.
-- Undo runs newest first. A merge can be undone only while its kept entry is not itself
-  merged. An event merge caused by a venue, collective, or DJ merge is undone only with it.
-- Users whose logs go back or come out of the archive get a notice. An open merge notice is
-  closed.
-
 ### 8. In-app notices
 - A banner the user sees on their next visit, shown until they act on it or dismiss it.
-- v1 uses it for event merges, undone merges, and Going prompts. It is the base for any
+- v1 uses it for event merges and Going prompts. It is the base for any
   later notifications.
 
 ### 9. Going
@@ -269,7 +273,12 @@ someone confuses two real venues. The report gives the local what they need to c
 
 - Averages use public, non-hidden, non-archived logs from non-banned users only.
 - Private logs count toward the owner's own profile stats and nowhere else.
-- Archived logs count nowhere until the owner switches to one or its merge is undone.
+- Archived logs count nowhere until the owner switches to one.
+- Picks and ratings on removed slots, and on hidden DJs, count nowhere.
+- Averages are not shown in v1 (section 6). Before any is shown, it needs a minimum number
+  of public logs from different users, and a rule for logs from new accounts, so a handful
+  of accounts cannot set a venue's or DJ's score. The numbers are set in the ADR that turns
+  averages on.
 
 ## Privacy
 
@@ -293,6 +302,7 @@ someone confuses two real venues. The report gives the local what they need to c
 - Followers-only visibility
 - Verified or claimed venue and DJ pages
 - Limiting locals to their cities
+- Undoing merges, and merges by locals (ADR 0012). The undo rules are in ADR 0009
 - Native app
 
 ## Data model
