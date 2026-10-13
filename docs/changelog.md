@@ -2,6 +2,17 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-13
+
+- `.claude/rules/database.md`: a one-value enum column is allowed only when the enum table
+  in `docs/DATA_MODEL.md` names the value expected next and the feature that brings it
+  (was: any state that could gain a value). Reason: the old wording contradicted the rule
+  against adding a column in case a feature arrives. Enums still replace booleans.
+- `.claude/rules/database.md`: each table lists who writes which column, enforced with
+  column grants or a trigger, with a test per protected column. Function security rules
+  live in `.claude/rules/supabase.md`. Reason: RLS picks rows, not columns, so an owner
+  update policy alone lets a user set their own role to admin through the API.
+
 ## 2026-10-12
 
 - Added `.claude/rules/database.md`, loaded for migrations and `docs/DATA_MODEL.md`: use an

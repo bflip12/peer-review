@@ -635,7 +635,31 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 | `reports` | Catalog targets: moderators and admins, without `reporter_id`. `duplicate` reports and other targets: admins | Signed-in users create. Moderators and admins resolve within their queue |
 | `event_redirects` | Everyone | Database functions |
 
-Averages and counts:
+### Column writes
+
+RLS decides which rows a user can write, not which columns. The browser talks to the
+database through the Supabase API, so an owner's update policy alone would let a user set
+their own `role` to `admin`, clear `hidden_at` on their log, or move `created_at` ahead to
+stay at the top of feeds. Each table below lists who writes which column. Everything not
+listed is written only by defaults, triggers, or database functions. Enforcement follows
+`.claude/rules/database.md`, and each protected column gets a test.
+
+| Table | Owner or signed-in user | Moderators and admins | Set only by defaults, triggers, or functions |
+|---|---|---|---|
+| `profiles` | `handle`, `display_name` | Admins: `role`, `account_status` | `id`, `account_status_at`, `created_at` |
+| `logs` | `overall_rating`, `sound_rating`, `venue_rating`, `body`, `visibility`. `event_id` only through "Change night" | Admins: `hidden_at` | `user_id` (the signed-in user), `short_id`, `event_date`, `archived_merge_id`, `created_at`, `updated_at` |
+| `set_listens` | `rating`. Insert and delete their own picks | | `event_id`, `updated_at` |
+| `comments` | `body`. Delete through a function that sets `deleted_at` and clears `body` | Admins: `hidden_at` | `user_id`, `edited_at`, `deleted_at`, `created_at` |
+| `venues`, `artists`, `collectives` | Creator until `used_by_others_at`: `name`, `city_id` | `name`, `city_id`. Admins: `hidden_at` | `short_id`, `used_by_others_at`, `merged_into_id`, `created_at`, `updated_at` |
+| `events` | Fill empty `venue_id`, `name`, and add co-hosts, through a function | Change set fields, through a function. Admins: `hidden_at` | Everything else |
+| `lineup_slots`, `slot_artists` | Through the lineup functions only | Through the lineup functions only | `removed_at` and every other column |
+| `reports` | Insert: target, `reason`, `description`, `duplicate_of_id` | Within their queue: `status` | `reporter_id`, `resolved_by`, `resolved_at`, `created_at` |
+| `notices` | `action` | | Every other column, including `acted_at` |
+| `links`, `venue_sound_systems` | Insert and delete, for whoever may edit the entry | Insert and delete | `id` |
+| `follows`, `likes`, `going` | Insert and delete only | | Every column |
+
+### Averages and counts
+
 - Picks on removed slots, and hidden artists, count nowhere: not in averages, "listened to"
   counts, or profile stats.
 - Averages use visible logs only. Venue: `venue_rating` on the venue's events. DJ: set
