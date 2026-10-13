@@ -50,9 +50,9 @@ is the current lean), leave out district entries, and add `city_names` with Engl
 local names so "Cologne" and "Köln" both match. Venues with name, city,
 links, and sound tags. DJs and collectives. Search-first creation with fuzzy duplicate
 suggestions. Links in a `links` table, validated by domain per
-platform. DJ names containing "b2b" are refused. DJ notes to tell same-name DJs apart,
-required when a new name matches exactly, shown in DJ search and on the DJ page, with the
-unique index on name and note (ADR 0011). Daily caps per user on new venues, DJs, and
+platform. DJ names containing "b2b" are refused. An optional home city on DJs, required when
+a new DJ's name matches one with no city, shown in DJ search and on the DJ page, with the
+unique index on name and city (ADR 0011). Daily caps per user on new venues, DJs, and
 collectives, by a trigger on `creations` (ADR 0011). The creator edits their
 entry until another user picks it (ADR 0009), with `used_by_others_at` set by a trigger
 and the creator read from `creations` (ADR 0010).
@@ -66,7 +66,8 @@ night" groups, nights one day either side, a required name for a second night at
 place and date, and the past-midnight line. Events created only when a log is saved, with
 the concurrent-save case joining instead of failing, and counting toward the daily event cap
 (ADR 0011). Lineup slots with one or more artists,
-b2b detection in DJ search, and slot removal by the user who added it. Log form with the
+b2b detection in DJ search, "b2b with" and slot removal by the user who added it until
+someone else picks it, with removal setting `removed_at` (ADR 0013). Log form with the
 overall rating, review, and privacy first, and a collapsed section for sound, venue, and
 "Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.
 "Change night" on a log, carrying everything over. Deletion of events left with no logs
@@ -94,7 +95,11 @@ help text per type, shown to the admin beside both entries. A catalog report que
 locals (reporters not shown) and a queue for "Duplicate" reports and reports on logs,
 comments, and users for admins. Locals and admins edit venues, DJs,
 collectives, and set event fields, with a history list and "Revert" per entry, and a
-"Recent edits" page for admins with bulk revert. Admins hide content,
+"Recent edits" page for admins with bulk revert. Lineup corrections by locals (ADR 0013):
+remove a slot, remove one DJ from a b2b slot, or switch to a same-name DJ, each in the
+event's history with "Revert", and reverts refused when they would duplicate a slot.
+"Didn't play" reports with an optional "Who played instead?". Hidden DJs left out of
+lineups and stats. Admins hide content,
 ban users, and assign roles.
 
 Merges of events, venues, DJs, and collectives, by admins only (ADR 0012), each with a
@@ -145,7 +150,9 @@ undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to th
   for logs from new accounts (SPEC "Aggregation rules"). The numbers go in the ADR that
   turns averages on.
 - DJ pages list a night only once someone other than the person who added the DJ's slot
-  has picked it in a public log. Stops one user
+  has picked it in a public log.
+- "Played:" in DJ search: venues and collectives the DJ played, taken from lineups. Only
+  nights with at least one public log, the same rule as DJ pages. Stops one user
   putting a DJ on a night they did not play. Wait until the app has enough traffic that
   this does not hide real nights.
 - Photos

@@ -41,13 +41,17 @@ Online scene communities across many cities. Two consequences:
   and search, never to match events.
 - A DJ name containing "b2b" is refused, with a pointer to the "b2b with" button on the
   lineup. b2b sets are lineup slots, not DJs (section 3).
-- DJs have an optional "Note to tell them apart", up to 60 characters, for two artists with
-  the same name (ADR 0011). The field appears when a new DJ's name matches an existing DJ
-  exactly, ignoring case and surrounding spaces, and is required then:
-  "There's already a DJ called DJ Rush." above the existing DJ with "Use this DJ", then
-  "Different person?" with the note field, help text "For example where they're from or
-  what they play.", and "Add as a new DJ". DJ search results show the note and the DJ's
-  link sites beside the name. The DJ page shows the note under the name.
+- DJs have an optional home city, picked from the city list, labelled "Where they're
+  based" with the help text "Not where you saw them. Check their RA or Instagram if
+  unsure." It tells apart two artists with the same name (ADR 0011). Empty means unknown;
+  there is no "No home city" choice.
+- When a new DJ's name matches an existing DJ exactly, ignoring case and surrounding
+  spaces, the form shows "There's already a DJ called DJ Rush." above each existing one with
+  its city, links, and "Use this DJ", then "Different person?" with the city field and "Add
+  as a new DJ". The city is required when an existing DJ with that name has no city, and
+  optional otherwise. Two DJs with the same name and city are refused.
+- DJ search results show the city and the DJ's link sites beside the name. The DJ page
+  shows the city under the name.
 - Per user, over the last 24 hours, at most 10 venues, 10 collectives, 50 DJs, and 20 new
   events (ADR 0011). Locals and admins are exempt. At a cap the form shows "You've added 10
   venues today. You can add more tomorrow."
@@ -104,14 +108,20 @@ collective nights work the same way.
 - A lineup slot is one set and holds one or more artists. A slot with several artists is a
   b2b set, shown as "A b2b B" with each name linking to its DJ page.
 - Users add DJs to the lineup from the log or Going form. Each slot has a "b2b with" button
-  that adds another artist to it.
+  that adds another artist to it, until someone other than the person who added the slot
+  has picked it. After that, a different b2b is a new slot.
 - Typing "A b2b B" (also "B2B" and "b3b") in DJ search makes a b2b slot when every name
   exactly matches an existing DJ, with an undo. Otherwise the form suggests "Add as a b2b
   set: A + B". "&", "vs", and "x" only suggest, because duo names contain them.
+- A slot never gets a different DJ, so a rating given to A never counts for B (ADR 0013).
+  A wrong slot is removed and the right one added as a new slot.
 - The user who added a slot can remove it until someone else has picked it in their log.
-  After that, users report it with the reason "Didn't play" and a local or admin removes
-  it.
-  Removing a slot removes its picks and ratings. The logs stay.
+  After that, users report it with the reason "Didn't play", with an optional "Who played
+  instead?", and a local or admin corrects the lineup (section 7).
+- A removed slot is left out of the lineup, and its picks and ratings stop counting and
+  are left out of logs. They stay stored, and reverting the removal brings them back. The
+  logs and their reviews are not changed.
+- Lineups leave out hidden DJs. A slot whose DJs are all hidden is left out.
 
 ### 4. Logs
 - One log per user per event. Editable.
@@ -166,18 +176,24 @@ data model and code the local role is `moderator`; "Local" is its label in the a
   - Change an event's venue, collective, or name when it is already set.
   - Work the catalog report queue: "Didn't play", and any report on a venue, DJ,
     collective, event, or lineup slot other than "Duplicate". Reporters are not shown.
-  - Remove lineup slots.
+  - Correct lineups in three ways: remove a slot, remove one DJ from a b2b slot, or switch
+    a DJ to another entry with the same name. Removing one DJ is refused when the slot
+    would then match another slot on that night: "A is already listed solo on this night.
+    Remove this slot instead."
 - Admins also merge events, venues, DJs, and collectives, handle "Duplicate" reports and
   reports on logs, comments, and users, hide content, ban users, and assign roles.
 - Merges are admin-only in v1, and cannot be undone yet. Every merge is recorded so it can
   be undone once undo ships after launch, when locals can merge too (ADR 0012).
-- Every edit to a venue, DJ, collective, or event is recorded with who made it, the field,
-  the old value, the new one, and when.
+- Every edit to a venue, DJ, collective, event, or lineup slot is recorded with who made
+  it, the field, the old value, the new one, and when. Slot changes are listed in their
+  event's history.
   - Each entry has a history list with a "Revert" button on each row, for locals and
     admins.
   - Admins also have a "Recent edits" page across the catalog, filtered by person, where
     they select several edits and revert them together.
   - A revert is itself an edit, so it shows in the history and can be reverted.
+  - A revert that would put two slots with the same DJs on one night is refused. The local
+    removes the other slot first.
 
 **Duplicate reports.** A wrong merge moves real logs to the wrong place, for example when
 someone confuses two real venues. The report gives the admin what they need to check.
@@ -258,6 +274,7 @@ someone confuses two real venues. The report gives the admin what they need to c
 - Averages use public, non-hidden, non-archived logs from non-banned users only.
 - Private logs count toward the owner's own profile stats and nowhere else.
 - Archived logs count nowhere until the owner switches to one.
+- Picks and ratings on removed slots, and on hidden DJs, count nowhere.
 - Averages are not shown in v1 (section 6). Before any is shown, it needs a minimum number
   of public logs from different users, and a rule for logs from new accounts, so a handful
   of accounts cannot set a venue's or DJ's score. The numbers are set in the ADR that turns

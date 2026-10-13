@@ -2,7 +2,7 @@
 
 The tables, relationships, constraints, and indexes for v1, and which of them are hard to
 change once real data exists. Product rules are in `SPEC.md`. The decisions behind this
-shape are in ADRs 0008 to 0012. Once migrations exist, they are the source of truth
+shape are in ADRs 0008 to 0013. Once migrations exist, they are the source of truth
 and this file describes them.
 
 Rules for changing the schema are in `.claude/rules/database.md`.
@@ -70,6 +70,7 @@ erDiagram
 
     cities ||--o{ venues : "located in"
     cities ||--o{ collectives : "based in (optional)"
+    cities ||--o{ artists : "based in (optional)"
     cities ||--o{ events : "happens in"
 
     venues ||--o{ venue_sound_systems : has
@@ -119,7 +120,7 @@ value instead of changing a column's type.
 | `notice_action` | `keep`, `switch`, `log_it`, `didnt_go`, `dismissed` | `notices.action` | |
 | `report_reason` | `duplicate`, `didnt_play`, `wrong_info`, `spam`, `abusive`, `other` | `reports.reason` | |
 | `report_status` | `open`, `actioned`, `dismissed` | `reports.status` | |
-| `catalog_type` | `venue`, `artist`, `collective`, `event` | `merges`, `catalog_edits` | |
+| `catalog_type` | `venue`, `artist`, `collective`, `event`, `lineup_slot` | `merges`, `catalog_edits` | `lineup_slot` for slot changes (ADR 0013). Never a merge type |
 | `merge_change_type` | See [merge_changes](#merge_changes) | `merge_changes.change_type` | |
 
 ## Tables
@@ -218,17 +219,17 @@ One row per DJ or live act. "DJs" in the UI.
 | `id` | uuid | |
 | `short_id` | text | Unique |
 | `name` | text | Required. Refused when it contains "b2b" (any case) |
-| `disambiguation` | text | Optional, up to 60 characters. "Note to tell them apart" in forms (ADR 0011) |
+| `city_id` | integer | Optional home city. References `cities`. Tells apart DJs with the same name (ADR 0011) |
 | `used_by_others_at` | timestamptz | As on venues |
 | `merged_into_id` | uuid | References `artists` |
 | `hidden_at` | timestamptz | |
 | `created_at`, `updated_at` | timestamptz | |
 
-Among DJs not merged, no two share a name and a note, a missing note counting as equal.
-One unique index on `(lower(btrim(name)), lower(btrim(disambiguation)))` with `NULLS NOT
-DISTINCT`, limited to rows not merged (checked). A second "DJ Rush" needs a note, and
-renaming a DJ to a name held by a DJ with no note is refused. The form asks for the note
-whenever the name matches, so the index is the backstop.
+Among DJs not merged, no two share a name and a city, a missing city counting as equal.
+One unique index on `(lower(btrim(name)), city_id)` with `NULLS NOT DISTINCT`, limited to
+rows not merged (checked). A second "DJ Rush" needs a city when the first has none, and
+renaming a DJ or changing their city into a taken pair is refused. The form requires the
+city in exactly that case, so it and the index agree.
 
 #### collectives
 
@@ -334,11 +335,23 @@ from its artist count, never stored.
 |---|---|---|
 | `id` | uuid | |
 | `event_id` | uuid | References `events`. Cascade. Updates cascade (merges) |
+| `removed_at` | timestamptz | Set when the slot is removed. The row and its picks stay so the removal can be reverted (ADR 0013) |
 | `created_at` | timestamptz | |
 
-Unique on `(id, event_id)` for `set_listens`. The same set of artists appears at most once
-per event (enforced by the functions that add slots and merge events). Who added the slot
-is in `creations`.
+Unique on `(id, event_id)` for `set_listens`. Among slots not removed, the same set of
+artists appears at most once per event (enforced by the functions that add, change, and
+revert slots and merge events). Who added the slot is in `creations`.
+
+A slot never gets a different artist (ADR 0013). The lineup functions allow only:
+- Adding an artist ("b2b with") until someone other than the slot's adder has picked it.
+- Removing one artist from a slot with two or more, refused when the result matches another
+  live slot on the event.
+- Switching an artist to another artist with the same name, ignoring case and surrounding
+  spaces.
+- Removing the slot (`removed_at`).
+
+DJ merges are exempt: they point slots at the kept artist, whatever its name. Each change
+except merges writes a `catalog_edits` row with `entity_type` `lineup_slot`.
 
 #### slot_artists
 
@@ -497,15 +510,16 @@ Each edit to a venue, DJ, collective, or event (ADR 0009).
 |---|---|---|
 | `id` | uuid | |
 | `entity_type` | `catalog_type` | |
-| `entity_id` | uuid | No foreign key: it can point at any of four tables |
-| `field` | text | `name`, `city_id`, `venue_id`, a link platform, a sound tag, a co-host |
+| `entity_id` | uuid | No foreign key: it can point at any of five tables |
+| `field` | text | `name`, `city_id`, `venue_id`, a link platform, a sound tag, a co-host, and for slots `removed` or `artists` |
 | `old_value`, `new_value` | jsonb | |
 | `edited_by` | uuid | References `profiles`. Set null on delete |
 | `reverts_edit_id` | uuid | Set when this edit is a revert. References `catalog_edits` |
 | `merge_id` | uuid | Set when a merge made the edit |
 | `created_at` | timestamptz | |
 
-Readable by moderators and admins.
+Readable by moderators and admins. A slot's edits are listed in its event's history. A
+revert that would leave two live slots with the same artists on one event is refused.
 
 #### merges
 
@@ -542,7 +556,7 @@ Each change a merge made, in order, so undo can replay them backwards.
 | `id` | uuid | |
 | `reporter_id` | uuid | References `profiles`. Set null on delete. Never shown to moderators |
 | `reason` | `report_reason` | |
-| `description` | text | Required for `duplicate` |
+| `description` | text | Required for `duplicate`. For `didnt_play`, the optional "Who played instead?" |
 | `log_id`, `comment_id`, `event_id`, `lineup_slot_id`, `venue_id`, `artist_id`, `collective_id`, `profile_id` | uuid | Exactly one is set (check). Cascade |
 | `duplicate_of_id` | uuid | Required for `duplicate`. Same type as the target (trigger) |
 | `status` | `report_status` | Default `open` |
@@ -577,6 +591,7 @@ undo can be added after launch (ADR 0012) and replay them.
 Co-hosts change two rules from ADR 0008 and 0009:
 - An event merge combines both events' collectives instead of picking one. The merger
   still picks the venue and name when both events have a different one.
+- An event merge moves removed slots with the event and combines only live slots.
 - A collective merge moves `event_collectives` rows. If both collectives host the same
   event, one row stays. Clashing no-venue nights on one date are listed to merge or name,
   as SPEC section 7 describes.
@@ -596,7 +611,7 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 | `cities`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
 | `venues`, `artists`, `collectives`, `links`, `venue_sound_systems` | Everyone, unless hidden | Create: signed-in users, within the daily caps. Edit: the creator until `used_by_others_at`, then moderators and admins. Hide: admins |
 | `events`, `event_collectives` | Everyone, unless hidden. Pages list an event only once it has a visible log | Create through the create function. Fill empty fields: users logging it. Change set fields: moderators and admins |
-| `lineup_slots`, `slot_artists` | Everyone | Add: signed-in users. Remove: the adder until someone else picks it, then moderators and admins |
+| `lineup_slots`, `slot_artists` | Everyone, except removed slots and hidden artists. Moderators and admins also see removed slots | Add: signed-in users. "b2b with" and remove: the adder until someone else picks it. After that, moderators and admins remove a slot, remove one artist, or switch to a same-name artist |
 | `logs` | Visible logs to everyone. The owner reads all of their own | Owner. Admins hide |
 | `set_listens` | Follows the log | Follows the log |
 | `follows`, `likes` | Everyone | Owner adds and removes their own |
@@ -608,6 +623,8 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 | `event_redirects` | Everyone | Database functions |
 
 Averages and counts:
+- Picks on removed slots, and hidden artists, count nowhere: not in averages, "listened to"
+  counts, or profile stats.
 - Averages use visible logs only. Venue: `venue_rating` on the venue's events. DJ: set
   ratings on slots including the DJ, solo, b2b, and combined. Collective: `venue_rating`
   on its no-venue nights. All three are calculated, not shown in v1 (SPEC section 6).
@@ -696,9 +713,9 @@ Run on a local PostgreSQL 16.15 in this session:
   time on 12 Oct is 10:00 UTC.
 - Enums: a value can be added and renamed, not removed, and a new value must be committed
   before use.
-- DJ name index (2026-10-12, PostgreSQL 16.15): refuses a second unnoted "DJ Rush" in any
-  case or spacing, allows one with a note, refuses the same note twice, refuses a blank or
-  61-character note, ignores merged rows, and refuses unmerging into a name now taken.
+- DJ name and city index (2026-10-13, PostgreSQL 16.15): refuses a second "DJ Rush" with
+  no city in any case or spacing, allows one with a city, refuses the same city twice,
+  ignores merged rows, and refuses changing a DJ's city into a taken pair.
 - Cap trigger (same session): refuses the 11th venue in 24 hours, counts each kind apart,
   ignores rows older than 24 hours, lets a moderator past it, and does not count slots.
   Two sessions inserting a 10th venue at once: with the per-user advisory lock the second
