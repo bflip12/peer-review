@@ -8,6 +8,29 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Reviewing which AI features belong in v1 (2026-10-13)
+
+**Goal.** Decide which AI features are worth building, and when, before any of them gets
+near the roadmap.
+
+**How I used AI.** I asked Claude to review every AI feature in the spec and backlog: what
+each needs (LLM calls, embeddings, data volume), a rough cost per user, what it does with too
+little data, and whether it belongs in v1. It priced each feature from token estimates
+against current model prices, checked what Supabase offers for free embeddings, and
+estimated how much review data v1 will have. It also proposed new AI ideas and judged them
+by the same questions, including some that turned out not to need AI at all. It listed what
+it could not verify.
+
+**My calls.**
+- No AI in v1 stays, as in [ADR 0006](adr/0006-no-ai-in-v1.md). The review showed cost is
+  not the blocker: every feature is cents per user. v1 will not have the review data the
+  features need.
+- After v1, in order: log assist, then venue review summaries, then visiting a city, each
+  when its trigger in the review is met.
+- Natural-language search is cut. Sound tag and city filters answer the example query.
+
+**Output.** [`docs/AI_FEATURES.md`](AI_FEATURES.md) and the "Later" list in `TASKS.md`.
+
 ## Reviewing the community-built catalog (2026-10-12)
 
 **Goal.** Check that logging stays quick and community-run, with no verification, without
