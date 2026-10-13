@@ -121,7 +121,6 @@ value instead of changing a column's type.
 | `log_visibility` | `public`, `private` | `logs.visibility` | Followers-only is on the "Not in v1" list |
 | `going_visibility` | `private` (only value) | `going.visibility` | ADR 0007 names mutual-follow visibility as the start of a social version |
 | `follow_status` | `active` (only value) | `follows.status` | Followers-only usually brings follow requests (`pending`) |
-| `reaction` | `like` (only value) | `likes.reaction` | Other reactions. The key stays one reaction per user per log |
 | `notice_kind` | `going_prompt` | `notices.kind` | SPEC section 8. `event_merge` and `merge_undone` are added in Milestone 10 (ADR 0014) |
 | `notice_action` | `log_it`, `didnt_go`, `dismissed` | `notices.action` | `keep` and `switch` are added in Milestone 10 |
 | `report_reason` | `duplicate`, `didnt_play`, `wrong_info`, `spam`, `abusive`, `other` | `reports.reason` | |
@@ -434,8 +433,9 @@ a merge can move logs and slots in two steps (checked).
 
 #### likes
 
-`user_id` and `log_id` (both cascade), `reaction` (`reaction`, default `like`),
-`created_at`. Primary key `(user_id, log_id)`: one reaction per user per log.
+`user_id` and `log_id` (both cascade), `created_at`. Primary key `(user_id, log_id)`: one
+like per user per log. Other reactions, if ever planned, add a `reaction` enum column with
+default `like` and keep the key (ADR 0014).
 
 #### comments
 
@@ -724,10 +724,11 @@ Ordered by cost once there is real data.
    would mean remapping every venue, collective, and event.
 9. **`profiles.id` is the auth user ID, and email stays in `auth.users`.**
 
-Easy to change later: the daily cap numbers, showing averages (with the minimums in SPEC
-"Aggregation rules"), link platforms, comment replies, new rating types
-(one column each), a room or set type per slot, event status (cancelled), festivals and
-recurring series (a parent table over events), city scope for moderators (one policy).
+Easy to change later: the daily cap numbers, other reactions on likes, showing averages
+(with the minimums in SPEC "Aggregation rules"), link platforms, comment replies, new
+rating types (one column each), a room or set type per slot, event status (cancelled),
+festivals and recurring series (a parent table over events), city scope for moderators
+(one policy).
 
 ## Checked
 

@@ -47,6 +47,9 @@ For averages:
 - No averages are calculated in v1. The aggregation rules stay as written.
 - The "Recent edits" page with bulk revert moves to "Later". Every catalog edit is still
   recorded from Milestone 2.
+- `likes.reaction` and its one-value `reaction` enum are dropped. No planned feature names
+  a second reaction, so the column fails the one-value enum rule in
+  `.claude/rules/database.md`. Adding it later is one column with a default.
 
 ## Consequences
 - Replaces from ADR 0012: admin merges in v1, and merges recorded before undo exists. Its
@@ -54,7 +57,8 @@ For averages:
 - Replaces from ADR 0007: Going reusing the notices built for event merges. Going builds
   the notices table and banner in Milestone 7.
 - Replaces from ADR 0008: artist views returning averages in v1. Replaces from ADR 0010:
-  averages calculated in v1. Replaces from ADR 0009: the "Recent edits" bulk revert in v1.
+  averages calculated in v1 and the `reaction` enum on likes. Replaces from ADR 0009: the
+  "Recent edits" bulk revert in v1.
 - Milestone 6 loses merges, the archive and switch notice, and the "Archived" section.
   Milestone 10 becomes "Merges and undo".
 - Until Milestone 10, a duplicate with logs from several users shows as two nights, and its

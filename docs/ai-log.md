@@ -26,8 +26,10 @@ not check from the session.
 - Users can fill in an empty venue on a night, or add a collective, unless it clashes
   with another night. A clash offers a duplicate report. I asked for the pros and cons
   first; locals-only would have sent every fix to me.
-- The one-value enum columns stay. They are there to future-proof, not instead of a
-  boolean, so the rule was reworded to require a named next value rather than dropped.
+- Follow status and Going visibility stay as one-value enums. They are there to
+  future-proof, not instead of a boolean, so the rule was reworded to require a named next
+  value rather than dropped. The reaction column on likes had no named next value, so I
+  dropped it.
 - Column write rules go into the data model. I asked how a user could even change their
   own role. The answer is that the browser writes to the database directly, and row rules
   do not check columns.
