@@ -18,7 +18,9 @@ the spec and ADRs, said what already works (join first, users fix their own mist
 undoable merges, hidden averages), and ranked five gaps. For the same-name DJ fix it drew
 the forms and search results as text so I could judge the flow before anything was written.
 It ran the new database rules on a local Postgres, including two inserts at the same moment
-against the daily cap.
+against the daily cap. When its plan for lineup fixes kept growing, I had it review the plan
+as a skeptical senior engineer: what is overbuilt, underbuilt, and contradictory. The review
+found that its own design broke the main case it was meant to fix.
 
 **My calls.**
 - Aliases stay allowed. Blocking them would not work, and the privacy model wants them.
@@ -26,8 +28,17 @@ against the daily cap.
   about anyone reaching them and considered starting lower and raising them on request. I
   kept them well above normal use, so the first users in each city, who add most of the
   catalog, never hit them.
-- DJs with the same name get a short note to tell them apart, asked for only when a new
-  name matches an existing one.
+- DJs with the same name are told apart by a home city from the cities list, not the
+  free-text note Claude first proposed. I pushed on why a note beat a city, since two DJs
+  with one name are almost always in different cities.
+- The city is optional, and empty means unknown. I didn't want a "No home city" choice that
+  becomes a catch-all. It is required only when a same-name DJ has no city.
+- A rating for DJ A must never end up counting for DJ B. Claude's first answer moved
+  ratings between slots, and the review showed it was too complex and contradicted itself.
+  I asked for something simpler: a lineup slot never gets a different DJ, and a wrong one is
+  replaced.
+- I asked whether lineup fixes could be reverted. They couldn't, so removing a slot now
+  hides it, and every slot change goes in the event's history with "Revert".
 - I turned down hiding nights from DJ pages until a second person confirms the set. The app
   needs visibility to gain traction first, so it waits in Later.
 - Merge undo moves to after launch. Merges stay recorded from the first one, and only
@@ -35,10 +46,10 @@ against the daily cap.
 - Averages need a minimum number of logs from different users, plus a rule for new
   accounts, before they are shown.
 
-**Output.** [ADR 0011](adr/0011-creation-caps-and-dj-notes.md),
-[ADR 0012](adr/0012-merge-undo-after-launch.md). `SPEC.md` sections 2 and 7, "Aggregation
-rules", and "Not in v1", [`docs/DATA_MODEL.md`](DATA_MODEL.md), and `TASKS.md` Milestones
-0, 2, 3, 6, and 10.
+**Output.** [ADR 0011](adr/0011-creation-caps-and-dj-cities.md),
+[ADR 0012](adr/0012-merge-undo-after-launch.md), [ADR 0013](adr/0013-lineup-corrections.md).
+`SPEC.md` sections 2, 3, and 7, "Aggregation rules", and "Not in v1",
+[`docs/DATA_MODEL.md`](DATA_MODEL.md), and `TASKS.md` Milestones 0, 2, 3, 6, and 10.
 
 ## Designing the data model (2026-10-12)
 
