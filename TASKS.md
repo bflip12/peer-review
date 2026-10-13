@@ -145,7 +145,8 @@ undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to th
 ## Later
 
 - Venue-claimed pages, with an opt-in public location
-- AI features: venue review summaries, log assist, visiting a city
+- AI features: log assist, then venue review summaries, then visiting a city, each when
+  its trigger in `docs/AI_FEATURES.md` is met
 - Show averages. Each needs a minimum number of public logs from different users and a rule
   for logs from new accounts (SPEC "Aggregation rules"). The numbers go in the ADR that
   turns averages on.
@@ -157,6 +158,7 @@ undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to th
   this does not hide real nights.
 - Photos
 - Want-to-go list, custom lists
-- Natural-language search ("clubs with Funktion-One")
+- Sound tag and city filters on venue search, which cover queries like "clubs with
+  Funktion-One" without natural-language search (`docs/AI_FEATURES.md`)
 - Public upcoming event listings
 - Notifications
