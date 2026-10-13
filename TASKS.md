@@ -103,12 +103,19 @@ and add collectives, refused on a clash or a venue in another city, with "Report
 same night". Deletion of events left with no logs
 and no Going markers, with a redirect when a move caused it. The log form accepts only
 events dated today or earlier.
+The private original copy of each log in `log_snapshots` (ADR 0015): written on the
+owner's first save and replaced on each of their saves and "Change night", never by other
+users' edits, lineup corrections, or hides, with RLS tests that no one but the owner reads
+it, admins included.
 
 ## Milestone 4: Pages
 
 Log, event, venue, DJ, collective, profile with stats, search by name. Venue, DJ, and
 collective pages list only events with at least one public log. No averages (ADR 0014).
 "Most listened to DJs" counts picked sets.
+The private "Original logs" page on the owner's profile, with the explanation from SPEC
+section 4, "Changed since you saved it" per row, and "View original" in the owner's log
+menu (ADR 0015).
 
 ## Milestone 5: Social
 

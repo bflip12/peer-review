@@ -56,3 +56,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0012](0012-merge-undo-after-launch.md) | Merge undo ships after launch, and merges are admin-only until then | Accepted, amended by 0014 |
 | [0013](0013-lineup-corrections.md) | A lineup slot never gets a different DJ, and slot changes can be reverted | Accepted |
 | [0014](0014-merges-ship-with-undo.md) | Merges ship with undo after launch, and v1 has no averages or bulk revert | Accepted |
+| [0015](0015-original-logs.md) | A private original copy of each log | Accepted |

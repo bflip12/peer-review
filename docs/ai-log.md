@@ -8,6 +8,32 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## A private original copy of each log (2026-10-13)
+
+**Goal.** Decide whether users get a read-only copy of their logs, so they keep their
+originals when other people edit the night.
+
+**How I used AI.** I asked Claude for its opinion before building anything. It checked
+what can change a log under the current spec and first argued against a copy table: the
+review is only changed by its owner, catalog edits are already recorded, and backups and
+an export cover data loss. When I asked for a product view, it changed its answer and
+proposed a frozen copy of the night, with the rule that what the user writes stays live
+and what others control is frozen.
+
+**My calls.**
+- A log is the whole entity, not just its review, and users will feel ownership of it.
+  That turned the recommendation from "export only" to a copy.
+- The copy holds the current review along with the night as it was originally recorded.
+- No notice on the log when its night changes. On a busy app lineups get corrected all
+  the time, so it would show on most logs. The copies get their own private page, with a
+  plain explanation at the top.
+- The copy refreshes on every save by its owner, not only the first. Claude recommended
+  it so "Change night" does not leave a copy of the old night, and I accepted.
+
+**Output.** [ADR 0015](adr/0015-original-logs.md), `SPEC.md` section 4,
+[`docs/DATA_MODEL.md`](DATA_MODEL.md) (`log_snapshots`), `TASKS.md` Milestones 3 and 4.
+Commit `92befb8`.
+
 ## A senior review of the whole v1 plan (2026-10-13)
 
 **Goal.** Find what is overbuilt, underbuilt, or contradictory across the spec, task list,
