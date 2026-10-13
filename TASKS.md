@@ -30,12 +30,16 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
    (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
    that generated types turn enums into unions, check Supabase Auth's sign-up rate limits
    per IP (ADR 0011), and pick the `short_id` length and alphabet.
-6. Add to `docs/code-style.md`: server component data fetching, and the Next.js
-   default-export exception for route files.
-7. Write the rules not covered yet: where state lives and what may not hold it, when a new
-   dependency is acceptable, what is committed versus generated, and the error and loading
-   conventions.
-8. Create the token file and `docs/style-guide.md` with the first styled component (the app
+6. Write an ADR on styling and data fetching. `docs/code-style.md` sections 8 to 10 assume
+   styled-components, client-side React Query (in its pre-v5 API), Sentry, and atoms, none
+   of which are in the stack, and styled-components needs client components in the App
+   Router. Proposal to weigh: CSS Modules with the token file, server components read,
+   server actions write, and no client data library until a screen needs one. Then rewrite
+   code-style sections 8 to 10 and checklist item 9 to match, with where state lives, the
+   Next.js default-export exception for route files, and the error and loading
+   conventions. Rules for new dependencies and for committed versus generated files are
+   written when the first case comes up (Supabase generated types, task 5).
+7. Create the token file and `docs/style-guide.md` with the first styled component (the app
    shell).
 
 ## Milestone 1: Accounts
@@ -70,7 +74,9 @@ b2b detection in DJ search, "b2b with" and slot removal by the user who added it
 someone else picks it, with removal setting `removed_at` (ADR 0013). Log form with the
 overall rating, review, and privacy first, and a collapsed section for sound, venue, and
 "Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.
-"Change night" on a log, carrying everything over. Deletion of events left with no logs
+"Change night" on a log, carrying everything over. Users fill in an empty venue or name
+and add collectives, refused on a clash or a venue in another city, with "Report as the
+same night". Deletion of events left with no logs
 and no Going markers, with a redirect when a move caused it. The log form accepts only
 events dated today or earlier.
 
@@ -78,7 +84,7 @@ events dated today or earlier.
 
 Log, event, venue, DJ, collective, profile with stats, search by name. Venue, DJ, and
 collective pages list only events with at least one public log. Artist averages computed
-solo, b2b, and combined, with the combined one shown. "Most listened to DJs" counts picked
+solo, b2b, and combined, not shown (SPEC section 6). "Most listened to DJs" counts picked
 sets.
 
 ## Milestone 5: Social
@@ -156,6 +162,8 @@ undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to th
   nights with at least one public log, the same rule as DJ pages. Stops one user
   putting a DJ on a night they did not play. Wait until the app has enough traffic that
   this does not hide real nights.
+- Paste a lineup ("A, B b2b C, D") to add several slots at once. A parser on commas, new
+  lines, and the existing b2b rules, no AI (`docs/AI_FEATURES.md`)
 - Photos
 - Want-to-go list, custom lists
 - Sound tag and city filters on venue search, which cover queries like "clubs with

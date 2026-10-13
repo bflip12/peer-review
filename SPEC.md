@@ -73,8 +73,14 @@ Online scene communities across many cities. Two consequences:
 - Names compare ignoring case and surrounding spaces.
 - Dates are read in the event city's timezone. "Today" in any rule means today in that
   city.
-- Anyone logging an event can set its collective or name when it has none. Changing a value
-  that is already set is for locals and admins (section 7).
+- Anyone logging an event can fill in its venue or name when it has none, and add a
+  collective. Changing or removing a value that is already set is for locals and admins
+  (section 7).
+- Filling in a venue on a night with no venue is refused when the venue is in another city,
+  or when the venue already has a night on that date that is also unnamed or has the same
+  name. Adding a collective to a night with no venue is refused the same way when that
+  collective already has such a night. The form says "Tresor already has a night on Sat 4
+  Oct." and offers "Report as the same night", which files a "Duplicate" report (section 7).
 - An event is created when the first log or Going marker on it is saved, never earlier. If
   two users create the same event at the same moment, the second save joins the first.
 - Event pages never show who created the event.

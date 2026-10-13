@@ -10,7 +10,8 @@ Rules for changing the schema are in `.claude/rules/database.md`.
 ## Conventions
 
 - **Keys.** Every table has a UUID primary key named `id`, except join tables (composite
-  key) and `cities` (GeoNames ID). `profiles.id` is the same value as `auth.users.id`.
+  key), `cities` (GeoNames ID), `link_platforms` (a text ID such as `instagram`), and
+  `event_redirects` (`from_short_id`). `profiles.id` is the same value as `auth.users.id`.
 - **Short IDs.** Pages that can be shared (venues, DJs, collectives, events, logs) also have
   a `short_id`: a short random string, unique per table, used only in URLs. UUIDs never
   appear in a URL.
@@ -288,8 +289,13 @@ Constraints:
 - Every event has a venue, at least one collective, or both. This spans two tables, so the
   function that creates events enforces it, and a trigger re-checks it when the last
   collective is removed from a no-venue event.
-- Only moderators and admins change `venue_id`, `name`, or the collectives once set. Any
-  user logging the event can fill them in when empty.
+- Any user logging the event can fill in `venue_id` or `name` when empty, and add a
+  collective. Only moderators and admins change or remove a value once set.
+- Filling in `venue_id` on a no-venue event can clash: the venue unique index refuses a
+  second unnamed (or same-name) night at that venue on that date, and the `(venue_id,
+  city_id)` reference refuses a venue in another city. Adding a co-host to a no-venue event
+  can clash on the `event_collectives` index. The function that fills fields turns each
+  refusal into the form message and the "Report as the same night" choice (SPEC section 3).
 
 #### event_collectives
 
@@ -504,7 +510,7 @@ once from both passing (checked).
 
 #### catalog_edits
 
-Each edit to a venue, DJ, collective, or event (ADR 0009).
+Each edit to a venue, DJ, collective, event, or lineup slot (ADR 0009, ADR 0013).
 
 | Field | Type | Notes |
 |---|---|---|
@@ -565,8 +571,9 @@ Each change a merge made, in order, so undo can replay them backwards.
 | `created_at` | timestamptz | |
 
 One column per target type, so each has a real foreign key. Which queue a report lands in
-follows from its target: catalog targets go to moderators, logs, comments, and profiles go
-to admins. Merges move reports to the kept entry.
+follows from its target and reason: catalog targets go to moderators, except `duplicate`
+reports, which go to admins until locals can merge (ADR 0012). Logs, comments, and profiles
+go to admins. Merges move reports to the kept entry.
 
 ## Event identity
 
