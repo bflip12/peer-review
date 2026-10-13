@@ -1,7 +1,7 @@
 # 0012: Merge undo ships after launch, and merges are admin-only until then
 
 - Date: 2026-10-12
-- Status: Accepted
+- Status: Accepted, amended by 0014
 
 ## Context
 ADR 0009 lets locals merge without approval because any merge can be undone. Undo is the

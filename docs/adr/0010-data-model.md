@@ -1,7 +1,7 @@
 # 0010: Data model shape, co-hosts, and enums for states that can grow
 
 - Date: 2026-10-12
-- Status: Accepted
+- Status: Accepted, amended by 0014
 
 ## Context
 ADRs 0008 and 0009 set the product rules for events, lineups, roles, and merges. Turning

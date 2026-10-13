@@ -1,7 +1,7 @@
 # 0008: One night picker for every event, and lineup slots for b2b sets
 
 - Date: 2026-10-09
-- Status: Accepted, amended by 0010 and 0013
+- Status: Accepted, amended by 0010, 0013, and 0014
 
 ## Context
 A review of the logging flow against apps with community-built catalogs (Untappd,

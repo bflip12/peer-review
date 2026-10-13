@@ -83,9 +83,8 @@ events dated today or earlier.
 ## Milestone 4: Pages
 
 Log, event, venue, DJ, collective, profile with stats, search by name. Venue, DJ, and
-collective pages list only events with at least one public log. Artist averages computed
-solo, b2b, and combined, not shown (SPEC section 6). "Most listened to DJs" counts picked
-sets.
+collective pages list only events with at least one public log. No averages (ADR 0014).
+"Most listened to DJs" counts picked sets.
 
 ## Milestone 5: Social
 
@@ -93,34 +92,19 @@ Follow, feed, likes, comments.
 
 ## Milestone 6: Moderation
 
-Roles (ADR 0009, ADR 0010, ADR 0012): `user`, `moderator`, and `admin` on the profile, with
-`moderator` shown as "Local" and cities in `moderator_cities`, shown as "Berlin local" but
-not enforced. Report button, including lineup slots with
-"Didn't play". "Duplicate" reports require the entry it duplicates and a description, with
-help text per type, shown to the admin beside both entries. A catalog report queue for
-locals (reporters not shown) and a queue for "Duplicate" reports and reports on logs,
-comments, and users for admins. Locals and admins edit venues, DJs,
-collectives, and set event fields, with a history list and "Revert" per entry, and a
-"Recent edits" page for admins with bulk revert. Lineup corrections by locals (ADR 0013):
-remove a slot, remove one DJ from a b2b slot, or switch to a same-name DJ, each in the
-event's history with "Revert", and reverts refused when they would duplicate a slot.
+Roles (ADR 0009, ADR 0010, ADR 0012, ADR 0014): `user`, `moderator`, and `admin` on the
+profile, with `moderator` shown as "Local" and cities in `moderator_cities`, shown as
+"Berlin local" but not enforced. Report button, including lineup slots with "Didn't play".
+"Duplicate" reports require the entry it duplicates and a description, with help text per
+type, shown to the admin with links to both entries. "Not a duplicate" closes one; real
+duplicates stay open until merges ship (ADR 0014). A catalog report queue for locals
+(reporters not shown) and a queue for "Duplicate" reports and reports on logs, comments,
+and users for admins. Locals and admins edit venues, DJs, collectives, and set event
+fields, with a history list and "Revert" per entry. Lineup corrections by locals (ADR
+0013): remove a slot, remove one DJ from a b2b slot, or switch to a same-name DJ, each in
+the event's history with "Revert", and reverts refused when they would duplicate a slot.
 "Didn't play" reports with an optional "Who played instead?". Hidden DJs left out of
-lineups and stats. Admins hide content,
-ban users, and assign roles.
-
-Merges of events, venues, DJs, and collectives, by admins only (ADR 0012), each with a
-summary before confirming (private logs as a count only). Merged entries keep their row with
-`merged_into_id`, redirect, and refuse anything new; unique indexes ignore them. Event
-merges move logs and markers, combine lineups by set, move set picks, and fill in missing
-fields. Venue and collective merges list same-date nights to merge (as child merges) or
-name; DJ merges combine matching slots. When a user logged
-both events, the more recently edited log stays and the other is archived with
-`archived_merge_id`. In-app notices table and banner, with "Keep the one showing" and
-"Switch to the other", neither deleting a log. An "Archived" section on the owner's profile.
-RLS tests that archived logs never appear in averages, feeds, or stats.
-
-`merges` and `merge_changes` written from the first merge, in the format undo will need
-(ADR 0009, ADR 0012). Undo itself is Milestone 10.
+lineups and stats. Admins hide content, ban users, and assign roles.
 
 ## Milestone 7: Going
 
@@ -128,7 +112,8 @@ RLS tests that archived logs never appear in averages, feeds, or stats.
 on markers per date. Private "Upcoming" list on the user's own profile. Morning-after
 notice with "Log it" (opens the log form with the event filled in) and "I didn't go"
 (removes the marker). Future events left off venue, DJ, and collective pages. RLS tests
-that no one but the owner can read a marker. Event merge moves markers.
+that no one but the owner can read a marker. Builds the in-app notices table and banner
+(SPEC section 8), the first use of notices now that merges come later (ADR 0014).
 
 ## Milestone 8: Share previews
 
@@ -140,19 +125,38 @@ Privacy page, PWA manifest, production deploy, sound systems seed. A credit line
 a link to geonames.org on the about or privacy page (required by the GeoNames CC BY 4.0
 license for the cities data).
 
-## Milestone 10: Undo merges
+## Milestone 10: Merges and undo
 
-After launch (ADR 0012). Undo with a summary, newest first, children only with their
-parent, putting back only rows still as the merge left them, asking what to do when a value
-would collide, and moving DJs picked after the merge onto the original lineup. Adds
-`merges.undone_by`, `merges.undone_at`, and the `merge_undone` notice kind. Tests for every
-undo rule in ADR 0009. Then locals can merge, and "Duplicate" reports move to their queue.
+After launch (ADR 0014). Merges and undo ship together, so undo's tests prove the merge
+record format from the first merge.
+
+Merges of events, venues, DJs, and collectives, each with a summary before confirming
+(private logs as a count only), opened from a "Duplicate" report with both entries side by
+side. Merged entries set the `merged_into_id` columns that exist from Milestones 2 and 3:
+they keep their row, redirect, and refuse anything new, and unique indexes ignore them.
+Event merges move logs and markers, combine lineups by set, move set picks, and fill in
+missing fields. Venue and collective merges list same-date nights to merge (as child
+merges) or name; DJ merges combine matching slots. When a user logged both events, the
+more recently edited log stays and the other is archived with `archived_merge_id`. The
+`event_merge` notice with "Keep the one showing" and "Switch to the other", neither
+deleting a log. An "Archived" section on the owner's profile. RLS tests that archived logs
+never appear in feeds or stats. Adds `merges`, `merge_changes`, `logs.archived_merge_id`,
+the merge fields on `notices` and `catalog_edits`, and the merge enum values
+(`docs/DATA_MODEL.md`).
+
+Undo with a summary, newest first, children only with their parent, putting back only rows
+still as the merge left them, asking what to do when a value would collide, and moving DJs
+picked after the merge onto the original lineup. Adds `merges.undone_by`,
+`merges.undone_at`, and the `merge_undone` notice kind. Tests for every undo rule in ADR
+0009. Then locals can merge, and "Duplicate" reports move to their queue.
 
 ## Later
 
 - Venue-claimed pages, with an opt-in public location
 - AI features: log assist, then venue review summaries, then visiting a city, each when
   its trigger in `docs/AI_FEATURES.md` is met
+- "Recent edits" page for admins across the catalog, filtered by person, with bulk revert
+  (ADR 0014). Edits are recorded from Milestone 2, so it can be built on existing data
 - Show averages. Each needs a minimum number of public logs from different users and a rule
   for logs from new accounts (SPEC "Aggregation rules"). The numbers go in the ADR that
   turns averages on.
