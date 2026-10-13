@@ -18,6 +18,8 @@ Online scene communities across many cities. Two consequences:
 ### 1. Accounts
 - Sign in with an email magic link or Google.
 - Handle required. Display name optional; the user decides what goes in it.
+- The handle and display name fields start empty. Nothing is copied from the Google
+  profile (name or photo).
 - Under the sign-in form: "Your email is only used to sign in. It is never shown to other
   users. Any address works, including an alias."
 
@@ -73,8 +75,14 @@ Online scene communities across many cities. Two consequences:
 - Names compare ignoring case and surrounding spaces.
 - Dates are read in the event city's timezone. "Today" in any rule means today in that
   city.
-- Anyone logging an event can set its collective or name when it has none. Changing a value
-  that is already set is for locals and admins (section 7).
+- Anyone logging an event can fill in its venue or name when it has none, and add a
+  collective. Changing or removing a value that is already set is for locals and admins
+  (section 7).
+- Filling in a venue on a night with no venue is refused when the venue is in another city,
+  or when the venue already has a night on that date that is also unnamed or has the same
+  name. Adding a collective to a night with no venue is refused the same way when that
+  collective already has such a night. The form says "Tresor already has a night on Sat 4
+  Oct." and offers "Report as the same night", which files a "Duplicate" report (section 7).
 - An event is created when the first log or Going marker on it is saved, never earlier. If
   two users create the same event at the same moment, the second save joins the first.
 - Event pages never show who created the event.
@@ -125,7 +133,7 @@ collective nights work the same way.
 
 ### 4. Logs
 - One log per user per event. Editable.
-- At most 3 logs per user per date, for party hopping. Archived logs do not count.
+- At most 3 logs per user per date, for party hopping.
 - A log can only be created for an event dated today or earlier.
 - Overall rating required: 0.5 to 5 in half steps.
 - Optional review text.
@@ -152,10 +160,10 @@ collective nights work the same way.
 ### 6. Pages
 - Log, event (with "12 listened to this set" per set), venue (sound tags, links, recent
   logs), DJ (links, recent logs, b2b sets labelled "b2b with B"), collective.
-- Averages are calculated but not shown in v1: venue rating per venue, set rating per DJ
-  (solo, b2b, and combined, a b2b rating counting toward each artist in it), and venue
-  rating of a collective's nights with no venue. Pages focus on logs and people, not
-  scores (ADR 0010).
+- No averages in v1, shown or calculated. Pages focus on logs and people, not scores (ADR
+  0010, ADR 0014). Ratings are stored, so the averages planned for later (venue rating per
+  venue, set rating per DJ solo, b2b, and combined, and venue rating of a collective's
+  nights with no venue) are queries added by the ADR that shows them.
 - URLs: `/venues/<id>/<name>`, `/djs/<id>/<name>`, `/collectives/<id>/<name>`,
   `/events/<id>/<name>`, `/logs/<id>`, `/@handle`. The short ID finds the page, and an
   outdated name part redirects. A handle change does not redirect the old profile URL.
@@ -180,17 +188,17 @@ data model and code the local role is `moderator`; "Local" is its label in the a
     a DJ to another entry with the same name. Removing one DJ is refused when the slot
     would then match another slot on that night: "A is already listed solo on this night.
     Remove this slot instead."
-- Admins also merge events, venues, DJs, and collectives, handle "Duplicate" reports and
-  reports on logs, comments, and users, hide content, ban users, and assign roles.
-- Merges are admin-only in v1, and cannot be undone yet. Every merge is recorded so it can
-  be undone once undo ships after launch, when locals can merge too (ADR 0012).
+- Admins also handle "Duplicate" reports and reports on logs, comments, and users, hide
+  content, ban users, and assign roles.
+- No merges in v1. Merges and merge undo ship together after launch (ADR 0014). Until then
+  a "Duplicate" report shows the admin both entries, linked, and the description. "Not a
+  duplicate" closes it; a real duplicate stays open for the merge milestone. A user who
+  logged the wrong one of two nights fixes it with "Change night".
 - Every edit to a venue, DJ, collective, event, or lineup slot is recorded with who made
   it, the field, the old value, the new one, and when. Slot changes are listed in their
   event's history.
   - Each entry has a history list with a "Revert" button on each row, for locals and
     admins.
-  - Admins also have a "Recent edits" page across the catalog, filtered by person, where
-    they select several edits and revert them together.
   - A revert is itself an edit, so it shows in the history and can be reverted.
   - A revert that would put two slots with the same DJs on one night is refused. The local
     removes the other slot first.
@@ -198,7 +206,7 @@ data model and code the local role is `moderator`; "Local" is its label in the a
 **Duplicate reports.** A wrong merge moves real logs to the wrong place, for example when
 someone confuses two real venues. The report gives the admin what they need to check.
 - "Which one is it a duplicate of?" Required. A search of the same type: venues for a
-  venue, nights for a night. The merge screen opens with both entries filled in.
+  venue, nights for a night.
 - A description, required, with a label and help text per type:
   - Venue, "Describe the place": "What would a regular recognize? The entrance, the
     layout, where the bar or booth is, anything specific to that room. Two different names
@@ -209,10 +217,16 @@ someone confuses two real venues. The report gives the admin what they need to c
     anything that shows both listings are the same crew."
   - DJ, "Describe how you know": "An alias they play under, a set you saw billed under both
     names, anything that shows it's one person."
-- The admin sees the two entries side by side (city, links, recent nights and lineups),
-  with matching links highlighted, and the description without the reporter's name. They
-  choose "Merge", which opens the merge summary, or "Not a duplicate", which closes the
-  report.
+- The admin sees the description without the reporter's name.
+
+#### After launch: merges (ADR 0014)
+
+These rules ship with merge undo. They are kept here so the merge milestone starts from
+them.
+
+- The duplicate report opens a screen with the two entries side by side (city, links,
+  recent nights and lineups), matching links highlighted. "Merge" opens the merge summary
+  with both entries filled in. "Not a duplicate" closes the report.
 
 **Merge summary.** Every merge shows a summary before it is confirmed.
 - Each pair of events that will merge (date, venue, collective, name, lineup, log count),
@@ -250,8 +264,8 @@ someone confuses two real venues. The report gives the admin what they need to c
 
 ### 8. In-app notices
 - A banner the user sees on their next visit, shown until they act on it or dismiss it.
-- v1 uses it for event merges and Going prompts. It is the base for any
-  later notifications.
+- v1 uses it for Going prompts (section 9). Event merge notices come with merges (ADR
+  0014). It is the base for any later notifications.
 
 ### 9. Going
 - On an event dated today or later, the user taps "Going". The event is picked or started
@@ -271,13 +285,14 @@ someone confuses two real venues. The report gives the admin what they need to c
 
 ## Aggregation rules
 
-- Averages use public, non-hidden, non-archived logs from non-banned users only.
+- Averages, once shown, use public, non-hidden, non-archived logs from non-banned users
+  only.
 - Private logs count toward the owner's own profile stats and nowhere else.
-- Archived logs count nowhere until the owner switches to one.
+- Archived logs (from merges, after launch) count nowhere until the owner switches to one.
 - Picks and ratings on removed slots, and on hidden DJs, count nowhere.
-- Averages are not shown in v1 (section 6). Before any is shown, it needs a minimum number
-  of public logs from different users, and a rule for logs from new accounts, so a handful
-  of accounts cannot set a venue's or DJ's score. The numbers are set in the ADR that turns
+- v1 has no averages (section 6). Before any is shown, it needs a minimum number of public
+  logs from different users, and a rule for logs from new accounts, so a handful of
+  accounts cannot set a venue's or DJ's score. The numbers are set in the ADR that turns
   averages on.
 
 ## Privacy
@@ -302,7 +317,8 @@ someone confuses two real venues. The report gives the admin what they need to c
 - Followers-only visibility
 - Verified or claimed venue and DJ pages
 - Limiting locals to their cities
-- Undoing merges, and merges by locals (ADR 0012). The undo rules are in ADR 0009
+- Merges and merge undo (ADR 0014). The undo rules are in ADR 0009
+- The admin "Recent edits" page with bulk revert (ADR 0014)
 - Native app
 
 ## Data model

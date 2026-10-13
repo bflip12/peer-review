@@ -8,6 +8,39 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## A senior review of the whole v1 plan (2026-10-13)
+
+**Goal.** Find what is overbuilt, underbuilt, or contradictory across the spec, task list,
+data model, and ADRs before any code is written.
+
+**How I used AI.** I had Claude read every planning doc and review it as a skeptical
+senior engineer, judged against the v1 done line: 20 people logging, following, and
+commenting for a month. It listed concrete changes in three groups, and I approved each one
+separately. Where I didn't follow a finding, it explained it again with a worked example
+and laid out the pros and cons of each option. It flagged the Supabase limits it could
+not check from the session.
+
+**My calls.**
+- Merges ship together with undo after launch, so the merge record is tested from the
+  first merge. Averages are not calculated in v1, and the bulk revert page waits.
+- Users can fill in an empty venue on a night, or add a collective, unless it clashes
+  with another night. A clash offers a duplicate report. I asked for the pros and cons
+  first; locals-only would have sent every fix to me.
+- Follow status and Going visibility stay as one-value enums. They are there to
+  future-proof, not instead of a boolean, so the rule was reworded to require a named next
+  value rather than dropped. The reaction column on likes had no named next value, so I
+  dropped it.
+- Column write rules go into the data model. I asked how a user could even change their
+  own role. The answer is that the browser writes to the database directly, and row rules
+  do not check columns.
+- Function security rules, custom email for magic links, and a production deploy from
+  Milestone 0.
+
+**Output.** [ADR 0014](adr/0014-merges-ship-with-undo.md), `SPEC.md`, `TASKS.md`,
+[`docs/DATA_MODEL.md`](DATA_MODEL.md) ("Column writes"),
+[`.claude/rules/database.md`](../.claude/rules/database.md). Commits `5eb3f57`, `3938d8c`,
+`657f6ce`, `1fb412a`.
+
 ## Reviewing which AI features belong in v1 (2026-10-13)
 
 **Goal.** Decide which AI features are worth building, and when, before any of them gets

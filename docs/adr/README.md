@@ -48,10 +48,11 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0004](0004-privacy-model.md) | Handles, hidden email, public logs with a private toggle | Accepted |
 | [0005](0005-no-media-in-v1.md) | No photos or video in v1 | Accepted |
 | [0006](0006-no-ai-in-v1.md) | No AI features in v1 | Accepted |
-| [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted |
-| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010 and 0013 |
-| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010, 0012, and 0013 |
-| [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted |
+| [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted, amended by 0014 |
+| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010, 0013, and 0014 |
+| [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010, 0012, 0013, and 0014 |
+| [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted, amended by 0014 |
 | [0011](0011-creation-caps-and-dj-cities.md) | Daily caps on new catalog entries, and a city for DJs with the same name | Accepted |
-| [0012](0012-merge-undo-after-launch.md) | Merge undo ships after launch, and merges are admin-only until then | Accepted |
+| [0012](0012-merge-undo-after-launch.md) | Merge undo ships after launch, and merges are admin-only until then | Accepted, amended by 0014 |
 | [0013](0013-lineup-corrections.md) | A lineup slot never gets a different DJ, and slot changes can be reverted | Accepted |
+| [0014](0014-merges-ship-with-undo.md) | Merges ship with undo after launch, and v1 has no averages or bulk revert | Accepted |

@@ -2,7 +2,7 @@
 
 The tables, relationships, constraints, and indexes for v1, and which of them are hard to
 change once real data exists. Product rules are in `SPEC.md`. The decisions behind this
-shape are in ADRs 0008 to 0013. Once migrations exist, they are the source of truth
+shape are in ADRs 0008 to 0014. Once migrations exist, they are the source of truth
 and this file describes them.
 
 Rules for changing the schema are in `.claude/rules/database.md`.
@@ -10,7 +10,8 @@ Rules for changing the schema are in `.claude/rules/database.md`.
 ## Conventions
 
 - **Keys.** Every table has a UUID primary key named `id`, except join tables (composite
-  key) and `cities` (GeoNames ID). `profiles.id` is the same value as `auth.users.id`.
+  key), `cities` (GeoNames ID), `link_platforms` (a text ID such as `instagram`), and
+  `event_redirects` (`from_short_id`). `profiles.id` is the same value as `auth.users.id`.
 - **Short IDs.** Pages that can be shared (venues, DJs, collectives, events, logs) also have
   a `short_id`: a short random string, unique per table, used only in URLs. UUIDs never
   appear in a URL.
@@ -29,7 +30,12 @@ Rules for changing the schema are in `.claude/rules/database.md`.
 - **Delete behaviour** is listed per reference. "Cascade" deletes the child row. "Set null"
   keeps it and empties the reference.
 - **Merged rows** stay in their table with `merged_into_id` set (ADR 0009). Unique rules
-  ignore them, and triggers refuse any new row that points at one.
+  ignore them, and triggers refuse any new row that points at one. Merges ship in
+  Milestone 10 (ADR 0014), but the `merged_into_id` columns exist from the start and stay
+  empty until then, because the event identity indexes and the co-host copies include
+  them.
+- **Milestone 10** marks the tables, columns, and enum values that ship with merges and
+  undo (ADR 0014). v1 migrations leave them out.
 
 ### Roles
 
@@ -115,13 +121,12 @@ value instead of changing a column's type.
 | `log_visibility` | `public`, `private` | `logs.visibility` | Followers-only is on the "Not in v1" list |
 | `going_visibility` | `private` (only value) | `going.visibility` | ADR 0007 names mutual-follow visibility as the start of a social version |
 | `follow_status` | `active` (only value) | `follows.status` | Followers-only usually brings follow requests (`pending`) |
-| `reaction` | `like` (only value) | `likes.reaction` | Other reactions. The key stays one reaction per user per log |
-| `notice_kind` | `event_merge`, `going_prompt` | `notices.kind` | SPEC section 8. `merge_undone` is added with merge undo (ADR 0012) |
-| `notice_action` | `keep`, `switch`, `log_it`, `didnt_go`, `dismissed` | `notices.action` | |
+| `notice_kind` | `going_prompt` | `notices.kind` | SPEC section 8. `event_merge` and `merge_undone` are added in Milestone 10 (ADR 0014) |
+| `notice_action` | `log_it`, `didnt_go`, `dismissed` | `notices.action` | `keep` and `switch` are added in Milestone 10 |
 | `report_reason` | `duplicate`, `didnt_play`, `wrong_info`, `spam`, `abusive`, `other` | `reports.reason` | |
 | `report_status` | `open`, `actioned`, `dismissed` | `reports.status` | |
 | `catalog_type` | `venue`, `artist`, `collective`, `event`, `lineup_slot` | `merges`, `catalog_edits` | `lineup_slot` for slot changes (ADR 0013). Never a merge type |
-| `merge_change_type` | See [merge_changes](#merge_changes) | `merge_changes.change_type` | |
+| `merge_change_type` | See [merge_changes](#merge_changes) | `merge_changes.change_type` | Milestone 10 |
 
 ## Tables
 
@@ -288,8 +293,13 @@ Constraints:
 - Every event has a venue, at least one collective, or both. This spans two tables, so the
   function that creates events enforces it, and a trigger re-checks it when the last
   collective is removed from a no-venue event.
-- Only moderators and admins change `venue_id`, `name`, or the collectives once set. Any
-  user logging the event can fill them in when empty.
+- Any user logging the event can fill in `venue_id` or `name` when empty, and add a
+  collective. Only moderators and admins change or remove a value once set.
+- Filling in `venue_id` on a no-venue event can clash: the venue unique index refuses a
+  second unnamed (or same-name) night at that venue on that date, and the `(venue_id,
+  city_id)` reference refuses a venue in another city. Adding a co-host to a no-venue event
+  can clash on the `event_collectives` index. The function that fills fields turns each
+  refusal into the form message and the "Report as the same night" choice (SPEC section 3).
 
 #### event_collectives
 
@@ -382,14 +392,14 @@ reviews table.
 | `venue_rating` | smallint | Optional. 1 to 10. On a no-venue night it rates the space |
 | `body` | text | Optional review |
 | `visibility` | `log_visibility` | Default `public` |
-| `archived_merge_id` | uuid | The merge that archived this log. `NULL` when not archived. References `merges` |
+| `archived_merge_id` | uuid | Milestone 10. The merge that archived this log. `NULL` when not archived. References `merges` |
 | `hidden_at` | timestamptz | Admin only |
 | `created_at` | timestamptz | Feed order. Edits do not change it |
 | `updated_at` | timestamptz | "Most recently edited" in merges |
 
 Constraints:
-- One live log per user per event: unique on `(user_id, event_id)` where
-  `archived_merge_id` is null (checked).
+- One log per user per event: unique on `(user_id, event_id)`. Milestone 10 makes it one
+  live log, unique where `archived_merge_id` is null (checked).
 - At most 3 live logs per user per date: a trigger, skipped inside merges and undo.
 - Created only for events dated today or earlier: insert policy or trigger. "Today" moves,
   so a check constraint cannot hold it.
@@ -423,8 +433,9 @@ a merge can move logs and slots in two steps (checked).
 
 #### likes
 
-`user_id` and `log_id` (both cascade), `reaction` (`reaction`, default `like`),
-`created_at`. Primary key `(user_id, log_id)`: one reaction per user per log.
+`user_id` and `log_id` (both cascade), `created_at`. Primary key `(user_id, log_id)`: one
+like per user per log. Other reactions, if ever planned, add a `reaction` enum column with
+default `like` and keep the key (ADR 0014).
 
 #### comments
 
@@ -466,8 +477,8 @@ In-app banners, kept after the user acts on them.
 | `user_id` | uuid | References `profiles`. Cascade |
 | `kind` | `notice_kind` | |
 | `event_id` | uuid | References `events`. Updates cascade. Set null on delete |
-| `merge_id` | uuid | `event_merge`. References `merges` |
-| `shown_log_id`, `archived_log_id` | uuid | `event_merge` only. Set null on delete |
+| `merge_id` | uuid | Milestone 10. `event_merge`. References `merges` |
+| `shown_log_id`, `archived_log_id` | uuid | Milestone 10. `event_merge` only. Set null on delete |
 | `due_at` | timestamptz | The banner shows once this has passed |
 | `action` | `notice_action` | |
 | `acted_at` | timestamptz | Set together with `action` |
@@ -504,7 +515,7 @@ once from both passing (checked).
 
 #### catalog_edits
 
-Each edit to a venue, DJ, collective, or event (ADR 0009).
+Each edit to a venue, DJ, collective, event, or lineup slot (ADR 0009, ADR 0013).
 
 | Field | Type | Notes |
 |---|---|---|
@@ -515,7 +526,7 @@ Each edit to a venue, DJ, collective, or event (ADR 0009).
 | `old_value`, `new_value` | jsonb | |
 | `edited_by` | uuid | References `profiles`. Set null on delete |
 | `reverts_edit_id` | uuid | Set when this edit is a revert. References `catalog_edits` |
-| `merge_id` | uuid | Set when a merge made the edit |
+| `merge_id` | uuid | Milestone 10. Set when a merge made the edit |
 | `created_at` | timestamptz | |
 
 Readable by moderators and admins. A slot's edits are listed in its event's history. A
@@ -523,7 +534,7 @@ revert that would leave two live slots with the same artists on one event is ref
 
 #### merges
 
-One row per merge (ADR 0009).
+Milestone 10. One row per merge (ADR 0009).
 
 | Field | Type | Notes |
 |---|---|---|
@@ -538,7 +549,7 @@ One row per merge (ADR 0009).
 
 #### merge_changes
 
-Each change a merge made, in order, so undo can replay them backwards.
+Milestone 10. Each change a merge made, in order, so undo can replay them backwards.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -565,8 +576,9 @@ Each change a merge made, in order, so undo can replay them backwards.
 | `created_at` | timestamptz | |
 
 One column per target type, so each has a real foreign key. Which queue a report lands in
-follows from its target: catalog targets go to moderators, logs, comments, and profiles go
-to admins. Merges move reports to the kept entry.
+follows from its target and reason: catalog targets go to moderators, except `duplicate`
+reports, which go to admins until locals can merge (ADR 0012). Logs, comments, and profiles
+go to admins. Merges move reports to the kept entry.
 
 ## Event identity
 
@@ -584,9 +596,10 @@ function then joins that user to the first event.
 
 ## Merges
 
-Merges run as database functions, each in one transaction, after a summary (SPEC section
-7). Admins only in v1. Every change is written to `merge_changes` from the first merge, so
-undo can be added after launch (ADR 0012) and replay them.
+Milestone 10, after launch. Merges run as database functions, each in one transaction,
+after a summary (SPEC section 7). Every change is written to `merge_changes` from the first
+merge, and merges ship together with undo, so undo's tests check that the record is
+enough to replay (ADR 0014).
 
 Co-hosts change two rules from ADR 0008 and 0009:
 - An event merge combines both events' collectives instead of picking one. The merger
@@ -618,16 +631,40 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 | `comments` | On logs the reader can see, unless hidden or the author is banned | Author creates, edits, deletes. Admins hide |
 | `going`, `notices` | Owner only | Owner. Notices are created by database functions |
 | `creations` | That user, moderators, admins | Database functions |
-| `catalog_edits`, `merges`, `merge_changes` | Moderators and admins | Database functions. Merges: admins in v1 |
+| `catalog_edits`, `merges`, `merge_changes` | Moderators and admins | Database functions. Merges: admins, from Milestone 10 |
 | `reports` | Catalog targets: moderators and admins, without `reporter_id`. `duplicate` reports and other targets: admins | Signed-in users create. Moderators and admins resolve within their queue |
 | `event_redirects` | Everyone | Database functions |
 
-Averages and counts:
+### Column writes
+
+RLS decides which rows a user can write, not which columns. The browser talks to the
+database through the Supabase API, so an owner's update policy alone would let a user set
+their own `role` to `admin`, clear `hidden_at` on their log, or move `created_at` ahead to
+stay at the top of feeds. Each table below lists who writes which column. Everything not
+listed is written only by defaults, triggers, or database functions. Enforcement follows
+`.claude/rules/database.md`, and each protected column gets a test.
+
+| Table | Owner or signed-in user | Moderators and admins | Set only by defaults, triggers, or functions |
+|---|---|---|---|
+| `profiles` | `handle`, `display_name` | Admins: `role`, `account_status` | `id`, `account_status_at`, `created_at` |
+| `logs` | `overall_rating`, `sound_rating`, `venue_rating`, `body`, `visibility`. `event_id` only through "Change night" | Admins: `hidden_at` | `user_id` (the signed-in user), `short_id`, `event_date`, `archived_merge_id`, `created_at`, `updated_at` |
+| `set_listens` | `rating`. Insert and delete their own picks | | `event_id`, `updated_at` |
+| `comments` | `body`. Delete through a function that sets `deleted_at` and clears `body` | Admins: `hidden_at` | `user_id`, `edited_at`, `deleted_at`, `created_at` |
+| `venues`, `artists`, `collectives` | Creator until `used_by_others_at`: `name`, `city_id` | `name`, `city_id`. Admins: `hidden_at` | `short_id`, `used_by_others_at`, `merged_into_id`, `created_at`, `updated_at` |
+| `events` | Fill empty `venue_id`, `name`, and add co-hosts, through a function | Change set fields, through a function. Admins: `hidden_at` | Everything else |
+| `lineup_slots`, `slot_artists` | Through the lineup functions only | Through the lineup functions only | `removed_at` and every other column |
+| `reports` | Insert: target, `reason`, `description`, `duplicate_of_id` | Within their queue: `status` | `reporter_id`, `resolved_by`, `resolved_at`, `created_at` |
+| `notices` | `action` | | Every other column, including `acted_at` |
+| `links`, `venue_sound_systems` | Insert and delete, for whoever may edit the entry | Insert and delete | `id` |
+| `follows`, `likes`, `going` | Insert and delete only | | Every column |
+
+### Averages and counts
+
 - Picks on removed slots, and hidden artists, count nowhere: not in averages, "listened to"
   counts, or profile stats.
 - Averages use visible logs only. Venue: `venue_rating` on the venue's events. DJ: set
   ratings on slots including the DJ, solo, b2b, and combined. Collective: `venue_rating`
-  on its no-venue nights. All three are calculated, not shown in v1 (SPEC section 6).
+  on its no-venue nights. None is calculated in v1 (SPEC section 6, ADR 0014).
 - Public log counts count visible logs.
 - Profile stats count the owner's live logs, private ones included, and never Going
   markers. "Most listened to DJs" counts `set_listens`, b2b sets counting for each artist.
@@ -646,7 +683,7 @@ with the query it serves:
 | `event_collectives (collective_id, event_date desc)` | Collective page |
 | `logs (user_id, created_at desc)` | Feed and profile |
 | `logs (event_id, created_at desc)` | Event page, log counts, empty-event check |
-| `logs (user_id, event_date)` where `archived_merge_id` is null | 3-per-date limit |
+| `logs (user_id, event_date)` (where `archived_merge_id` is null, from Milestone 10) | 3-per-date limit |
 | `lineup_slots (event_id)` | Lineups |
 | `slot_artists (artist_id)` | DJ page |
 | `set_listens (slot_id)` | "12 listened to this set", DJ averages |
@@ -656,9 +693,9 @@ with the query it serves:
 | `notices (user_id, due_at)` where `acted_at` is null | Banner on each visit |
 | `reports (status, created_at)` | Report queues |
 | `catalog_edits (entity_type, entity_id, created_at desc)` | History list per entry |
-| `catalog_edits (edited_by, created_at desc)` | "Recent edits" filtered by person |
+| `catalog_edits (edited_by, created_at desc)` | "Recent edits" filtered by person (Later, ADR 0014) |
 | `creations (created_by, created_at desc)` | Daily caps |
-| `merge_changes (merge_id, seq)` | Undo (covered by the unique key) |
+| `merge_changes (merge_id, seq)` | Undo, Milestone 10 (covered by the unique key) |
 | `venues (city_id)` | Duplicate suggestions within a city |
 | Trigram GIN on `cities.name`, `cities.ascii_name` | City autocomplete (Milestone 2) |
 
@@ -681,15 +718,17 @@ Ordered by cost once there is real data.
 6. **Equal co-hosts.** Adding a "main host" later is one column. Removing co-hosts means
    picking one per event.
 7. **Merge records.** A merge without `merge_changes` rows can never be undone, so the
-   record format has to be right from the first merge.
+   record format has to be right from the first merge. Merges and undo ship together for
+   that reason (ADR 0014).
 8. **City IDs are GeoNames IDs.** A bigger GeoNames file only adds rows. A different source
    would mean remapping every venue, collective, and event.
 9. **`profiles.id` is the auth user ID, and email stays in `auth.users`.**
 
-Easy to change later: the daily cap numbers, showing averages (with the minimums in SPEC
-"Aggregation rules"), link platforms, comment replies, new rating types
-(one column each), a room or set type per slot, event status (cancelled), festivals and
-recurring series (a parent table over events), city scope for moderators (one policy).
+Easy to change later: the daily cap numbers, other reactions on likes, showing averages
+(with the minimums in SPEC "Aggregation rules"), link platforms, comment replies, new
+rating types (one column each), a room or set type per slot, event status (cancelled),
+festivals and recurring series (a parent table over events), city scope for moderators
+(one policy).
 
 ## Checked
 

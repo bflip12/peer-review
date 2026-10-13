@@ -168,7 +168,7 @@ Revisit embeddings when there are thousands of reviews.
 
 | Idea | Needs AI? | Verdict |
 |---|---|---|
-| Paste a lineup ("A, B b2b C, D") to add several slots at once | No. A parser on commas, new lines, and the existing b2b rules | Worth it. Small, deterministic, saves the most typing on the log form. Consider for Milestone 3 |
+| Paste a lineup ("A, B b2b C, D") to add several slots at once | No. A parser on commas, new lines, and the existing b2b rules | Worth it. Small, deterministic, saves the most typing on the log form. Listed in `TASKS.md` "Later" |
 | Translate a review | An LLM call per review and language, cached | Cut. Browsers translate pages already. Revisit if reviews come in many languages and users ask |
 | Sort the admin report queue by type (spam, abuse, wrong info) | An LLM call per report | Cut. At v1 size one admin reads every report |
 | Help admins judge "Duplicate" reports | An LLM call comparing two entries and the description | Cut. A wrong merge moves real logs, so this stays a human call. Volume is low |

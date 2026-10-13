@@ -1,7 +1,7 @@
 # 0007: A private "Going" marker for future events
 
 - Date: 2026-10-07
-- Status: Accepted
+- Status: Accepted, amended by 0014
 
 ## Context
 v1 covered only nights that already happened. Users also want to mark nights they plan to
