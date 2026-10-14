@@ -8,6 +8,29 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## Party names come from the poster, not the user (2026-10-14)
+
+**Goal.** Stop users from treating the event name as their own label for a night, without
+losing the real party names people search by.
+
+**How I used AI.** I raised the problem and my first idea, and debated the concept with
+Claude before any plan. It checked the idea against the spec and ADRs, argued for options,
+gave the case against its own recommendation, and drafted the field copy over several
+rounds. While writing the data model it caught that storing who set the name on the event
+row would break the project's rule against showing who did what on a public row.
+
+**My calls.**
+- My first idea was to show the name field only for a second night at the same venue and
+  date. I changed course because names like "Frequencies" matter for recognition.
+- Claude recommended making a party name an entity with its own page. I rejected it: most
+  named nights are one-offs, and series don't matter at this scale.
+- The copy: "poster" instead of "flyer", "official name" in the help text, and "Halloween"
+  as the placeholder. I dropped "Day party" as the example because it makes people second
+  guess what kind of night it was, and cut the preview row as corny.
+
+**Output.** [ADR 0015](adr/0015-event-names.md), `SPEC.md`, `TASKS.md`,
+[`docs/DATA_MODEL.md`](DATA_MODEL.md), 9770e07.
+
 ## A senior review of the whole v1 plan (2026-10-13)
 
 **Goal.** Find what is overbuilt, underbuilt, or contradictory across the spec, task list,
