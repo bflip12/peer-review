@@ -273,7 +273,8 @@ One night. See [Event identity](#event-identity).
 | `date` | date | Required. The night it started |
 | `city_id` | integer | Required. References `cities` |
 | `venue_id` | uuid | Optional. References `venues` |
-| `name` | text | Optional. "Day party" |
+| `name` | text | Optional. The official name from the poster, "Halloween" (ADR 0015) |
+| `name_locked_at` | timestamptz | Set by a trigger when a user other than the name's setter logs the night or marks Going on it. Cleared when the name changes. Ends the setter's edit right |
 | `merged_into_id` | uuid | References `events` |
 | `hidden_at` | timestamptz | |
 | `created_at`, `updated_at` | timestamptz | |
@@ -293,8 +294,15 @@ Constraints:
 - Every event has a venue, at least one collective, or both. This spans two tables, so the
   function that creates events enforces it, and a trigger re-checks it when the last
   collective is removed from a no-venue event.
-- Any user logging the event can fill in `venue_id` or `name` when empty, and add a
-  collective. Only moderators and admins change or remove a value once set.
+- Any user logging the event or marking Going on it can fill in `venue_id` or `name` when
+  empty, and add a collective. The name's setter can change or clear `name` until
+  `name_locked_at` (ADR 0015). Only moderators and admins change or remove any other value
+  once set, and the name after that.
+- The name's setter is the `edited_by` of the event's latest `catalog_edits` row for
+  `name`, or the event's `creations` row when the name was set with the event. It is never
+  stored on `events`, because a public row must not show who did what. The lock trigger
+  runs on log and Going inserts and on "Change night" moves into the event, and skips the
+  setter's own rows.
 - Filling in `venue_id` on a no-venue event can clash: the venue unique index refuses a
   second unnamed (or same-name) night at that venue on that date, and the `(venue_id,
   city_id)` reference refuses a venue in another city. Adding a co-host to a no-venue event
@@ -651,7 +659,7 @@ listed is written only by defaults, triggers, or database functions. Enforcement
 | `set_listens` | `rating`. Insert and delete their own picks | | `event_id`, `updated_at` |
 | `comments` | `body`. Delete through a function that sets `deleted_at` and clears `body` | Admins: `hidden_at` | `user_id`, `edited_at`, `deleted_at`, `created_at` |
 | `venues`, `artists`, `collectives` | Creator until `used_by_others_at`: `name`, `city_id` | `name`, `city_id`. Admins: `hidden_at` | `short_id`, `used_by_others_at`, `merged_into_id`, `created_at`, `updated_at` |
-| `events` | Fill empty `venue_id`, `name`, and add co-hosts, through a function | Change set fields, through a function. Admins: `hidden_at` | Everything else |
+| `events` | Fill empty `venue_id`, `name`, and add co-hosts, through a function. The name's setter: change or clear `name` until `name_locked_at`, through the same function | Change set fields, through a function. Admins: `hidden_at` | `name_locked_at` and everything else |
 | `lineup_slots`, `slot_artists` | Through the lineup functions only | Through the lineup functions only | `removed_at` and every other column |
 | `reports` | Insert: target, `reason`, `description`, `duplicate_of_id` | Within their queue: `status` | `reporter_id`, `resolved_by`, `resolved_at`, `created_at` |
 | `notices` | `action` | | Every other column, including `acted_at` |
