@@ -27,6 +27,7 @@ not counted so docblocks never push a file over.
 
 **Output.** [PR #13](https://github.com/bflip12/peer-review/pull/13), commands in
 [`CLAUDE.md`](../CLAUDE.md).
+
 ## Party names come from the poster, not the user (2026-10-14)
 
 **Goal.** Stop users from treating the event name as their own label for a night, without
