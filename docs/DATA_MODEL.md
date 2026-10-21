@@ -2,7 +2,7 @@
 
 The tables, relationships, constraints, and indexes for v1, and which of them are hard to
 change once real data exists. Product rules are in `SPEC.md`. The decisions behind this
-shape are in ADRs 0008 to 0014. Once migrations exist, they are the source of truth
+shape are in ADRs 0008 to 0016. Once migrations exist, they are the source of truth
 and this file describes them.
 
 Rules for changing the schema are in `.claude/rules/database.md`.
@@ -97,6 +97,7 @@ erDiagram
     events ||--o{ logs : "logged as"
     logs ||--o{ set_listens : picks
     lineup_slots ||--o{ set_listens : "picked in"
+    logs ||--|| log_snapshots : "original copy"
     logs ||--o{ likes : receives
     logs ||--o{ comments : receives
     events ||--o{ going : "marked on"
@@ -273,7 +274,7 @@ One night. See [Event identity](#event-identity).
 | `date` | date | Required. The night it started |
 | `city_id` | integer | Required. References `cities` |
 | `venue_id` | uuid | Optional. References `venues` |
-| `name` | text | Optional. The official name from the poster, "Halloween" (ADR 0015) |
+| `name` | text | Optional. The official name from the poster, "Halloween" (ADR 0016) |
 | `name_locked_at` | timestamptz | Set by a trigger when a user other than the name's setter logs the night or marks Going on it. Cleared when the name changes. Ends the setter's edit right |
 | `merged_into_id` | uuid | References `events` |
 | `hidden_at` | timestamptz | |
@@ -296,7 +297,7 @@ Constraints:
   collective is removed from a no-venue event.
 - Any user logging the event or marking Going on it can fill in `venue_id` or `name` when
   empty, and add a collective. The name's setter can change or clear `name` until
-  `name_locked_at` (ADR 0015). Only moderators and admins change or remove any other value
+  `name_locked_at` (ADR 0016). Only moderators and admins change or remove any other value
   once set, and the name after that.
 - The name's setter is the `edited_by` of the event's latest `catalog_edits` row for
   `name`, or the event's `creations` row when the name was set with the event. It is never
@@ -431,6 +432,34 @@ Primary key `(log_id, slot_id)`. `(log_id, event_id)` references `logs (id, even
 `(slot_id, event_id)` references `lineup_slots (id, event_id)`, so a pick always points at
 a slot on its log's event. Both cascade, and are deferred to the end of the transaction so
 a merge can move logs and slots in two steps (checked).
+
+#### log_snapshots
+
+The private original copy of a log's night (ADR 0015). One row per log.
+
+| Field | Type | Notes |
+|---|---|---|
+| `log_id` | uuid | Primary key. References `logs`. Cascade |
+| `format` | smallint | Version of the `night` layout. Starts at 1 |
+| `night` | jsonb | The night as it was at the owner's last save. See below |
+| `saved_at` | timestamptz | The owner's last save |
+
+`night` holds names, never IDs, so renames and merges leave it as it was:
+- `date`, `city` (name, region, country code), `event_name`, `venue`, `collectives`.
+- `lineup`: the slots in the order the event page shows them, each with `artists` (names in
+  b2b order), `picked`, `rating` (1 to 10, or null), and `removed`. A slot the lineup
+  leaves out (removed, or every DJ hidden) is included only when the log picked it, with
+  `removed` true.
+
+Rules:
+- An internal function builds `night` from the live rows. It runs in the transaction of
+  each owner save: a new log, an edit to the log or its picks, and "Change night". Edits by
+  other users, lineup corrections, hides, merges, and undo never run it. Milestone 3
+  decides whether the log save function or a trigger calls it; a trigger has to tell the
+  owner's save apart from a merge.
+- "Changed since you saved it" on the Original logs page: the stored `night` differs from
+  the function's output on the live rows.
+- A new field raises `format`. Old rows keep their layout, and the app reads each format.
 
 ### Social
 
@@ -638,6 +667,7 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 | `follows`, `likes` | Everyone | Owner adds and removes their own |
 | `comments` | On logs the reader can see, unless hidden or the author is banned | Author creates, edits, deletes. Admins hide |
 | `going`, `notices` | Owner only | Owner. Notices are created by database functions |
+| `log_snapshots` | Owner only. Not moderators or admins | Database functions |
 | `creations` | That user, moderators, admins | Database functions |
 | `catalog_edits`, `merges`, `merge_changes` | Moderators and admins | Database functions. Merges: admins, from Milestone 10 |
 | `reports` | Catalog targets: moderators and admins, without `reporter_id`. `duplicate` reports and other targets: admins | Signed-in users create. Moderators and admins resolve within their queue |
@@ -657,6 +687,7 @@ listed is written only by defaults, triggers, or database functions. Enforcement
 | `profiles` | `handle`, `display_name` | Admins: `role`, `account_status` | `id`, `account_status_at`, `created_at` |
 | `logs` | `overall_rating`, `sound_rating`, `venue_rating`, `body`, `visibility`. `event_id` only through "Change night" | Admins: `hidden_at` | `user_id` (the signed-in user), `short_id`, `event_date`, `archived_merge_id`, `created_at`, `updated_at` |
 | `set_listens` | `rating`. Insert and delete their own picks | | `event_id`, `updated_at` |
+| `log_snapshots` | | | Every column |
 | `comments` | `body`. Delete through a function that sets `deleted_at` and clears `body` | Admins: `hidden_at` | `user_id`, `edited_at`, `deleted_at`, `created_at` |
 | `venues`, `artists`, `collectives` | Creator until `used_by_others_at`: `name`, `city_id` | `name`, `city_id`. Admins: `hidden_at` | `short_id`, `used_by_others_at`, `merged_into_id`, `created_at`, `updated_at` |
 | `events` | Fill empty `venue_id`, `name`, and add co-hosts, through a function. The name's setter: change or clear `name` until `name_locked_at`, through the same function | Change set fields, through a function. Admins: `hidden_at` | `name_locked_at` and everything else |
@@ -731,6 +762,10 @@ Ordered by cost once there is real data.
 8. **City IDs are GeoNames IDs.** A bigger GeoNames file only adds rows. A different source
    would mean remapping every venue, collective, and event.
 9. **`profiles.id` is the auth user ID, and email stays in `auth.users`.**
+10. **Original log copies record the night at each save.** A field left out of `night`
+    cannot be filled in for past saves, and a log saved before the table existed has no
+    copy. Hence the table ships with logs in Milestone 3, and `format` lets new fields join
+    without rewriting old copies.
 
 Easy to change later: the daily cap numbers, other reactions on likes, showing averages
 (with the minimums in SPEC "Aggregation rules"), link platforms, comment replies, new
@@ -779,3 +814,4 @@ Run on a local PostgreSQL 16.15 in this session:
 - `short_id` length and alphabet. Collisions are handled by the unique constraint and a
   retry.
 - The functions and triggers named above are described, not written or run.
+- Whether the log save function or a trigger refreshes `log_snapshots` (Milestone 3).

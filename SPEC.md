@@ -64,7 +64,7 @@ Online scene communities across many cities. Two consequences:
 
 ### 3. Events
 - An event is a date (the night it started), a city, a venue, one or more collectives, or
-  both, and an optional name (ADR 0008, ADR 0010, ADR 0015). A collective without a venue
+  both, and an optional name (ADR 0008, ADR 0010, ADR 0016). A collective without a venue
   covers warehouse parties with no fixed home. A collective's party at a club has both.
 - Collectives on an event are equal co-hosts. The event shows on each of their pages.
 - Per venue and date, among events not merged: one unnamed event, plus any number of named
@@ -75,7 +75,7 @@ Online scene communities across many cities. Two consequences:
 - Names compare ignoring case and surrounding spaces.
 - Dates are read in the event city's timezone. "Today" in any rule means today in that
   city.
-- The name is the official name from the poster (ADR 0015). Wherever it is asked, the
+- The name is the official name from the poster (ADR 0016). Wherever it is asked, the
   field reads:
   - Label: "Name on the poster (optional)"
   - Placeholder: "Halloween"
@@ -159,6 +159,22 @@ collective nights work the same way.
   over: ratings, review, and set picks. DJs the log picked that are not on the new lineup
   are added to it. The move is blocked when the user already logged that event or would
   pass 3 logs on its date.
+- **Original logs.** Each log keeps a private copy of its night, readable only by the
+  owner (ADR 0015).
+  - The copy freezes the date, city, event name, venue, collectives, lineup, and the
+    user's set picks with their stars, as they were when the owner last saved the log. The
+    ratings and review always show the current version.
+  - Saving the log or its picks, or "Change night", replaces the copy. Edits by other
+    users, lineup corrections, and merges never change it. A pick on a slot removed before
+    the save stays in the copy, marked "Removed from the lineup".
+  - The copies are listed on an "Original logs" page on the user's own profile, newest
+    first. Nothing shows on the log itself. A row whose night has changed since the last
+    save shows "Changed since you saved it". The owner's menu on a log has "View
+    original", which opens its entry.
+  - The page starts with: "A private copy of each of your logs, showing the night as it was
+    when you last saved the log. Other people can correct a night's name, venue, or lineup.
+    Those corrections show on your logs, but not here. Your rating and review always show
+    your latest version. Only you can see this page."
 
 ### 5. Social
 - Follow users.
@@ -180,6 +196,8 @@ collective nights work the same way.
   outdated name part redirects. A handle change does not redirect the old profile URL.
 - Profile with stats: nights logged, top venues, most listened to DJs (sets picked under
   "Which sets did you listen to?", b2b sets counting for each artist), this year.
+- The user's own profile links to their private pages: "Upcoming" (section 9) and
+  "Original logs" (section 4).
 - Search by name across venues, DJs, collectives, and users.
 
 ### 7. Moderation
@@ -314,8 +332,8 @@ them.
 - Known limit: the Supabase project owner can read `auth.users`. Hiding emails from the
   operator entirely needs sign-in with no email at all (passkeys only, no account
   recovery). Not in v1.
-- Deleting an account deletes the user's logs, comments, likes, follows, and Going
-  markers.
+- Deleting an account deletes the user's logs (with their original copies), comments,
+  likes, follows, and Going markers.
 
 ## Not in v1
 

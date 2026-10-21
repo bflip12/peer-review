@@ -1,4 +1,4 @@
-# 0015: An event's name is the official name from the poster
+# 0016: An event's name is the official name from the poster
 
 - Date: 2026-10-14
 - Status: Accepted

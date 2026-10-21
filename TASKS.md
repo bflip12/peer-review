@@ -91,7 +91,7 @@ Events with a venue, one or more co-host collectives, or both (ADR 0008, ADR 001
 the venue and collective unnamed-night rules enforced by unique indexes. The night picker: date first,
 one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
 night" groups, nights one day either side, the optional name field with the poster copy
-(ADR 0015), a second night at the same place and date showing the existing night with
+(ADR 0016), a second night at the same place and date showing the existing night with
 "Join" before a required name, and the past-midnight line. Events created only when a log is saved, with
 the concurrent-save case joining instead of failing, and counting toward the daily event cap
 (ADR 0011). Lineup slots with one or more artists,
@@ -105,12 +105,19 @@ same night". The name's setter changes or clears it until `name_locked_at`, set 
 trigger when another user logs the night or marks Going on it. Deletion of events left with no logs
 and no Going markers, with a redirect when a move caused it. The log form accepts only
 events dated today or earlier.
+The private original copy of each log in `log_snapshots` (ADR 0015): written on the
+owner's first save and replaced on each of their saves and "Change night", never by other
+users' edits, lineup corrections, or hides, with RLS tests that no one but the owner reads
+it, admins included.
 
 ## Milestone 4: Pages
 
 Log, event, venue, DJ, collective, profile with stats, search by name. Venue, DJ, and
 collective pages list only events with at least one public log. No averages (ADR 0014).
 "Most listened to DJs" counts picked sets.
+The private "Original logs" page on the owner's profile, with the explanation from SPEC
+section 4, "Changed since you saved it" per row, and "View original" in the owner's log
+menu (ADR 0015).
 
 ## Milestone 5: Social
 
