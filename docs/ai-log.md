@@ -10,16 +10,16 @@ how AI was used, which calls were mine, and what came out of it.
 
 ## First code: the scaffold (2026-10-21)
 
-**Goal.** Set up Next.js with formatting, linting, unit tests, and browser tests before any
-feature code.
+**Goal.** Set up Next.js with formatting, linting, unit tests, and browser tests before
+any feature code.
 
 **How I used AI.** Claude proposed the plan and asked the three questions that changed the
-setup: package manager, file length limit, and import sort plugin. It generated the app in a
-scratch folder so it would not overwrite the planning docs. It checked each tool's behaviour
-by running it, not from memory: a 301-line file fails lint, a wrong heading fails the test,
-and the import sort plugin groups imports as configured. It found that the installed
-Playwright expects a newer Chromium than the cloud container has, and added a setting to use
-the installed one.
+setup: package manager, file length limit, and import sort plugin. It generated the app in
+a scratch folder so it would not overwrite the planning docs. It checked each tool's
+behaviour by running it, not from memory: a 301-line file fails lint, a wrong heading
+fails the test, and the import sort plugin groups imports as configured. It found that the
+installed Playwright expects a newer Chromium than the cloud container has, and added a
+setting to use the installed one.
 
 **My calls.** npm. Claude proposed a 200-line limit per file; I thought that was too
 strict, and we settled on 300 lines of code (500 for tests), with blank lines and comments
@@ -27,7 +27,6 @@ not counted so docblocks never push a file over.
 
 **Output.** [PR #13](https://github.com/bflip12/peer-review/pull/13), commands in
 [`CLAUDE.md`](../CLAUDE.md).
-
 ## Party names come from the poster, not the user (2026-10-14)
 
 **Goal.** Stop users from treating the event name as their own label for a night, without
