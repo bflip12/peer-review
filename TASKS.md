@@ -90,8 +90,9 @@ the first one (ADR 0009), so history and "Revert" in Milestone 6 have data to sh
 Events with a venue, one or more co-host collectives, or both (ADR 0008, ADR 0010), with
 the venue and collective unnamed-night rules enforced by unique indexes. The night picker: date first,
 one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
-night" groups, nights one day either side, a required name for a second night at the same
-place and date, and the past-midnight line. Events created only when a log is saved, with
+night" groups, nights one day either side, the optional name field with the poster copy
+(ADR 0016), a second night at the same place and date showing the existing night with
+"Join" before a required name, and the past-midnight line. Events created only when a log is saved, with
 the concurrent-save case joining instead of failing, and counting toward the daily event cap
 (ADR 0011). Lineup slots with one or more artists,
 b2b detection in DJ search, "b2b with" and slot removal by the user who added it until
@@ -100,7 +101,8 @@ overall rating, review, and privacy first, and a collapsed section for sound, ve
 "Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.
 "Change night" on a log, carrying everything over. Users fill in an empty venue or name
 and add collectives, refused on a clash or a venue in another city, with "Report as the
-same night". Deletion of events left with no logs
+same night". The name's setter changes or clears it until `name_locked_at`, set by a
+trigger when another user logs the night or marks Going on it. Deletion of events left with no logs
 and no Going markers, with a redirect when a move caused it. The log form accepts only
 events dated today or earlier.
 The private original copy of each log in `log_snapshots` (ADR 0015): written on the

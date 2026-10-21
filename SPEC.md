@@ -64,8 +64,8 @@ Online scene communities across many cities. Two consequences:
 
 ### 3. Events
 - An event is a date (the night it started), a city, a venue, one or more collectives, or
-  both, and an optional name (ADR 0008, ADR 0010). A collective without a venue covers
-  warehouse parties with no fixed home. A collective's party at a club has both.
+  both, and an optional name (ADR 0008, ADR 0010, ADR 0016). A collective without a venue
+  covers warehouse parties with no fixed home. A collective's party at a club has both.
 - Collectives on an event are equal co-hosts. The event shows on each of their pages.
 - Per venue and date, among events not merged: one unnamed event, plus any number of named
   events with distinct names. This covers a day party and a night party at one club.
@@ -75,9 +75,17 @@ Online scene communities across many cities. Two consequences:
 - Names compare ignoring case and surrounding spaces.
 - Dates are read in the event city's timezone. "Today" in any rule means today in that
   city.
-- Anyone logging an event can fill in its venue or name when it has none, and add a
-  collective. Changing or removing a value that is already set is for locals and admins
-  (section 7).
+- The name is the official name from the poster (ADR 0016). Wherever it is asked, the
+  field reads:
+  - Label: "Name on the poster (optional)"
+  - Placeholder: "Halloween"
+  - Help text: "Use the official name from the poster. Leave it empty if the night didn't
+    have one."
+- Anyone logging an event or marking Going on it can fill in its venue or name when it has
+  none, and add a collective. The user who set the name can change or clear it until
+  another user logs the night or marks Going on it after the name was set. Changing or
+  removing any other value that is already set, and the name after that, is for locals and
+  admins (section 7).
 - Filling in a venue on a night with no venue is refused when the venue is in another city,
   or when the venue already has a night on that date that is also unnamed or has the same
   name. Adding a collective to a night with no venue is refused the same way when that
@@ -101,16 +109,19 @@ collective nights work the same way.
   venue, collective, name, first three DJs, and the public log count when it is above zero.
   A night with no lineup shows "No lineup yet".
 - **Start a new night** lists matching venues and collectives, then "Add a venue or
-  collective". Tapping one starts a new event, created when the log is saved.
+  collective". Tapping one starts a new event, created when the log is saved. The form
+  shows the optional name field.
 - Starting a new night at a venue or collective that already has a night on that date
-  requires a name. Text under the field: "Tresor already has a night on Sat 4 Oct. Name
-  this party so people can tell the two apart, for example 'Day party' or the collective
-  running it." If a collective is picked, the field starts with its name.
+  first shows that night with "Join". "No, it's a different party" then shows the name
+  field, required, with the label "Name on the poster". Text under the field: "Tresor
+  already has a night on Sat 4 Oct. Add the name from the poster so people can tell the
+  two apart." If a collective is picked, the field starts with its name.
 - Starting a new night at a venue or collective that has a night one day either side shows
   one line first: "Tresor has a night on Fri 3 Oct. Nights that run past midnight go under
   the date they started."
 - After the pick, the form shows the night at the top (venue, collective, name, date,
-  lineup, public log count) with a "Change" link.
+  lineup, public log count) with a "Change" link. A joined night with no name shows the
+  optional name field.
 
 **Lineups.**
 - A lineup slot is one set and holds one or more artists. A slot with several artists is a
@@ -199,7 +210,8 @@ data model and code the local role is `moderator`; "Local" is its label in the a
 - Locals fix the catalog. Each local has one or more cities, shown on their profile as
   "Berlin local". In v1 the cities are not enforced, and a local can act anywhere. Locals:
   - Edit venues, DJs, and collectives: name, city, links, sound tags.
-  - Change an event's venue, collective, or name when it is already set.
+  - Change an event's venue, collective, or name when it is already set. The user who set
+    a name can still change it until someone else logs the night (section 3).
   - Work the catalog report queue: "Didn't play", and any report on a venue, DJ,
     collective, event, or lineup slot other than "Duplicate". Reporters are not shown.
   - Correct lineups in three ways: remove a slot, remove one DJ from a b2b slot, or switch
