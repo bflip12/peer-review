@@ -333,8 +333,10 @@ data model, and ADRs before any code is written.
 
 Each task starts with a plan and the questions that change the work, and nothing is built
 until I say go. Claude writes tests before logic, reads the current docs for a library
-instead of working from memory, and checks each tool by running it. Work goes on a branch
-with a draft PR from the first commit, and each task merges to main as one commit.
+instead of working from memory, and checks each tool by running it. For layout, it
+captures each page at phone and laptop widths and looks at the images itself before
+calling the work done. Work goes on a branch with a draft PR from the first commit, and
+each task merges to main as one commit.
 
 ### First code: the scaffold (2026-10-21)
 

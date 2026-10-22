@@ -18,8 +18,8 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-3. Add a screenshot script that captures a page at 375px and 1280px.
-4. Add CI on GitHub Actions: typecheck, lint, test, build.
+4. Add CI on GitHub Actions: typecheck, lint, test, build. Install Playwright's Chromium
+   before `npm test`, since the screenshot script's test launches a browser.
 5. Create the Supabase project and local dev setup, a migrations folder, a way to test RLS
    policies, and `.claude/rules/supabase.md`. Confirm Supabase runs Postgres 15 or later
    (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
@@ -64,7 +64,8 @@ nothing is copied from the Google profile. The privacy page, since Google's cons
 asks for a privacy policy link (unverified for basic scopes). Column write tests for
 `profiles`: a user cannot change their own `role` or `account_status`
 (`docs/DATA_MODEL.md` "Column writes"). Every later milestone that adds a table adds its
-column write tests the same way.
+column write tests the same way. A signed-in option for `npm run screenshot`, so pages
+behind sign-in can be captured.
 
 ## Milestone 2: Venues, DJs, collectives
 

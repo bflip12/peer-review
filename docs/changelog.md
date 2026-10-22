@@ -4,6 +4,14 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-22
 
+- Rule 3 names `npm run screenshot` and says the captures are read before a UI task is
+  called done (was: screenshots at 375px and 1280px, with no tool). Reason: the script
+  now exists, and a capture nobody opens checks nothing.
+- Rule 7: GitHub deletes the branch on merge (was: delete the branch after the merge).
+  Reason: the repo deletes merged branches automatically.
+- `CLAUDE.md`: the cloud Chromium prefix applies to `npm test` and `npm run screenshot`
+  as well as `npm run e2e`, and the allowlist covers it for every npm script. Reason: the
+  screenshot script's test launches a browser.
 - `docs/ai-log.md` is grouped by stage, from idea to code, with entries oldest first in
   each stage (was: one list, newest first). How AI is used is described once per stage,
   and an entry adds one sentence only when it differs. The `ai-log` skill writes entries
