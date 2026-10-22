@@ -8,7 +8,16 @@ Owner: Bobby Filippopoulos, software developer.
 Next.js App Router, TypeScript, Supabase (Postgres, Auth, RLS), Vercel.
 
 ## Commands
-Added by the scaffold task. Do not guess a command that is not listed here.
+Do not guess a command that is not listed here. Node 22 or later, npm.
+- `npm run dev`, `npm run build`, `npm run start`: Next.js dev server, build, and server.
+- `npm run typecheck`: generates route types, then runs `tsc`.
+- `npm run lint`: ESLint. `npm run format` writes Prettier, `npm run format:check` checks.
+- `npm test`: Vitest once. `npm run test:watch`: Vitest in watch mode.
+- `npm run e2e`: Playwright, starting the dev server (CI: build and start). In cloud
+  sessions, prefix `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium`.
+
+Before writing Next.js code, read the guide for it in `node_modules/next/dist/docs/`
+(`AGENTS.md`, which `next dev` keeps current).
 
 ## Rules
 1. Confirm before building: propose the plan, ask what changes the work, wait for "go".

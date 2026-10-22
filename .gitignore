@@ -1,4 +1,30 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# builds
+/build
+/dist
+
+# tests
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# misc
 .DS_Store
-node_modules/
-dist/
-build/
+*.pem
+npm-debug.log*

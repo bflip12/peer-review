@@ -18,9 +18,6 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-1. Scaffold Next.js and TypeScript with a `src/` folder. Prettier settings from code-style
-   section 1, ESLint with a `max-lines` limit, Vitest with React Testing Library, and
-   Playwright. Record every command in `CLAUDE.md`.
 2. Add a `PostToolUse` hook on `Edit|Write` that runs Prettier and ESLint fix on the edited
    file. Add a permissions allowlist to `.claude/settings.json` for routine commands.
 3. Add a screenshot script that captures a page at 375px and 1280px.
@@ -49,8 +46,10 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
    styled-components, client-side React Query (in its pre-v5 API), Sentry, and atoms, none
    of which are in the stack, and styled-components needs client components in the App
    Router. Proposal to weigh: CSS Modules with the token file, server components read,
-   server actions write, and no client data library until a screen needs one. Then rewrite
-   code-style sections 8 to 10 and checklist item 9 to match, with where state lives, the
+   server actions write, and no client data library until a screen needs one. Cover Cache
+   Components and Partial Prefetching too: `create-next-app` turns both on, the scaffold
+   kept them, and they change how fetched data is cached. Then rewrite code-style sections
+   8 to 10 and checklist item 9 to match, with where state lives, the
    Next.js default-export exception for route files, and the error and loading
    conventions. Rules for new dependencies and for committed versus generated files are
    written when the first case comes up (Supabase generated types, task 5).

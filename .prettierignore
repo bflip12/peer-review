@@ -1,0 +1,9 @@
+# Markdown is hand-wrapped at 90 columns. Prettier would rewrap every doc.
+*.md
+package-lock.json
+.next/
+next-env.d.ts
+coverage/
+test-results/
+playwright-report/
+blob-report/
