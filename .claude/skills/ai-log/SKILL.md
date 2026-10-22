@@ -26,14 +26,20 @@ If it does not qualify, write nothing and do not mention it.
 
 ## 2. Write the entry
 
-Add it at the top of the entries, below the intro. Format:
+The log is grouped by stage, from idea to code: working rules, product concept, feature
+specs, technical spec, reviews, implementation. Each stage opens with a paragraph on how
+Bobby uses AI in it. Add the entry at the end of its stage, since entries run oldest
+first. If a session uses AI in a way the stage paragraph does not cover, update that
+paragraph.
+Format:
 
 ```md
-## <What happened, in plain words> (YYYY-MM-DD)
+### <What happened, in plain words> (YYYY-MM-DD)
 
 **Goal.** One sentence.
 
-**How I used AI.** What the AI did: the technique, not a transcript.
+**How I used AI.** Optional. One sentence, only when this step used AI differently from
+the stage paragraph.
 
 **My calls.** The decisions Bobby made and why, including where he changed or rejected
 the AI's proposal.
