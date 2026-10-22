@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "screenshot": "node scripts/screenshot/takeScreenshots.ts"
   },
   "dependencies": {
     "next": "16.4.2",
