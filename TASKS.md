@@ -18,8 +18,6 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-2. Add a `PostToolUse` hook on `Edit|Write` that runs Prettier and ESLint fix on the edited
-   file. Add a permissions allowlist to `.claude/settings.json` for routine commands.
 3. Add a screenshot script that captures a page at 375px and 1280px.
 4. Add CI on GitHub Actions: typecheck, lint, test, build.
 5. Create the Supabase project and local dev setup, a migrations folder, a way to test RLS

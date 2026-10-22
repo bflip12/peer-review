@@ -2,6 +2,21 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-22
+
+- `.claude/settings.json`: a `PostToolUse` hook on `Edit|Write` runs Prettier and
+  `eslint --fix` on the edited file, and exits 2 with any errors left so Claude fixes them
+  in the same turn. Markdown is skipped. Reason: formatting no longer depends on anyone
+  running `npm run format`, and lint errors show up at the edit, not at the end of a task.
+- `.claude/settings.json`: an allowlist for the npm scripts, `npx` runs of the project's
+  tools, and git, including `add`, `commit`, and `push`. Deny rules block force pushes and
+  pushes to `main`. Reason: rule 7 pushes after every commit, and asking each time added
+  up. The deny rules match command text, so they cover the usual commands, not every way
+  of writing one.
+- `package.json` sets `"type": "module"` and Node 22.18 or later. Reason: Node runs the
+  TypeScript hook directly, and 22.18 is the first Node 22 release that does so without a
+  flag.
+
 ## 2026-10-13
 
 - `.claude/rules/database.md`: a one-value enum column is allowed only when the enum table

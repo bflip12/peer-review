@@ -8,6 +8,29 @@ are recorded in [`docs/adr/`](adr/README.md) and workflow rules in
 Entries cover notable steps only, newest first. Each one says what the step set out to do,
 how AI was used, which calls were mine, and what came out of it.
 
+## A hook that formats and lints every edit (2026-10-22)
+
+**Goal.** Format and lint each file as Claude edits it, and stop asking permission for
+routine commands.
+
+**How I used AI.** Claude read the current Claude Code docs for the hook input, exit
+codes, and permission rule syntax before writing anything, and wrote the tests before the
+hook.
+It then checked the hook on real edits in the session: a badly formatted file came back
+formatted, and an `any` came back to Claude as an ESLint error. It tested each deny rule
+with `git push --dry-run`, which checks a push without making it.
+
+**My calls.** Lint errors that `--fix` cannot fix go back to Claude to fix right away,
+instead of waiting for `npm run lint`. `git add`, `commit`, and `push` are allowed, since
+the workflow pushes after every commit, with deny rules for force pushes and pushes to
+`main`. The docs say those rules match command text and are not a hard boundary, which I
+accepted. Auto mode blocked Claude from editing its own settings and `CLAUDE.md`, so I
+switched modes for that step.
+
+**Output.** [`scripts/hooks/formatEditedFile.ts`](../scripts/hooks/formatEditedFile.ts),
+[`.claude/settings.json`](../.claude/settings.json),
+[PR #14](https://github.com/bflip12/peer-review/pull/14).
+
 ## First code: the scaffold (2026-10-21)
 
 **Goal.** Set up Next.js with formatting, linting, unit tests, and browser tests before
