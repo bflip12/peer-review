@@ -4,6 +4,11 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-22
 
+- `docs/ai-log.md` is grouped by stage, from idea to code, with entries oldest first in
+  each stage (was: one list, newest first). How AI is used is described once per stage,
+  and an entry adds one sentence only when it differs. The `ai-log` skill writes entries
+  this way. Reason: Bobby wants the log to read as the overall process, and the same
+  detail in every entry was getting too specific.
 - `.claude/settings.json`: a `PostToolUse` hook on `Edit|Write` runs Prettier and
   `eslint --fix` on the edited file, and exits 2 with any errors left so Claude fixes them
   in the same turn. Markdown is skipped. Reason: formatting no longer depends on anyone
