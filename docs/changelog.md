@@ -2,6 +2,13 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-23
+
+- CI on GitHub Actions (`.github/workflows/ci.yml`) checks every PR and every push to
+  `main`, and `CLAUDE.md` describes it. Actions are pinned to commit SHAs (was: no CI).
+  Reason: a clean machine catches what only works in one container, and a SHA cannot be
+  moved to different code the way a tag can.
+
 ## 2026-10-22
 
 - Rule 3 names `npm run screenshot` and says the captures are read before a UI task is

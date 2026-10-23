@@ -18,8 +18,6 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-4. Add CI on GitHub Actions: typecheck, lint, test, build. Install Playwright's Chromium
-   before `npm test`, since the screenshot script's test launches a browser.
 5. Create the Supabase project and local dev setup, a migrations folder, a way to test RLS
    policies, and `.claude/rules/supabase.md`. Confirm Supabase runs Postgres 15 or later
    (`NULLS NOT DISTINCT`), re-run the checks listed in `docs/DATA_MODEL.md` there, check
