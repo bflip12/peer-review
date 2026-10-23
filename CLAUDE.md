@@ -15,11 +15,11 @@ Do not guess a command that is not listed here. Node 22.18 or later, npm.
 - `npm test`: Vitest once. `npm run test:watch`: Vitest in watch mode.
 - `npm run e2e`: Playwright, starting the dev server. With `CI` set it runs
   `npm run start`, so run `npm run build` first.
+- `npm run screenshot -- / /other/route`: full-page PNGs of each route at 375px and
+  1280px in `screenshots/`. Starts the dev server if nothing answers on port 3000.
 
 CI (`.github/workflows/ci.yml`) runs typecheck, lint, the format check, unit tests, the
 build, and e2e on every PR and every push to `main`, on the Node version in `.nvmrc`.
-- `npm run screenshot -- / /other/route`: full-page PNGs of each route at 375px and
-  1280px in `screenshots/`. Starts the dev server if nothing answers on port 3000.
 
 In cloud sessions, prefix `npm test`, `npm run e2e`, and `npm run screenshot` with
 `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium`. The container's Chromium is older
