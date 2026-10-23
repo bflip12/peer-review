@@ -20,8 +20,9 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // CI tests the production build. Locally the dev server starts faster.
-    command: IS_CI ? "npm run build && npm run start" : "npm run dev",
+    // CI tests the production build, which its Build step makes first. Locally the dev
+    // server starts faster.
+    command: IS_CI ? "npm run start" : "npm run dev",
     url: BASE_URL,
     reuseExistingServer: !IS_CI,
     timeout: 120_000

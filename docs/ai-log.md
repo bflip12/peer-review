@@ -365,3 +365,22 @@ switched modes for that step.
 **Output.** [`scripts/hooks/formatEditedFile.ts`](../scripts/hooks/formatEditedFile.ts),
 [`.claude/settings.json`](../.claude/settings.json),
 [PR #14](https://github.com/bflip12/peer-review/pull/14).
+
+### CI on GitHub Actions (2026-10-23)
+
+**Goal.** Check every PR on a clean machine: typecheck, lint, formatting, tests, the
+build, and the browser smoke test.
+
+**How I used AI.** Before deciding, I had Claude explain the terms I was not sure of (CI,
+the Node setup step, pinning, and branch protection) with a diagram and a code example,
+until each choice was clear.
+
+**My calls.**
+- The format check and the browser smoke test run in CI as well as the four checks the
+  task named.
+- Actions are pinned to commit SHAs, after the 2025 `tj-actions` attack showed how a moved
+  tag can run someone else's code in CI. Dependabot updates come later.
+- CI is required before merging into `main`, including merges Claude makes when I ask.
+
+**Output.** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml),
+[PR #17](https://github.com/bflip12/peer-review/pull/17).
