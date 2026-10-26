@@ -56,3 +56,34 @@ jobs:
 
       - name: End-to-end tests against the build
         run: npm run e2e
+
+  database:
+    name: Database tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      # Applies every migration to a fresh local stack, so a broken migration fails here.
+      - name: Start the local Supabase stack
+        run: npm run db:start
+
+      - name: Database tests
+        run: npm run test:db
+
+      - name: Check the generated database types are up to date
+        run: |
+          npm run db:types
+          git diff --exit-code src/lib/supabase/database.types.ts
