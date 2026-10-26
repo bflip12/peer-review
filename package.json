@@ -14,7 +14,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "screenshot": "node scripts/screenshot/takeScreenshots.ts"
+    "screenshot": "node scripts/screenshot/takeScreenshots.ts",
+    "db:start": "supabase start --exclude realtime,storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,mailpit",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts && prettier --write src/lib/supabase/database.types.ts",
+    "test:db": "vitest run --config vitest.db.config.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
