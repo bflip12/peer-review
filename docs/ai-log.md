@@ -384,3 +384,29 @@ until each choice was clear.
 
 **Output.** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml),
 [PR #17](https://github.com/bflip12/peer-review/pull/17).
+
+### Supabase, with grants locked down and RLS tested through the API (2026-10-26)
+
+**Goal.** Set up Supabase locally and in the cloud, with a way to test row level security
+before any table exists.
+
+**How I used AI.** Claude probed what Supabase actually grants by default on the local
+stack instead of trusting the docs, and found that new tables and functions were open to
+signed-out users. It then ran the tests once without its own fix to show they catch the
+problem.
+
+**My calls.**
+- RLS tests go through the API as real signed-in users, not SQL tests inside the
+  database, because the API is what an attacker reaches.
+- Database tests run in CI on every PR.
+- Automatic RLS on for the hosted project, as a safety net under the explicit rules.
+- The project lives in Canada. One region is enough at this scale, and users elsewhere
+  only see slower requests.
+- URL IDs are 8 characters without lookalike letters.
+- The repo stays private for now, with a fresh public repo later and a private repo for
+  notes. GitHub does not enforce required checks on a private repo on the free plan, so a
+  rule that Claude merges only on green CI stands in.
+
+**Output.** [ADR 0017](adr/0017-explicit-grants-and-api-tests.md),
+[`.claude/rules/supabase.md`](../.claude/rules/supabase.md),
+[`supabase/`](../supabase/), [PR #18](https://github.com/bflip12/peer-review/pull/18).

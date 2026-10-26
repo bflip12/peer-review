@@ -2,6 +2,16 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-26
+
+- Rule 7: merge only when CI is green on the PR's latest commit. Reason: the repo is
+  private on a free plan, so GitHub does not enforce the required check, and this rule
+  stands in for it.
+- Added `.claude/rules/supabase.md`, loaded for `supabase/**`: migrations, explicit
+  grants, function security, and database tests (ADR 0017). The function security rules moved
+  there from `TASKS.md`. `CLAUDE.md` lists the database commands and the cloud setup for
+  Docker and the Supabase image registry. Reason: Milestone 0 task 5.
+
 ## 2026-10-23
 
 - CI on GitHub Actions (`.github/workflows/ci.yml`) checks every PR and every push to
