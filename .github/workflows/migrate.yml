@@ -20,10 +20,11 @@ concurrency:
 permissions:
   contents: read
 
+# The session pooler URL with the database password, from the dashboard's Connect
+# button. GitHub's runners have no IPv6, and the direct address is IPv6-only, so it must
+# be the pooler. No Supabase access token is needed: both steps talk to Postgres directly.
 env:
-  SUPABASE_PROJECT_REF: stcjavdqwjgdgudoudqv
-  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
 jobs:
   migrate:
@@ -45,17 +46,12 @@ jobs:
       - name: Install packages
         run: npm ci
 
-      - name: Link the hosted project
-        run: npx supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-
       - name: List the migrations that will run
-        run: npx supabase db push --linked --dry-run --password "$SUPABASE_DB_PASSWORD"
+        run: npx supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
 
       - name: Apply migrations
-        run: npx supabase db push --linked --yes --password "$SUPABASE_DB_PASSWORD"
+        run: npx supabase db push --db-url "$SUPABASE_DB_URL" --yes
 
       # Postgres version, RLS on every table, and only listed functions callable.
       - name: Check the hosted schema
         run: npx vitest run --config vitest.db.config.mts supabase/tests/schema.test.ts
-        env:
-          SUPABASE_QUERY_FLAG: --linked

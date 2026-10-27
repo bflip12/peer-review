@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -52,32 +51,17 @@ export const deleteTestUser = async (userId: string): Promise<void> => {
   if (error) throw error;
 };
 
-// Runs SQL through `supabase db query`, which reaches the hosted project with only the
-// access token. The CLI wraps rows in a JSON object with a `rows` array.
-const runSqlWithCli = <RowT>(sql: string, targetFlag: string): RowT[] => {
-  const output = execFileSync(
-    "npx",
-    ["supabase", "db", "query", targetFlag, "--output-format", "json", sql],
-    { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }
-  );
-  const parsed = JSON.parse(output) as { rows?: RowT[]; error?: { message: string } };
-  if (!parsed.rows) throw new Error(parsed.error?.message ?? `No rows in: ${output}`);
-  return parsed.rows;
-};
-
 /**
  * Runs SQL as `postgres`, the role migrations run as, for test setup the API cannot do:
- * creating and dropping objects, or reading the catalog. With `SUPABASE_QUERY_FLAG` set
- * (`--linked` in CI, for the hosted project), it goes through `supabase db query` with that
- * flag instead of a direct connection to the local stack.
+ * creating and dropping objects, or reading the catalog. Connects to `SUPABASE_DB_URL`
+ * when it is set (the hosted project in the Migrate workflow), otherwise to the local
+ * stack. Only the catalog checks in `schema.test.ts` run against the hosted project.
  */
 export const runSql = async <RowT extends Record<string, unknown>>(
   sql: string
 ): Promise<RowT[]> => {
-  const queryFlag = process.env.SUPABASE_QUERY_FLAG;
-  if (queryFlag) return runSqlWithCli<RowT>(sql, queryFlag);
-
-  const client = new pg.Client({ connectionString: getLocalSupabase().dbUrl });
+  const connectionString = process.env.SUPABASE_DB_URL ?? getLocalSupabase().dbUrl;
+  const client = new pg.Client({ connectionString });
   await client.connect();
   try {
     const result = await client.query<RowT>(sql);
