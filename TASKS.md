@@ -26,17 +26,6 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-7. Write an ADR on styling and data fetching. `docs/code-style.md` sections 8 to 10 assume
-   styled-components, client-side React Query (in its pre-v5 API), Sentry, and atoms, none
-   of which are in the stack, and styled-components needs client components in the App
-   Router. Proposal to weigh: CSS Modules with the token file, server components read,
-   server actions write, and no client data library until a screen needs one. Cover Cache
-   Components and Partial Prefetching too: `create-next-app` turns both on, the scaffold
-   kept them, and they change how fetched data is cached. Then rewrite code-style sections
-   8 to 10 and checklist item 9 to match, with where state lives, the
-   Next.js default-export exception for route files, and the error and loading
-   conventions. Rules for new dependencies and for committed versus generated files are
-   written when the first case comes up (Supabase generated types, task 5).
 8. Create the token file and `docs/style-guide.md` with the first styled component (the app
    shell).
 

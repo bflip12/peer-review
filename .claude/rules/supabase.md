@@ -46,10 +46,11 @@ role the table is not meant for.
 
 ## Tests
 
-- Database tests live in `supabase/tests/` and run with `npm run test:db` against the local
-  stack. They go through the API with `supabase-js`, as a signed-out visitor
-  (`createAnonClient`) and as signed-in test users (`createTestUser`), because the API is
-  what a client can reach.
+- Database tests live in `supabase/tests/`. Tests of a feature's data functions sit
+  beside the function in `src/` as `*.db.test.ts`. Both run with `npm run test:db`
+  against the local stack. They go through the API with `supabase-js`, as a signed-out
+  visitor (`createAnonClient`) and as signed-in test users (`createTestUser`), because the
+  API is what a client can reach.
 - Every RLS policy, protected column, and exposed function gets a test as `anon` and as a
   plain user, plus the other roles it treats differently.
 - Use `runSql` (as `postgres`) only for setup, cleanup, and reading the catalog. Each test
