@@ -4,6 +4,14 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-27
 
+- The Migrate workflow connects to the hosted database with one secret,
+  `SUPABASE_DB_URL` (the session pooler URL), and no Supabase access token (was: an
+  access token and `supabase link`). Reason: `supabase link` needs a token that can read
+  the project's API keys, including the service role key, which bypasses RLS. Both steps
+  only need a Postgres connection.
+- CI installs only the Chromium browser for Playwright, not its system packages (was:
+  `--with-deps`). Reason: that step spent 7 of the job's 8.5 minutes on a slow Ubuntu
+  mirror fetching fonts the tests do not need. E2e stays on every PR; it takes 2 seconds.
 - `.claude/rules/supabase.md`: every migration works with the live app (add before use,
   remove after use, rename in steps). `CLAUDE.md` describes deploys: never apply a
   migration by hand. Reason: Vercel and the migration job run at the same time on a merge

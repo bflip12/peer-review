@@ -45,8 +45,11 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+      # Browser only. The runner image already has Chromium's system libraries, and
+      # --with-deps spent up to 7 minutes fetching extra fonts from a slow apt mirror.
+      # If a launch fails on a missing library, add --with-deps back.
       - name: Install Chromium for Playwright
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Unit tests
         run: npm test
