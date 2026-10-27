@@ -18,17 +18,15 @@ order.
   started fresh from `main` so the history carries no personal paths or work email.
   Notes that should stay private go in a separate private repo.
 
+- **Supabase access token.** Replace the `SUPABASE_ACCESS_TOKEN` repo secret before it
+  expires on 2027-01-25, with the same scoped permissions (Read on Project Settings,
+  Database, Connection Pooling, and Migrations, for `peer-review` only). An expired token
+  fails the Migrate workflow at "Link the hosted project".
+
 Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
 
-6. Deploy before any feature: Vercel production on `peerreview.club` and preview deploys
-   per PR, and migrations applied by CI to the hosted Supabase project
-   (`stcjavdqwjgdgudoudqv`, region Canada), never by hand. Auth redirects, cookies, OAuth
-   callbacks, and link previews are then tested on the real domain from Milestone 1. Run
-   `supabase/tests/schema.test.ts` against the hosted project once, to confirm its
-   Postgres version. Free projects pause after 7 days of low activity, so check what
-   wakes or prevents that before launch.
 7. Write an ADR on styling and data fetching. `docs/code-style.md` sections 8 to 10 assume
    styled-components, client-side React Query (in its pre-v5 API), Sentry, and atoms, none
    of which are in the stack, and styled-components needs client components in the App
@@ -45,17 +43,19 @@ Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 1: Accounts
 
-Sign-in with magic link and Google, handle and display name setup, the sign-in privacy
-note, RLS tests proving email is never exposed, account deletion. Custom SMTP for magic
-links on `peerreview.club` with SPF and DKIM (Supabase's built-in sender allows 2 emails
-an hour and sends only to the project's team members), on a free tier (for example Resend
-or Postmark), with an ADR (new service). The handle and display name fields start empty;
-nothing is copied from the Google profile. The privacy page, since Google's consent screen
-asks for a privacy policy link (unverified for basic scopes). Column write tests for
-`profiles`: a user cannot change their own `role` or `account_status`
-(`docs/DATA_MODEL.md` "Column writes"). Every later milestone that adds a table adds its
-column write tests the same way. A signed-in option for `npm run screenshot`, so pages
-behind sign-in can be captured.
+Before any of it: a second free Supabase project as staging for preview deploys, and the
+Supabase keys added by hand in Vercel per environment, production to
+`stcjavdqwjgdgudoudqv` and previews to staging (ADR 0018). Sign-in with magic link and
+Google, handle and display name setup, the sign-in privacy note, RLS tests proving email
+is never exposed, account deletion. Custom SMTP for magic links on `peerreview.club` with
+SPF and DKIM (Supabase's built-in sender allows 2 emails an hour and sends only to the
+project's team members), on a free tier (for example Resend or Postmark), with an ADR (new
+service). The handle and display name fields start empty; nothing is copied from the
+Google profile. The privacy page, since Google's consent screen asks for a privacy policy
+link (unverified for basic scopes). Column write tests for `profiles`: a user cannot
+change their own `role` or `account_status` (`docs/DATA_MODEL.md` "Column writes"). Every
+later milestone that adds a table adds its column write tests the same way. A signed-in
+option for `npm run screenshot`, so pages behind sign-in can be captured.
 
 ## Milestone 2: Venues, DJs, collectives
 

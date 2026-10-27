@@ -54,3 +54,14 @@ role the table is not meant for.
   plain user, plus the other roles it treats differently.
 - Use `runSql` (as `postgres`) only for setup, cleanup, and reading the catalog. Each test
   user is new; delete it in `afterAll`.
+
+## Deploys
+
+A merge to `main` deploys the app on Vercel and applies migrations through
+`.github/workflows/migrate.yml` at the same time, and either can finish first. So every
+migration works with the app that is live:
+- Add before you use: add a table or column in one PR, start using it in a later one. In
+  the same PR, the app can go live before the migration runs.
+- Remove after you stop using: stop reading a column in one PR, drop it in a later one.
+- Rename in steps: add the new column, copy the data, switch the code, then drop the old
+  one later.

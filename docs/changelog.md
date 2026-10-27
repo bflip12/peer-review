@@ -2,6 +2,13 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-27
+
+- `.claude/rules/supabase.md`: every migration works with the live app (add before use,
+  remove after use, rename in steps). `CLAUDE.md` describes deploys: never apply a
+  migration by hand. Reason: Vercel and the migration job run at the same time on a merge
+  to `main` (ADR 0018).
+
 ## 2026-10-26
 
 - Rule 7: merge only when CI is green on the PR's latest commit. Reason: the repo is
