@@ -18,6 +18,11 @@ order.
   started fresh from `main` so the history carries no personal paths or work email.
   Notes that should stay private go in a separate private repo.
 
+- **Supabase access token.** Replace the `SUPABASE_ACCESS_TOKEN` repo secret before it
+  expires on 2027-01-25, with the same scoped permissions (Read on Project Settings,
+  Database, Connection Pooling, and Migrations, for `peer-review` only). An expired token
+  fails the Migrate workflow at "Link the hosted project".
+
 Decided: the name is Peer Review and the domain is `peerreview.club`.
 
 ## Milestone 0: Setup
