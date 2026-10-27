@@ -818,11 +818,14 @@ below passed on both:
   against the server's IP unless it forwards the user's with `Sb-Forwarded-For`. From
   Supabase's docs, not measured.
 
+- Hosted project (2026-10-27, first Migrate run): Postgres 15 or later, and RLS on every
+  table in `public`. The project's "automatic RLS" option adds `public.rls_auto_enable()`,
+  callable by `anon` and `authenticated` until a migration revoked it. After the revoke,
+  the event trigger still enables RLS on a new table created by a role without `EXECUTE`
+  (checked on a local copy of the trigger).
+
 ## Unverified
 
-- The hosted project's Postgres version. The local stack runs 17.11, and a database test
-  refuses anything below 15. That test runs against the hosted project once CI applies
-  migrations there (Milestone 0 task 6).
 - GeoNames file sizes, district codes, timezone names, and main-name language. The download
   was blocked by this session's network policy.
 - The functions and triggers named above are described, not written or run.
