@@ -14,7 +14,10 @@ Rules for changing the schema are in `.claude/rules/database.md`.
   `event_redirects` (`from_short_id`). `profiles.id` is the same value as `auth.users.id`.
 - **Short IDs.** Pages that can be shared (venues, DJs, collectives, events, logs) also have
   a `short_id`: a short random string, unique per table, used only in URLs. UUIDs never
-  appear in a URL.
+  appear in a URL. Eight characters from `23456789abcdefghjkmnpqrstuvwxyz`: digits and
+  lowercase letters without `0`, `1`, `i`, `l`, and `o`, which read alike. That is 31^8,
+  about 853 billion values. A collision is refused by the unique constraint and retried
+  with a new value.
 - **Missing values** are `NULL`. Optional text columns refuse empty or whitespace-only text,
   so `''` is never stored. The app turns blank input into `NULL`.
 - **Fixed lists** the code switches on are Postgres enums (listed in [Enums](#enums)). Lists
@@ -775,7 +778,9 @@ festivals and recurring series (a parent table over events), city scope for mode
 
 ## Checked
 
-Run on a local PostgreSQL 16.15 in this session:
+Run on a local PostgreSQL 16.15 in the data model session, then re-run on 2026-10-26
+against Supabase's Postgres 17.11 (the local stack from Supabase CLI 2.121.0). Every check
+below passed on both:
 - Without `NULLS NOT DISTINCT`, a unique index lets two unnamed nights at one venue on one
   date both save. With it, the second is refused, and "DAY PARTY" is refused beside "Day
   party".
@@ -802,16 +807,23 @@ Run on a local PostgreSQL 16.15 in this session:
   ignores rows older than 24 hours, lets a moderator past it, and does not count slots.
   Two sessions inserting a 10th venue at once: with the per-user advisory lock the second
   is refused; without it both save.
+- Supabase defaults (2026-10-26, local stack): a new table in `public` is readable by
+  `anon` with RLS off, and a new function is callable by `anon`. The first migration
+  removes those defaults, and `supabase/tests/` checks that nothing is reachable through
+  the API until a migration grants it.
+- Supabase's generated TypeScript types turn an enum into a union of its values
+  (`"venue" | "dj" | "collective"`).
+- Supabase Auth limits sign-ups and sign-ins to 30 requests per 5 minutes per IP by
+  default (ADR 0011), adjustable in the dashboard. Requests from the app's server count
+  against the server's IP unless it forwards the user's with `Sb-Forwarded-For`. From
+  Supabase's docs, not measured.
 
 ## Unverified
 
-- The Supabase project's Postgres version. `NULLS NOT DISTINCT` needs 15 or later. Re-run
-  every check above against Supabase in Milestone 0 task 5.
-- That Supabase's generated TypeScript types turn enums into unions.
+- The hosted project's Postgres version. The local stack runs 17.11, and a database test
+  refuses anything below 15. That test runs against the hosted project once CI applies
+  migrations there (Milestone 0 task 6).
 - GeoNames file sizes, district codes, timezone names, and main-name language. The download
   was blocked by this session's network policy.
-- Supabase Auth's sign-up rate limits per IP (ADR 0011). Checked in Milestone 0 task 5.
-- `short_id` length and alphabet. Collisions are handled by the unique constraint and a
-  retry.
 - The functions and triggers named above are described, not written or run.
 - Whether the log save function or a trigger refreshes `log_snapshots` (Milestone 3).

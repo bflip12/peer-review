@@ -58,3 +58,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0014](0014-merges-ship-with-undo.md) | Merges ship with undo after launch, and v1 has no averages or bulk revert | Accepted |
 | [0015](0015-original-logs.md) | A private original copy of each log | Accepted |
 | [0016](0016-event-names.md) | An event's name is the official name from the poster | Accepted |
+| [0017](0017-explicit-grants-and-api-tests.md) | Explicit grants, and database tests through the API | Accepted |

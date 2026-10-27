@@ -34,8 +34,7 @@ Check the change against the "Not in v1" list in `SPEC.md` and "Later" in `TASKS
   database function or a `BEFORE UPDATE` trigger that checks `profiles.role`, since
   every signed-in user is the same Postgres role. Each protected column gets a test.
 - **Database functions.** Function security rules (schemas, `security definer`, grants)
-  live in `.claude/rules/supabase.md`, created in Milestone 0 task 5. Until then they are
-  listed in that task in `TASKS.md`.
+  live in `.claude/rules/supabase.md`.
 
 Apart from the one-value enum case above, do not add a column only in case a feature
 arrives. Adding a column later is cheap. Changing a type, a key, or columns into rows is
