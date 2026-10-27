@@ -26,6 +26,10 @@ CI (`.github/workflows/ci.yml`) runs typecheck, lint, the format check, unit tes
 build, and e2e on every PR and every push to `main`, on the Node version in `.nvmrc`. A
 second job runs the database tests and checks the generated types are current.
 
+Deploys (ADR 0018): Vercel deploys `main` to `peerreview.club` and each PR to a preview.
+`.github/workflows/migrate.yml` applies new migrations to the hosted Supabase project on
+merges to `main`. Never apply a migration by hand.
+
 In cloud sessions:
 - Prefix `npm test`, `npm run e2e`, and `npm run screenshot` with
   `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium`. The container's Chromium is older

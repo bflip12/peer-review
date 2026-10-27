@@ -410,3 +410,25 @@ problem.
 **Output.** [ADR 0017](adr/0017-explicit-grants-and-api-tests.md),
 [`.claude/rules/supabase.md`](../.claude/rules/supabase.md),
 [`supabase/`](../supabase/), [PR #18](https://github.com/bflip12/peer-review/pull/18).
+
+### Deploying before any feature (2026-10-27)
+
+**Goal.** Put the app live on `peerreview.club`, with a preview per PR and database
+changes that only reach production through CI.
+
+**How I used AI.** I set up the Vercel, Cloudflare, and GitHub accounts myself, and
+Claude walked me through each dashboard from my screenshots, field by field.
+
+**My calls.**
+- Preview deploys get their own staging database from Milestone 1, so a buggy preview
+  never touches real users' data.
+- Vercel deploys on its own while CI applies migrations, with a rule that every migration
+  works with the live app, instead of a stricter pipeline that needs more setup.
+- No Supabase integration in Vercel: keys go in by hand per environment, so it is clear
+  which deploy sees which database.
+- Free-tier pausing is accepted until launch instead of a job that keeps the database
+  awake.
+
+**Output.** [ADR 0018](adr/0018-hosting-and-deploys.md),
+[`.github/workflows/migrate.yml`](../.github/workflows/migrate.yml),
+[PR #19](https://github.com/bflip12/peer-review/pull/19).
