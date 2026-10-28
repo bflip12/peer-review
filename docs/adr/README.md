@@ -60,3 +60,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0016](0016-event-names.md) | An event's name is the official name from the poster | Accepted |
 | [0017](0017-explicit-grants-and-api-tests.md) | Explicit grants, and database tests through the API | Accepted |
 | [0018](0018-hosting-and-deploys.md) | Hosting and deploys | Accepted |
+| [0019](0019-styling-data-and-state.md) | Styling, data fetching, and state | Accepted |

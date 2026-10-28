@@ -4,6 +4,14 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-27
 
+- `docs/code-style.md` sections 8 to 10 are rewritten for this stack (ADR 0019): CSS
+  Modules with token variables, server components reading through `data/` functions,
+  server actions validated with Zod, where state lives, and errors and loading with
+  `error.tsx`, `<Suspense>`, and `notFound()`. Section 2's folder example, section 7's
+  reducer, section 12, and the checklist follow (was: styled-components, React Query,
+  Sentry, atoms, Immer). The route-file `export default` exception moved into code-style.
+  Data function tests are `*.db.test.ts` beside the code and run with `npm run test:db`.
+  Reason: the old sections described a different stack.
 - The Migrate workflow connects to the hosted database with one secret,
   `SUPABASE_DB_URL` (the session pooler URL), and no Supabase access token (was: an
   access token and `supabase link`). Reason: `supabase link` needs a token that can read

@@ -29,24 +29,27 @@ and let the formatter place it.
 A feature is a folder. One concern per file. One exported function per file in `utils/`.
 
 ```
-region-table/
-  RegionTable.tsx
-  AddColumnForm.tsx
+src/app/regions/page.tsx              route files only: they compose features
+src/features/region-table/
+  RegionTable.tsx                     server component, reads data
+  RegionTable.module.css
+  RegionTableEditor.tsx               "use client" leaf
+  AddColumnForm.tsx                   "use client", submits an action
   regionTable.types.ts
   regionTable.constants.ts
-  atoms/regionTableAtoms.ts
-  hooks/useRegionEditor.ts          composition root
-  hooks/useRegionData.ts            one concern each
-  hooks/useRegionSave.ts
-  hooks/useRegionSync.ts
-  hooks/useRegionSave.test.ts       tests sit beside the code
-  queries/useRegionDataQuery.ts
-  mutations/useBulkUpdateRegionsMutation.ts
+  data/getRegionTable.ts              server-only read, takes the Supabase client
+  data/getRegionTable.db.test.ts      runs against the local stack
+  actions/addColumn.ts                "use server", one action per file
+  schemas/addColumnSchema.ts          Zod schema for the action's input
+  hooks/useRegionEditor.ts            composition root
+  hooks/useRegionSelection.ts         one concern each
+  hooks/useRegionSelection.test.ts    tests sit beside the code
   utils/getSelectionState.ts
   utils/getSelectionState.test.ts
-  utils/validateNewColumn.ts
 ```
 
+- Features live in `src/features/<feature>/`. `src/app/` holds route files only.
+  Shared Supabase code lives in `src/lib/supabase/`.
 - Folder names are kebab-case. Component and type files are PascalCase or camelCase after
   what they export.
 - A hook large enough to need helpers gets its own folder, with its helpers and its types
@@ -236,19 +239,19 @@ export const useRegionEditor = ({
   ```
 - Never mutate an input. Build the next value and return it: `const next = new Map(current)`,
   `return [...columns, column]`, `return columns.filter((c) => c.name !== name)`.
-- The one exception is an Immer reducer, where the parameter is named `draft` and assigned
-  directly. Brace every case; throw in `default`:
+- A `useReducer` reducer returns a new state for every action. Brace every case; throw in
+  `default`:
   ```ts
-  export const regionNodeReducer = (draft: RegionNodeStateT, action: RegionNodeActionT) => {
+  export const regionNodeReducer = (
+    state: RegionNodeStateT,
+    action: RegionNodeActionT
+  ): RegionNodeStateT => {
     switch (action.type) {
       case "setEditMode": {
-        draft.inEditMode = action.payload;
-        break;
+        return { ...state, inEditMode: action.payload };
       }
       case "cancelChanges": {
-        draft.title = draft.originalTitle;
-        draft.inEditMode = false;
-        break;
+        return { ...state, title: state.originalTitle, inEditMode: false };
       }
       default: {
         throw new Error("invalid region node reducer action");
@@ -265,12 +268,18 @@ export const useRegionEditor = ({
    */
   const processNode = (node: TreeNodeT): boolean => { ... };
   ```
-- Derived data is computed (`useMemo`, a derived atom, a selector). Never store it in a
-  second piece of state that has to be kept in sync.
+- Derived data is computed (during render, or with `useMemo` when it is expensive). Never
+  store it in a second piece of state that has to be kept in sync.
 
-## 8. Components
+## 8. Components and styling
+
+Components are server components unless they need the browser. A client component starts
+with `"use client"` and sits at the smallest leaf that needs state, effects, or event
+handlers. ADR 0019 explains the choices in sections 8 to 10.
 
 ```tsx
+import styles from "./RegionPicker.module.css";
+
 export type RegionPickerPropsT = {
   regions: RegionT[];
   selectedId?: string;
@@ -285,105 +294,124 @@ export const RegionPicker = ({
   isDisabled = false,
   className,
   onRegionSelect
-}: RegionPickerPropsT) => {
+}: RegionPickerPropsT): ReactElement => {
   if (!regions.length) {
     return <EmptyState>No regions</EmptyState>;
   }
 
-  return <Wrapper className={className}>...</Wrapper>;
+  return <div className={cx(styles.wrapper, className)}>...</div>;
 };
+```
 
-const Wrapper = styled.div`
-  min-width: 0;
-`;
+```css
+/* RegionPicker.module.css */
+.wrapper {
+  --name-column-width: 312px;
+  display: grid;
+  grid-template-columns: var(--name-column-width) 1fr;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
 ```
 
 - Props are destructured in the signature, defaults in the destructuring. Required props
   first, optional next, callbacks last.
-- `export const`, arrow function. Never `React.FC`.
-- `styled-components` definitions go at the bottom of the file, after the component. The
-  outermost is `Wrapper`; the rest are named for their role (`TableContent`, `ResetButton`).
-- Colors and spacing come from CSS variables (`var(--color-primary)`). No hard-coded hex in
-  a styled block. Local layout values are custom properties on the wrapper:
-  ```ts
-  const Wrapper = styled.div`
-    --name-column-width: 312px;
-    display: grid;
-    grid-template-columns: var(--name-column-width) 1fr;
-  `;
-  ```
-- Target a UI library's class names from inside the styled wrapper, not by overriding the
-  library theme globally.
+- `export const`, arrow function. Never `React.FC`. Route files (`page.tsx`, `layout.tsx`,
+  `loading.tsx`, `error.tsx`, `not-found.tsx`) use `export default`, because Next.js
+  requires it; the component is still a named arrow function exported at the bottom.
+- Styles live in a CSS Module beside the component, `<Component>.module.css`. The
+  outermost class is `wrapper`; the rest are named for their role (`tableContent`,
+  `resetButton`).
+- Colors, spacing, and type come from the token variables (`var(--color-text)`). No color
+  value in a module. Local layout values are custom properties on the wrapper, as above.
+- The only global CSS is the token file and the reset, imported by the root layout.
+- A value known only at render time is passed as a custom property, never as a style:
+  `style={{ "--progress": `${percent}%` }}`.
 - Accept and forward `data-testid` on components that tests drive.
 - Guard clauses first, then the main return. No nested ternaries in JSX; lift the condition
   into a named boolean above the return.
-- A component needing a provider exports a thin wrapper that renders the provider around a
-  `...Content` component holding the logic.
+- Props passed to a client component are sent to the browser. Pass only the fields it
+  renders, never a whole row that holds fields the viewer may not see.
 
-## 9. Data fetching and mutations
+## 9. Data, actions, and state
 
-- One file per query in `queries/`, one per mutation in `mutations/`.
-- The request itself is a module-level `const` async function with positional arguments,
-  returning the typed body. The hook wraps it.
-- Query keys live in an exported object, so invalidation uses the same literal:
+### Reading
+
+- Server components read data by calling functions in the feature's `data/` folder. Never
+  fetch in `useEffect`.
+- A data function starts with `import "server-only"`, takes the Supabase client as its
+  first argument, and returns typed rows. Taking the client lets the app call it as the
+  signed-in user and database tests call it as a test user:
   ```ts
-  export const regionQueryKeys = {
-    regionTableData: "regionTableData"
-  };
+  /**
+   * The regions in one set, ordered by name. RLS decides which rows the client sees.
+   */
+  export const getRegionTable = async (
+    supabase: SupabaseClientT,
+    regionSetId: string
+  ): Promise<RegionRowT[]> => { ... };
   ```
-- The query hook takes a params object with `enabled`, optional `onSuccess` / `onError`, and
-  a `queryConfig` passthrough that omits the keys the hook controls:
+- A component that reads cookies, the signed-in user, or other request data sits inside
+  `<Suspense>` with a fallback the size of the content. The build fails otherwise.
+- Data is read per request. Do not wrap a Supabase read in `use cache` without an ADR:
+  cached code cannot read cookies, and on Vercel the cache does not persist across
+  requests (ADR 0019).
+- Start independent reads together (`Promise.all`, or sibling `<Suspense>` boundaries), so
+  one slow read does not hold up the others.
+
+### Writing
+
+- Writes are server actions, one per file in the feature's `actions/` folder, starting
+  with `"use server"`.
+- A server action is a public endpoint. Every action, in this order:
+  1. parses its input with the Zod schema from `schemas/`,
+  2. checks who is calling, when the action needs a signed-in user,
+  3. writes through the signed-in user's Supabase client, so RLS applies (never the
+     service role key),
+  4. calls `refresh()` to show the change, or `redirect()` to move on,
+  5. returns an `ActionResultT`.
   ```ts
-  queryConfig?: Omit<
-    UseQueryOptions<RegionTableDataT, unknown>,
-    "queryKey" | "queryFn" | "enabled" | "onSuccess" | "onError"
-  >;
+  export type ActionResultT<DataT = undefined> =
+    | { ok: true; data: DataT }
+    | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
   ```
-- `enabled` includes the preconditions: `enabled: enabled && !!regionSet && !!filterId`.
-- The hook returns a narrowed object, not the library's whole result, so callers do not
-  depend on the data library:
-  ```ts
-  return {
-    data: queryInfo.data,
-    error: queryInfo.error,
-    isError: queryInfo.status === "error",
-    isLoading: queryInfo.status === "loading",
-    isFetching: queryInfo.isFetching,
-    refetch: queryInfo.refetch
-  };
-  ```
-- A mutation's `onSuccess` invalidates and refreshes what depends on it, then calls the
-  caller's `onSuccess` last.
-- Check size and other limits before sending, with the limit named and the failure shown to
-  the user.
+- Forms call actions through `useActionState`, which gives the result and a `pending`
+  flag. Check limits in the schema, with the limit named in the message.
+- `useOptimistic` shows a change before the action finishes (likes, follows).
 
-## 10. Errors and user feedback
+### Where state lives
 
-A failed write reports three ways: captured with context, shown to the user, and returned to
-the caller.
+| State | Where |
+|---|---|
+| Data from the database | Read on the server, passed down as props. Never copied into client state |
+| Filters, tabs, sort, page | The URL search params, so a view can be shared and reloaded |
+| UI-only state (open, editing, draft text) | `useState` or `useReducer` in the client component that needs it |
+| A change waiting on the server | `useOptimistic` |
 
-```ts
-onError: (error) => {
-  const message = extractErrorMessage(error);
+No global client store. React context only for small cross-cutting UI state, such as a
+theme. A store or a client data library needs an ADR and a screen that requires it.
 
-  Sentry.captureException(error, {
-    tags: { component: "RegionTable", action: "save" },
-    extra: { regionSet }
-  });
+## 10. Errors, loading, and user feedback
 
-  setValidationError(message);
-  toast.error(message);
-}
-```
-
-- `handleSave` returns `Promise<boolean>`. The component decides whether to close.
-- Turning a transport error into a user-facing message is its own documented utility, with
-  the precedence order in the docblock and a named `fallback` parameter.
+- **Expected failures** (invalid input, a name already taken, a cap reached) are returned
+  from the action as `{ ok: false, message }` and shown beside the field or the form. They
+  are never thrown.
+- **Unexpected failures** are thrown. The route segment's `error.tsx` catches them. It is
+  a client component that shows a plain message and a button that calls `retry()`. Errors
+  from the server reach it as a generic message with `error.digest`, which matches the
+  server log; never show `error.message` from the server.
+- **Missing entities** call `notFound()`, and `not-found.tsx` renders the page.
+- **Loading:** each data section has its own `<Suspense>` fallback, sized like the content
+  so the page does not jump. `loading.tsx` covers a whole route only when nothing on it
+  can render without data.
+- **Logging:** log unexpected server errors with `console.error`, with the action and the
+  ids involved, never the user's private content. Error monitoring is decided at launch.
 - Messages are complete sentences that say what to do next, not status codes.
 
 ## 11. Docblocks and comments
 
-- Every exported function, hook, atom, and non-obvious type gets a `/** ... */` docblock.
+- Every exported function, hook, action, and non-obvious type gets a `/** ... */`
+  docblock.
 - The docblock says what the thing is for and the constraint a caller could get wrong:
   ```ts
   /**
@@ -421,7 +449,11 @@ onError: (error) => {
 
 A test file sits beside every non-trivial module.
 
-- Vitest or Jest with React Testing Library. `renderHook` and `act` for hooks.
+- Vitest with React Testing Library. `renderHook` and `act` for hooks.
+- Async server components are not rendered in unit tests; React Testing Library does not
+  support them. Keep them thin: test their data functions in `*.db.test.ts` files against
+  the local stack (`npm run test:db`), their logic in pure functions, and the page with
+  Playwright.
 - `describe` names the unit. Nest a second `describe` per behaviour area when a file covers
   several.
 - A test name is a verb phrase stating the behaviour. No "should".
@@ -459,17 +491,19 @@ A test file sits beside every non-trivial module.
 
 ## 13. Checklist
 
-1. Every export is `export const` with an arrow function, no `export default`.
+1. Every export is `export const` with an arrow function, no `export default`, except in
+   route files, which Next.js requires to `export default`.
 2. Every type is a `type` ending in `T`. No `interface`, no `any`.
 3. Exported functions have an explicit return type and a docblock naming the constraint a
    caller could get wrong.
 4. Logic worth testing is in an exported pure function, not inside a hook body.
-5. No input is mutated, except an Immer `draft`.
+5. No input is mutated.
 6. Handlers returned from a hook use `useCallback` with a complete dependency array, and
    `exhaustive-deps` is clean or the omission is explained.
 7. The hook returns one flat object, last in the body.
 8. Magic numbers are named constants with the reason in a comment.
-9. Styled components are at the bottom; colors come from CSS variables.
+9. Styles are in a CSS Module beside the component, colors come from token variables, and
+   client components are leaves that receive only the fields they render.
 10. Test file beside the code, names are verb phrases, empty case covered, whole result
     shapes asserted.
 11. Prettier and ESLint pass.

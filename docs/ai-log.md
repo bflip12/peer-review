@@ -215,6 +215,26 @@ sessions and listed where they disagreed.
 [`.claude/rules/database.md`](../.claude/rules/database.md). `SPEC.md` sections 2, 3, 5, 6,
 7, and 9, and `TASKS.md` Milestones 0, 2, 3, and 6.
 
+### Styling, data fetching, and state for Next.js 16 (2026-10-27)
+
+**Goal.** Replace the style guide's data and styling rules, written for a different stack,
+with ones that fit Next.js 16, Supabase, and Vercel.
+
+**How I used AI.** I asked Claude to review its own plan as a senior Next.js developer
+before writing anything. It read Next's bundled docs and built throwaway routes to see
+which mistakes fail the build. The review dropped part of the plan: caching catalog reads
+would save little on Vercel, because the default cache does not persist across serverless
+requests.
+
+**My calls.**
+- CSS Modules with token variables, not Tailwind or CSS-in-JS.
+- Cache Components stays on, with data read per request until a measured need.
+- Zod validates every server action, since an action is a public endpoint.
+- Error monitoring waits until launch.
+
+**Output.** [ADR 0019](adr/0019-styling-data-and-state.md),
+[`docs/code-style.md`](code-style.md) sections 8 to 10.
+
 ## 5. Reviews
 
 Before code, I have Claude review the plan as a critic: against similar apps with
@@ -428,6 +448,11 @@ Claude walked me through each dashboard from my screenshots, field by field.
   which deploy sees which database.
 - Free-tier pausing is accepted until launch instead of a job that keeps the database
   awake.
+- When the first migration run needed a token that could read the project's API keys,
+  including the key that bypasses RLS, I chose to drop the token and connect CI straight
+  to the database instead of widening its access.
+- When the schema check flagged a function Supabase's automatic RLS option had left
+  callable by signed-out users, I had it revoked by migration rather than allowed.
 
 **Output.** [ADR 0018](adr/0018-hosting-and-deploys.md),
 [`.github/workflows/migrate.yml`](../.github/workflows/migrate.yml),
