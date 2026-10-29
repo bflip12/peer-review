@@ -9,9 +9,11 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **Design direction.** References are in `docs/design/references/`. Three directions
-  (editorial, database, old internet) are drawn in a Claude Design canvas. Bobby picks
-  one or mixes parts; then come mockups of five screens and task 8 (PR #23).
+- **Design direction.** References are in `docs/design/references/`. Bobby picked the old
+  internet direction, styled after `mockups-1.webp`: IBM Plex Mono only, solid hairline
+  rules, small uppercase labels on fixed page sections. The feed is drawn with ink links
+  and with blue links in the Claude Design canvas; Bobby picks one, then come the other
+  four screens and task 8 (PR #23).
 - **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
   environment's network settings.
 
