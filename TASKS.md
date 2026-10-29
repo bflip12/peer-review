@@ -9,8 +9,9 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **Design direction.** Collect 3 to 5 reference screenshots of sites, apps, or record
-  sleeves. Then install the frontend-design plugin and use them with it.
+- **Design direction.** References are in `docs/design/references/`. Three directions
+  (editorial, database, old internet) are drawn in a Claude Design canvas. Bobby picks
+  one or mixes parts; then come mockups of five screens and task 8 (PR #23).
 - **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
   environment's network settings.
 
