@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import type { ReactElement } from "react";
 
+import { FormError } from "@/features/forms/FormError";
 import { SubmitButton } from "@/features/forms/SubmitButton";
 import { TextField } from "@/features/forms/TextField";
 
@@ -38,8 +39,8 @@ export const SignInForm = ({ action }: SignInFormPropsT): ReactElement => {
       <SubmitButton isPending={isPending}>Send sign-in link</SubmitButton>
       <div className={styles.status} role="status">
         {isSent && "Check your email. The link in it signs you in."}
-        {failure && !failure.fieldErrors && failure.message}
       </div>
+      {failure && !failure.fieldErrors && <FormError>{failure.message}</FormError>}
     </form>
   );
 };

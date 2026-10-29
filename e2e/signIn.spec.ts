@@ -102,7 +102,7 @@ test.describe("sign-in", () => {
     await otherPage.goto(usedLink);
     await otherPage.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(otherPage.getByRole("status")).toContainText(
+    await expect(otherPage.getByRole("main").getByRole("alert")).toContainText(
       "This sign-in link has expired or was already used. Ask for a new one."
     );
     await expect(

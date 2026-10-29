@@ -57,9 +57,10 @@ describe("SignInForm", () => {
     expect(field).toHaveAttribute("aria-invalid", "true");
     expect(field).toHaveValue("dj");
     expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("shows a failure that is not about the field in the status line", async () => {
+  it("shows a failure that is not about the field as an alert", async () => {
     render(
       <SignInForm
         action={mockAction({
@@ -71,8 +72,9 @@ describe("SignInForm", () => {
 
     await submitEmail("dj@example.com");
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "Too many sign-in emails were sent. Wait a minute, then try again."
     );
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 });

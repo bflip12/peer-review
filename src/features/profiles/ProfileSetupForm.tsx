@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import type { ReactElement } from "react";
 
 import type { FormActionT } from "@/features/auth/auth.types";
+import { FormError } from "@/features/forms/FormError";
 import { SubmitButton } from "@/features/forms/SubmitButton";
 import { TextField } from "@/features/forms/TextField";
 
@@ -45,9 +46,7 @@ export const ProfileSetupForm = ({ action }: ProfileSetupFormPropsT): ReactEleme
         onValueChange={setDisplayName}
       />
       <SubmitButton isPending={isPending}>Create profile</SubmitButton>
-      <div className={styles.status} role="status">
-        {failure?.message}
-      </div>
+      {failure && <FormError>{failure.message}</FormError>}
     </form>
   );
 };

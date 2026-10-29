@@ -28,7 +28,7 @@ describe("ConfirmSignInForm", () => {
     render(<ConfirmSignInForm tokenHash="abc123" action={action} />);
 
     expect(action).not.toHaveBeenCalled();
-    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("explains a used link and links to a new one", async () => {
@@ -44,7 +44,7 @@ describe("ConfirmSignInForm", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "This sign-in link has expired or was already used. Ask for a new one."
     );
     expect(screen.getByRole("link", { name: "Get a new sign-in link" })).toHaveAttribute(

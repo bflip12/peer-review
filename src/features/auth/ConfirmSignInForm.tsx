@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { ReactElement } from "react";
 
+import { FormError } from "@/features/forms/FormError";
 import { SubmitButton } from "@/features/forms/SubmitButton";
 
 import type { FormActionT } from "./auth.types";
@@ -30,13 +31,11 @@ export const ConfirmSignInForm = ({
       <input type="hidden" name="tokenHash" value={tokenHash} />
       <input type="hidden" name="type" value="email" />
       <SubmitButton isPending={isPending}>Sign in</SubmitButton>
-      <div className={styles.status} role="status">
-        {failure && (
-          <>
-            {failure.message} <Link href="/sign-in">Get a new sign-in link</Link>
-          </>
-        )}
-      </div>
+      {failure && (
+        <FormError>
+          {failure.message} <Link href="/sign-in">Get a new sign-in link</Link>
+        </FormError>
+      )}
     </form>
   );
 };
