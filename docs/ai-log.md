@@ -521,3 +521,32 @@ tested each finding by running it: a file with only lint warnings, an import of
 [`.claude/rules/workflows.md`](../.claude/rules/workflows.md),
 [PR #26](https://github.com/bflip12/peer-review/pull/26),
 [PR #27](https://github.com/bflip12/peer-review/pull/27).
+
+### Sign-in, the first feature (2026-10-29)
+
+**Goal.** The `profiles` table and sign-in with an email link, the first code users see.
+
+**How I used AI.** Claude checked each library behaviour by running it against the local
+stack before relying on it: that a sign-in link works once, what Auth returns for a resend
+too soon, and that the proxy refreshes an expired session. Screenshots of every signed-in
+state, read before calling the UI done, caught a header that wrapped on phones.
+
+**My calls.**
+- Before agreeing to the plan I asked what the Google OAuth client costs and what the
+  SMTP provider is for, then created the staging project and the Vercel settings myself.
+- Staging is a second Supabase project, not a Supabase branch. I asked whether one
+  staging site would be simpler than a preview per branch, and kept one staging database
+  with a preview per PR.
+- I asked what a token hash link is for, then chose it: the link works in any browser,
+  and signing in waits for a button press so a mail scanner cannot use up the link
+  ([ADR 0022](adr/0022-sign-in-links-and-sessions.md)).
+- Banned users can read their own profile, so the app can tell them why, and can no
+  longer change it.
+- I merged new code standards to `main` while the profiles PR was open, and had it
+  brought up to them before merging.
+
+**Output.** [ADR 0022](adr/0022-sign-in-links-and-sessions.md),
+`supabase/migrations/20261029055304_create_profiles.sql`, `src/features/auth/`,
+`src/features/profiles/`, `src/proxy.ts`, `e2e/signIn.spec.ts`,
+[PR #25](https://github.com/bflip12/peer-review/pull/25),
+[PR #28](https://github.com/bflip12/peer-review/pull/28).
