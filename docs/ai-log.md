@@ -477,11 +477,17 @@ every color pair instead of estimating it.
   I liked most. When I was unsure about link color, I had both drawn and picked ink over
   blue.
 - Renamed the event name field to "Event name", with "Day Party" as the example, and moved
-  it below the review so it reads as optional. ADR 0016 got an amendment.
+  it below the review so it reads as optional.
 - Asked for the log form state where a new night has no lineup yet, which the first
   mockups left out.
+- Questioned the night picker: a button called "Log a night" could read as the place to
+  create a night, and the DJ option looked like a way to start one. The results became
+  one list asked as "Where were you?", where each row says "Join" or "Start" and a venue
+  with a night on the date shows as that night, so users never choose between joining
+  and creating ([ADR 0020](adr/0020-night-picker-one-list.md)).
 
 **Output.** [`docs/style-guide.md`](style-guide.md), `src/styles/tokens.css`, the app
 shell in `src/features/app-shell/`, a contrast test over the token file,
 [`docs/design/references/`](design/references/README.md),
-[PR #23](https://github.com/bflip12/peer-review/pull/23).
+[PR #23](https://github.com/bflip12/peer-review/pull/23),
+[PR #24](https://github.com/bflip12/peer-review/pull/24).
