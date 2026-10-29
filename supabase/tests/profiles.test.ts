@@ -20,7 +20,9 @@ const newHandle = (): string => `t${randomUUID().replaceAll("-", "").slice(0, 12
 // Gives a test user a profile, as the user would after first sign-in.
 const createProfile = async (user: TestUserT, handle = newHandle()): Promise<string> => {
   const { error } = await user.client.from("profiles").insert({ handle });
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
   return handle;
 };
 
@@ -141,8 +143,9 @@ describe("profiles", () => {
         handles.map(async (handle) => {
           const user = await newUser();
           const { error } = await user.client.from("profiles").insert({ handle });
-          if (!error)
+          if (!error) {
             await runSql(`delete from public.profiles where id = '${user.userId}'`);
+          }
           return error?.code;
         })
       );
@@ -266,8 +269,8 @@ describe("profiles", () => {
           where id in ('${admin.userId}', '${bannedAdmin.userId}');`);
     });
 
-    it("hides a banned profile from everyone but admins, its owner included", async () => {
-      const readers = [createAnonClient(), bob.client, moderator.client, banned.client];
+    it("hides a banned profile from signed-out visitors, users, and moderators", async () => {
+      const readers = [createAnonClient(), bob.client, moderator.client];
       const result = await Promise.all(
         readers.map((client) =>
           client.from("profiles").select("id").eq("id", banned.userId)
@@ -277,6 +280,28 @@ describe("profiles", () => {
       expect(result.map(({ data, error }) => [data, error])).toEqual(
         readers.map(() => [[], null])
       );
+    });
+
+    it("shows a banned user their own profile", async () => {
+      const result = await banned.client
+        .from("profiles")
+        .select("id, account_status")
+        .eq("id", banned.userId);
+
+      expect([result.data, result.error]).toEqual([
+        [{ id: banned.userId, account_status: "banned" }],
+        null
+      ]);
+    });
+
+    it("refuses a banned user changing their own profile", async () => {
+      const result = await banned.client
+        .from("profiles")
+        .update({ display_name: "Still here" })
+        .eq("id", banned.userId)
+        .select();
+
+      expect([result.data, result.error]).toEqual([[], null]);
     });
 
     it("shows a banned profile to an admin", async () => {

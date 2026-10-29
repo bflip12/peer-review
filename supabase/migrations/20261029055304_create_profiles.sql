@@ -7,19 +7,29 @@ create type public.role as enum ('user', 'moderator', 'admin');
 create type public.account_status as enum ('active', 'banned');
 
 create table public.profiles (
-  id uuid primary key default auth.uid() references auth.users on delete cascade,
+  id uuid default auth.uid()
+    constraint profiles_pkey primary key
+    constraint profiles_id_fkey references auth.users on delete cascade,
   handle text not null
-    constraint profiles_handle_format check (handle ~ '^[A-Za-z0-9_.]{2,30}$'),
+    constraint profiles_handle_check check (handle ~ '^[A-Za-z0-9_.]{2,30}$'),
   display_name text
-    constraint profiles_display_name_format check (
+    constraint profiles_display_name_check check (
       display_name ~ '[^[:space:]]' and char_length(display_name) <= 50
     ),
   role public.role not null default 'user',
   account_status public.account_status not null default 'active',
-  -- When the status last changed. Set by the admin function that bans (Milestone 6).
   account_status_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+comment on table public.profiles is
+  'One per account, keyed by the auth user id. Holds no email address.';
+comment on column public.profiles.handle is
+  'Shown as @handle and used in profile URLs. Unique ignoring case.';
+comment on column public.profiles.role is
+  'Only admins change it. The app shows moderator as "Local".';
+comment on column public.profiles.account_status_at is
+  'When account_status last changed. Null until the first change.';
 
 create unique index profiles_handle_key on public.profiles (lower(handle));
 
@@ -43,20 +53,29 @@ create function private.is_admin() returns boolean
 revoke execute on function private.is_admin() from public, anon;
 grant execute on function private.is_admin() to authenticated;
 
--- Banned profiles are hidden from everyone but admins, their owner included.
-create policy "everyone reads active profiles" on public.profiles
-  for select to anon using (account_status = 'active');
+-- Two select policies, one per role, because anon cannot run private.is_admin().
+-- Banned profiles are shown only to admins and to their owner, so the app can tell a
+-- banned user why they cannot post.
+create policy "Everyone reads active profiles" on public.profiles
+  for select to anon
+  using (account_status = 'active');
 
-create policy "users read active profiles, admins read all" on public.profiles
+create policy "Users read active profiles and their own, admins read all" on public.profiles
   for select to authenticated
-  using (account_status = 'active' or (select private.is_admin()));
+  using (
+    account_status = 'active'
+    or id = (select auth.uid())
+    or (select private.is_admin())
+  );
 
-create policy "users create their own profile" on public.profiles
-  for insert to authenticated with check (id = (select auth.uid()));
+create policy "Users create their own profile" on public.profiles
+  for insert to authenticated
+  with check (id = (select auth.uid()));
 
-create policy "users update their own profile" on public.profiles
+create policy "Active users update their own profile" on public.profiles
   for update to authenticated
-  using (id = (select auth.uid())) with check (id = (select auth.uid()));
+  using (id = (select auth.uid()) and account_status = 'active')
+  with check (id = (select auth.uid()) and account_status = 'active');
 
 -- Users write only their handle and display name. The id comes from the default. Role and
 -- status get an admin function in Milestone 6. No delete: deleting the account cascades.

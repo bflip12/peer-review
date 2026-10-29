@@ -666,7 +666,7 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 
 | Table | Read | Write |
 |---|---|---|
-| `profiles` | Everyone. Banned profiles only to admins | Owner: handle, display name. Admins: role, account status |
+| `profiles` | Everyone. Banned profiles only to admins and their owner | Owner, while active: handle, display name. Admins: role, account status |
 | `moderator_cities` | Everyone | Admins |
 | `cities`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
 | `venues`, `artists`, `collectives`, `links`, `venue_sound_systems` | Everyone, unless hidden | Create: signed-in users, within the daily caps. Edit: the creator until `used_by_others_at`, then moderators and admins. Hide: admins |
@@ -835,8 +835,8 @@ below passed on both:
   only their own profile and cannot set or change `role`, `account_status`,
   `account_status_at`, `created_at`, or `id` (each refused with `42501` by the column
   grants). Handles clash ignoring case. Banned profiles are hidden from signed-out
-  visitors, users, moderators, their owner, and banned admins, and shown to active
-  admins. No column in `public` or `graphql_public` has "mail" in its name, and the API
+  visitors, users, moderators, and banned admins, and shown to active admins and to
+  their owner, who can no longer change them. No column in `public` or `graphql_public` has "mail" in its name, and the API
   refuses the `auth` schema (`PGRST106`).
 
 ## Unverified
