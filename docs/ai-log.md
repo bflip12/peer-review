@@ -517,4 +517,7 @@ tested each finding by running it: a file with only lint warnings, an import of
 
 **Output.** [ADR 0021](adr/0021-lint-enforcement-and-react-compiler.md),
 [`eslint.config.mjs`](../eslint.config.mjs), [`stylelint.config.mjs`](../stylelint.config.mjs),
-[PR #26](https://github.com/bflip12/peer-review/pull/26).
+[`.claude/rules/security.md`](../.claude/rules/security.md),
+[`.claude/rules/workflows.md`](../.claude/rules/workflows.md),
+[PR #26](https://github.com/bflip12/peer-review/pull/26),
+[PR #27](https://github.com/bflip12/peer-review/pull/27).

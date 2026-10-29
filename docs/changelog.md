@@ -4,6 +4,23 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-29
 
+- New `.claude/rules/security.md` for `src/**`: identity from `getClaims()` or
+  `getUser()`, never `getSession()` on the server; only `NEXT_PUBLIC_*` reaches the
+  browser; no service role key under `src/`; untrusted input in redirects and HTML.
+  Reason: Milestone 1 adds auth, and these are the mistakes Next.js's and Supabase's docs
+  warn about.
+- New `.claude/rules/workflows.md` for `.github/**`, writing down what the workflows
+  already do: SHA-pinned actions, read-only permissions, no persisted credentials,
+  timeouts.
+- `.claude/rules/database.md` gains SQL and policy style: Supabase's naming conventions,
+  Postgres's constraint name pattern, one policy per operation, `(select auth.uid())`.
+- `docs/code-style.md`: `T | null` for database values and `?:` for optional inputs (was:
+  `Maybe<T>`, which the project never defined); Testing Library's query priority (was:
+  forward `data-testid` on every component tests drive); an end-to-end section; React 19
+  and Next.js 16 points (`ref` as a prop, `<Context>` as provider, keys, `&&`,
+  `PageProps`); effects only for syncing with outside systems; a new section 13 on
+  accessibility, so the checklist is section 14. "Mixed-type collection" is dropped from
+  the cases every test covers, since TypeScript rules it out.
 - Lint fails on warnings, in CI and in the edit hook (ADR 0021). Reason: warnings exited 0,
   so `exhaustive-deps` and every accessibility rule were never reported.
 - ESLint enforces the mechanical rules of `docs/code-style.md` (naming, `type`, return
