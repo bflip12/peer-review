@@ -457,3 +457,31 @@ Claude walked me through each dashboard from my screenshots, field by field.
 **Output.** [ADR 0018](adr/0018-hosting-and-deploys.md),
 [`.github/workflows/migrate.yml`](../.github/workflows/migrate.yml),
 [PR #19](https://github.com/bflip12/peer-review/pull/19).
+
+### Choosing the design and styling the app shell (2026-10-29)
+
+**Goal.** Settle how Peer Review looks, then build the token file and the first styled
+component.
+
+**How I used AI.** Claude worked as a senior designer. It recommended the tools, read my
+reference mockups, drew three directions and then five screens in a Claude Design canvas
+I could review on my phone, ran a design critique on them, and computed the contrast of
+every color pair instead of estimating it.
+
+**My calls.**
+- Claude Design for mockups and the frontend-design and Design plugins, with no Figma,
+  since a second design file would drift from the token file.
+- My reference mockups were for style only. Claude designed the screens from the spec, so
+  they have no photos (ADR 0005), one 0.5 to 5 rating scale, and no averages (ADR 0014).
+- Picked the "old internet" direction out of three, styled after the one reference sheet
+  I liked most. When I was unsure about link color, I had both drawn and picked ink over
+  blue.
+- Renamed the event name field to "Event name", with "Day Party" as the example, and moved
+  it below the review so it reads as optional. ADR 0016 got an amendment.
+- Asked for the log form state where a new night has no lineup yet, which the first
+  mockups left out.
+
+**Output.** [`docs/style-guide.md`](style-guide.md), `src/styles/tokens.css`, the app
+shell in `src/features/app-shell/`, a contrast test over the token file,
+[`docs/design/references/`](design/references/README.md),
+[PR #23](https://github.com/bflip12/peer-review/pull/23).
