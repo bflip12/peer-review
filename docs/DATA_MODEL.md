@@ -147,10 +147,17 @@ One row per account, created when the user picks a handle after first sign-in.
 | `display_name` | text | Optional, up to 50 characters |
 | `role` | `role` | Default `user`. Only admins change it |
 | `account_status` | `account_status` | Default `active`. Only admins change it |
-| `account_status_at` | timestamptz | When the status last changed |
+| `account_status_at` | timestamptz | When the status last changed. `NULL` until the first change |
 | `created_at` | timestamptz | |
 
-No email column, and no other table has one.
+No email column, and no other table has one. Handles are unique through an index on
+`lower(handle)`. `id` defaults to `auth.uid()`, so a user's insert sends only the handle
+and display name.
+
+The read policy for signed-in users calls `private.is_admin()`: whether the caller has
+`role = 'admin'` and `account_status = 'active'`. It is `security definer` so it can read
+the caller's row without running the policy that calls it. The `private` schema holds
+helpers like it; the API does not serve it.
 
 #### moderator_cities
 
@@ -659,7 +666,7 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 
 | Table | Read | Write |
 |---|---|---|
-| `profiles` | Everyone. Banned profiles only to admins | Owner: handle, display name. Admins: role, account status |
+| `profiles` | Everyone. Banned profiles only to admins and their owner | Owner, while active: handle, display name. Admins: role, account status |
 | `moderator_cities` | Everyone | Admins |
 | `cities`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
 | `venues`, `artists`, `collectives`, `links`, `venue_sound_systems` | Everyone, unless hidden | Create: signed-in users, within the daily caps. Edit: the creator until `used_by_others_at`, then moderators and admins. Hide: admins |
@@ -823,6 +830,14 @@ below passed on both:
   callable by `anon` and `authenticated` until a migration revoked it. After the revoke,
   the event trigger still enables RLS on a new table created by a role without `EXECUTE`
   (checked on a local copy of the trigger).
+
+- `profiles` (2026-10-29, local stack, `supabase/tests/profiles.test.ts`): a user creates
+  only their own profile and cannot set or change `role`, `account_status`,
+  `account_status_at`, `created_at`, or `id` (each refused with `42501` by the column
+  grants). Handles clash ignoring case. Banned profiles are hidden from signed-out
+  visitors, users, moderators, and banned admins, and shown to active admins and to
+  their owner, who can no longer change them. No column in `public` or `graphql_public` has "mail" in its name, and the API
+  refuses the `auth` schema (`PGRST106`).
 
 ## Unverified
 

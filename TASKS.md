@@ -29,16 +29,15 @@ design directions" (Screens page).
 Before any of it: a second free Supabase project as staging for preview deploys, and the
 Supabase keys added by hand in Vercel per environment, production to
 `stcjavdqwjgdgudoudqv` and previews to staging (ADR 0018). Sign-in with magic link and
-Google, handle and display name setup, the sign-in privacy note, RLS tests proving email
-is never exposed, account deletion. Custom SMTP for magic links on `peerreview.club` with
-SPF and DKIM (Supabase's built-in sender allows 2 emails an hour and sends only to the
-project's team members), on a free tier (for example Resend or Postmark), with an ADR (new
-service). The handle and display name fields start empty; nothing is copied from the
-Google profile. The privacy page, since Google's consent screen asks for a privacy policy
-link (unverified for basic scopes). Column write tests for `profiles`: a user cannot
-change their own `role` or `account_status` (`docs/DATA_MODEL.md` "Column writes"). Every
-later milestone that adds a table adds its column write tests the same way. A signed-in
-option for `npm run screenshot`, so pages behind sign-in can be captured.
+Google, handle and display name setup (the `profiles` table is done), the sign-in privacy
+note, account deletion. Custom SMTP for magic links on `peerreview.club` with SPF and DKIM
+(Supabase's built-in sender allows 2 emails an hour and sends only to the project's team
+members), on a free tier (for example Resend or Postmark), with an ADR (new service). The
+handle and display name fields start empty; nothing is copied from the Google profile.
+The privacy page, since Google's consent screen asks for a privacy policy link
+(unverified for basic scopes). A signed-in option for `npm run screenshot`, so pages
+behind sign-in can be captured. Every later milestone that adds a table adds its column
+write tests the way `supabase/tests/profiles.test.ts` does.
 
 ## Milestone 2: Venues, DJs, collectives
 
