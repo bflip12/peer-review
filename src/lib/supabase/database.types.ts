@@ -29,7 +29,37 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      profiles: {
+        Row: {
+          account_status: Database["public"]["Enums"]["account_status"];
+          account_status_at: string | null;
+          created_at: string;
+          display_name: string | null;
+          handle: string;
+          id: string;
+          role: Database["public"]["Enums"]["role"];
+        };
+        ComputedFields: never;
+        Insert: {
+          account_status?: Database["public"]["Enums"]["account_status"];
+          account_status_at?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          handle: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["role"];
+        };
+        Update: {
+          account_status?: Database["public"]["Enums"]["account_status"];
+          account_status_at?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          handle?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["role"];
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -38,7 +68,8 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      account_status: "active" | "banned";
+      role: "user" | "moderator" | "admin";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -154,6 +185,9 @@ export const Constants = {
     Enums: {}
   },
   public: {
-    Enums: {}
+    Enums: {
+      account_status: ["active", "banned"],
+      role: ["user", "moderator", "admin"]
+    }
   }
 } as const;
