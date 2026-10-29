@@ -53,7 +53,9 @@ const waitForSchemaCache = async (): Promise<void> => {
   const service = createServiceClient();
   for (let attempt = 0; attempt < 50; attempt++) {
     const { error } = await service.rpc("test_whoami");
-    if (!error || !NOT_IN_SCHEMA_CACHE.includes(error.code)) return;
+    if (!error || !NOT_IN_SCHEMA_CACHE.includes(error.code)) {
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error("PostgREST did not reload its schema cache within 5 seconds.");

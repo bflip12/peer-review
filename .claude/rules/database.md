@@ -55,6 +55,37 @@ not.
 - Ratings are `smallint` 1 to 10 (half-stars times two).
 - Dates for events are read in the event city's timezone.
 
+## SQL style
+
+Follows Supabase's Postgres SQL style guide, which the existing migrations already match.
+- Lowercase keywords: `create table`, `select ... from`, `not null`.
+- snake_case for every name. Tables are plural (`logs`, `lineup_slots`), columns singular.
+  Enum types are singular and say what they describe (`log_visibility`).
+- A reference column is the singular table name plus `_id` (`venue_id`). Timestamps end in
+  `_at` (`hidden_at`), booleans start with `is_` or `has_` (`is_merged`, `has_venue`).
+- Constraint and index names follow Postgres's own pattern, so a name in an error says
+  where it came from: `<table>_<columns>_key` (unique), `_pkey`, `_fkey`, `_check`, and
+  `_idx` for other indexes. Name each one explicitly.
+- Every table gets `comment on table`, and a column whose name does not explain it gets
+  `comment on column`.
+- In functions and queries, names are schema-qualified (`public.logs`), since
+  `security definer` functions run with `search_path = ''` (`supabase.md`).
+- A query with steps uses CTEs (`with ... as`), not nested subqueries.
+- Dynamic SQL is built with `format()`: `%I` for identifiers, `%L` for literals. Never by
+  joining strings.
+- Every migration starts with a comment saying what it does and why.
+
+### Policies
+
+- One policy per operation (`select`, `insert`, `update`, `delete`), never `for all`, each
+  with `to` naming its roles (`to authenticated`, `to anon, authenticated`).
+- The name says who may do what, in quotes: `"Owners update their own logs"`.
+- Write `(select auth.uid())`, not `auth.uid()`, so Postgres runs it once per query
+  instead of once per row (Supabase's RLS performance guide).
+- `update` policies have both `using` (which rows) and `with check` (what the row may
+  become).
+- Index the columns a policy filters on, such as `user_id`.
+
 ## After a change
 
 - Update `docs/DATA_MODEL.md`, including "Hard to change later" and the enum table.

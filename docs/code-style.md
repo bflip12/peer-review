@@ -5,8 +5,10 @@ searchable tree, so they read as a single codebase.
 
 ## 1. Formatting
 
-Formatting is automated. Run Prettier and ESLint; never hand-format and never hand-sort
-imports. The settings, for reference:
+Formatting is automated. Run Prettier, ESLint, and Stylelint; never hand-format and never
+hand-sort imports. ESLint and Stylelint enforce most of the mechanical rules in this guide
+and fail on warnings (ADR 0021); this guide gives the reasons and covers what they cannot
+check. The Prettier settings, for reference:
 
 - `printWidth: 90`, `tabWidth: 2`, spaces, LF endings
 - double quotes, semicolons, no trailing commas
@@ -85,8 +87,11 @@ src/features/region-table/
 - Names say what the thing is, not how it is used: `getSelectionState`, not `doSelection`.
 - Magic numbers become named constants in the module that owns them, with the reason in a
   comment: `// 50MB, matching the backend limit`.
-- A nullable value uses `Maybe<T>` (`T | undefined | null`) where the project defines it,
-  rather than spelling out the union each time.
+- `null` and `undefined` mean different things, so a type never allows both. A value from
+  the database that is not set is `T | null`, as the generated types and
+  `docs/DATA_MODEL.md` have it. A prop or argument the caller may leave out is optional,
+  `name?: T`. No `Maybe<T>` type: it hides which of the two a value is, and every caller
+  ends up checking for both.
 
 ## 4. Types
 
@@ -206,8 +211,10 @@ export const useRegionEditor = ({
 
 - Body order: state, refs, effects, handlers, derived values, return.
 - The return is a flat object literal, last in the body.
-- Handlers the hook returns are wrapped in `useCallback` with a complete dependency array.
-  Handlers used only inside the hook are plain functions.
+- The React Compiler memoizes components and hooks (ADR 0021). Do not add `useMemo` or
+  `useCallback` for performance. Use them only when a value's identity matters outside
+  render: an effect dependency that must not change every render, or a function that must
+  be created once, such as a debounced one.
 - Keep `react-hooks/exhaustive-deps` enabled. Fix each warning on its merits: add the
   dependency, move the value into a ref, or extract the function. When a dependency is
   deliberately left out, say why on that effect.
@@ -218,6 +225,11 @@ export const useRegionEditor = ({
   const updateQueryDebounced = useMemo(() => debounce(setQuery, debounceMs), [debounceMs]);
   useEffect(() => () => updateQueryDebounced.cancel(), [updateQueryDebounced]);
   ```
+- An effect synchronizes with something outside React: a browser API, a subscription, a
+  timer. It is not for values computed from props or state (compute them during render) or
+  for responding to a user action (do that in the event handler). `react-hooks` reports
+  `setState` called directly in an effect. This follows React's "You Might Not Need an
+  Effect".
 - Use a ref to mirror a value only when a callback would otherwise close over a stale copy.
   Keep the mirror in one effect and state what it is for.
 - Native listeners needing `{ passive: false }` are added in an effect and removed in its
@@ -327,7 +339,16 @@ export const RegionPicker = ({
 - The only global CSS is the token file and the reset, imported by the root layout.
 - A value known only at render time is passed as a custom property, never as a style:
   `style={{ "--progress": `${percent}%` }}`.
-- Accept and forward `data-testid` on components that tests drive.
+- React 19: `ref` is a regular prop, typed in the props type; never `forwardRef`. A
+  context is rendered as its own provider, `<ThemeContext value={theme}>`, not
+  `<ThemeContext.Provider>`.
+- List keys are stable ids from the data, never the array index. An index key gives a row
+  another row's state when the list is filtered or reordered.
+- The left side of `&&` in JSX is a boolean. `{count && <Badge />}` renders `0` when
+  `count` is zero; write `{count > 0 && <Badge />}`.
+- Route files type their props with the generated helpers, `PageProps<"/venues/[id]">` and
+  `LayoutProps<"/">`, which `npm run typecheck` generates. `params` and `searchParams` are
+  promises; await them inside the `<Suspense>` boundary that needs them.
 - Guard clauses first, then the main return. No nested ternaries in JSX; lift the condition
   into a named boolean above the return.
 - Props passed to a client component are sent to the browser. Pass only the fields it
@@ -483,13 +504,54 @@ A test file sits beside every non-trivial module.
   catches logic leaking between branches.
 - Test exported pure functions directly. The hook test then covers wiring and state
   transitions only.
-- Always cover: empty input, a single item, a duplicate, surrounding whitespace, and a
-  mixed-type collection.
+- Always cover: empty input, a single item, a duplicate, and surrounding whitespace.
 - Mock only the boundary (a data hook, a network module), never the unit under test. Declare
   mocks at the top, each with a one-line comment naming what it stands in for.
 - No snapshot tests.
 
-## 13. Checklist
+### Querying the page
+
+Tests find elements the way a user does, so a test that passes means the page works for
+people using a screen reader too. Use Testing Library's query priority:
+1. `getByRole` with the accessible name: `getByRole("button", { name: "Save log" })`.
+2. `getByLabelText` for form fields.
+3. `getByText` for content that is not interactive.
+4. `getByTestId` only when none of these can tell the element apart. Add `data-testid`
+   for that one test; components do not carry test ids by default.
+
+Interact with `@testing-library/user-event`, not `fireEvent`, so a click also focuses and
+a typed value fires every key event. It is added with the first test that clicks or types.
+`eslint-plugin-testing-library` reports the common mistakes.
+
+### End-to-end tests
+
+Playwright tests in `e2e/` follow Playwright's best practices:
+- Locators are user-facing: `page.getByRole`, `getByLabel`, `getByText`. No CSS or XPath
+  selectors.
+- Assertions are web-first and wait on their own: `await expect(locator).toBeVisible()`.
+  Never `page.waitForTimeout`.
+- Each test creates the data it needs and does not depend on another test having run.
+- A test checks one user journey ("signs in and logs a night"), named like a unit test.
+- `eslint-plugin-playwright` reports missing `await`s and the other common mistakes.
+
+## 13. Accessibility
+
+Pages meet WCAG 2.1 AA. The colors are checked by `src/styles/tokens.test.ts`, focus by
+the reset, and `eslint-plugin-jsx-a11y` reports the markup mistakes it can see. The rest:
+- The native element first: `<button>` for actions, `<a href>` for navigation, `<label>`
+  for fields, `<ul>` for lists. ARIA only for what HTML cannot say (`aria-pressed` on a
+  toggle button, `aria-live` for a status that changes).
+- Every page has one `<h1>`, and headings go down one level at a time.
+- Every input has a visible `<label>`. Help text and errors are linked with
+  `aria-describedby`, and an invalid field sets `aria-invalid`.
+- Everything works with the keyboard alone, in a sensible order, with no `tabIndex`
+  greater than 0.
+- An icon or star with no text gets an accessible name, or is hidden with
+  `aria-hidden="true"` when text beside it says the same (the rating pattern in
+  `docs/style-guide.md`).
+- Color never carries meaning alone. An error has text, not only a red border.
+
+## 14. Checklist
 
 1. Every export is `export const` with an arrow function, no `export default`, except in
    route files, which Next.js requires to `export default`.
@@ -498,12 +560,14 @@ A test file sits beside every non-trivial module.
    caller could get wrong.
 4. Logic worth testing is in an exported pure function, not inside a hook body.
 5. No input is mutated.
-6. Handlers returned from a hook use `useCallback` with a complete dependency array, and
-   `exhaustive-deps` is clean or the omission is explained.
+6. No `useMemo` or `useCallback` for performance, and `exhaustive-deps` is clean or the
+   omission is explained.
 7. The hook returns one flat object, last in the body.
 8. Magic numbers are named constants with the reason in a comment.
 9. Styles are in a CSS Module beside the component, colors come from token variables, and
    client components are leaves that receive only the fields they render.
 10. Test file beside the code, names are verb phrases, empty case covered, whole result
     shapes asserted.
-11. Prettier and ESLint pass.
+11. Tests query by role, label, or text; a test id only when nothing else works.
+12. Native elements, a label on every input, and the page works with the keyboard.
+13. `npm run lint` and `npm run format:check` pass.

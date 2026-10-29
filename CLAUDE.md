@@ -11,7 +11,8 @@ Next.js App Router, TypeScript, Supabase (Postgres, Auth, RLS), Vercel.
 Do not guess a command that is not listed here. Node 22.18 or later, npm.
 - `npm run dev`, `npm run build`, `npm run start`: Next.js dev server, build, and server.
 - `npm run typecheck`: generates route types, then runs `tsc`.
-- `npm run lint`: ESLint. `npm run format` writes Prettier, `npm run format:check` checks.
+- `npm run lint`: ESLint, then Stylelint, failing on any warning. `npm run format` writes
+  Prettier, `npm run format:check` checks.
 - `npm test`: Vitest once. `npm run test:watch`: Vitest in watch mode.
 - `npm run e2e`: Playwright, starting the dev server. With `CI` set it runs
   `npm run start`, so run `npm run build` first.
@@ -38,8 +39,9 @@ In cloud sessions:
 - Prefix `npm run db:start` and `npm run db:types` with
   `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io`. The default registry is blocked there.
 
-After each Edit or Write, a hook runs Prettier and `eslint --fix` on the file
-(`scripts/hooks/formatEditedFile.ts`). Errors it cannot fix come back to Claude to fix.
+After each Edit or Write, a hook runs Prettier, then `eslint --fix` or `stylelint --fix`, on
+the file (`scripts/hooks/formatEditedFile.ts`). Errors and warnings it cannot fix come back
+to Claude to fix. Change a rule that blocks correct code in its config (ADR 0021).
 
 Before writing Next.js code, read the guide for it in `node_modules/next/dist/docs/`
 (`AGENTS.md`, which `next dev` keeps current).
@@ -67,8 +69,12 @@ Before writing Next.js code, read the guide for it in `node_modules/next/dist/do
 ## Where the rest lives
 - `.claude/rules/voice.md`: writing voice for UI copy, docs, commits, and replies.
 - `.claude/rules/react.md`: loads for `src/**`. Code style, colors, Next.js exceptions.
+- `.claude/rules/security.md`: loads for `src/**`. Auth checks, secrets, what reaches the
+  browser, untrusted input.
 - `.claude/rules/database.md`: loads for `supabase/**` and `docs/DATA_MODEL.md`. Enums,
-  future-proofing checks, and value conventions for the schema.
+  future-proofing checks, value conventions, and SQL and policy style.
 - `.claude/rules/supabase.md`: loads for `supabase/**`. Migrations, grants, function
   security, and database tests.
+- `.claude/rules/workflows.md`: loads for `.github/**`. Pinned actions, permissions, and
+  secrets in GitHub Actions.
 - `docs/DATA_MODEL.md`: tables, constraints, indexes, and RLS visibility rules.

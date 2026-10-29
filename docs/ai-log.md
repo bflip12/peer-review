@@ -491,3 +491,33 @@ shell in `src/features/app-shell/`, a contrast test over the token file,
 [`docs/design/references/`](design/references/README.md),
 [PR #23](https://github.com/bflip12/peer-review/pull/23),
 [PR #24](https://github.com/bflip12/peer-review/pull/24).
+
+### Moving the style guide into the linter (2026-10-29)
+
+**Goal.** Review the development rules against the stack and every language in the repo,
+so the code stays consistent as Claude writes more of it.
+
+**How I used AI.** Claude worked as a staff developer reviewing the rule files, and
+tested each finding by running it: a file with only lint warnings, an import of
+`server-only` in a test, and a build with the React Compiler on.
+
+**My calls.**
+- After the first pass I asked whether React and the other languages had been reviewed.
+  The second pass found that lint warnings failed nothing, so `exhaustive-deps` and every
+  accessibility rule had never been reported, and that no data function could have loaded
+  in a database test.
+- Rules a machine can check go in the lint config, since a lint error reaches Claude
+  after every edit and a paragraph only when remembered. Stylelint for CSS.
+- React Compiler on before Milestone 1, while there is almost no app code
+  ([ADR 0021](adr/0021-lint-enforcement-and-react-compiler.md)).
+- `T | null` for database values and `?:` for optional inputs, instead of a `Maybe<T>`
+  type that hides which one a value is.
+- Two PRs: lint and config first, then the docs (security rules, SQL style, workflow
+  rules, test and accessibility sections).
+
+**Output.** [ADR 0021](adr/0021-lint-enforcement-and-react-compiler.md),
+[`eslint.config.mjs`](../eslint.config.mjs), [`stylelint.config.mjs`](../stylelint.config.mjs),
+[`.claude/rules/security.md`](../.claude/rules/security.md),
+[`.claude/rules/workflows.md`](../.claude/rules/workflows.md),
+[PR #26](https://github.com/bflip12/peer-review/pull/26),
+[PR #27](https://github.com/bflip12/peer-review/pull/27).

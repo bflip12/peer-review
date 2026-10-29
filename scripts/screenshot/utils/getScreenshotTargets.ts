@@ -22,7 +22,9 @@ export const getScreenshotTargets = (
 
   const targets: ScreenshotTargetT[] = [];
   for (const route of uniqueRoutes) {
-    if (!route.startsWith("/")) throw new Error(`Route "${route}" must start with /.`);
+    if (!route.startsWith("/")) {
+      throw new Error(`Route "${route}" must start with /.`);
+    }
     const name = getRouteName(route);
     const clash = targets.find((target) => target.name === name);
     if (clash) {

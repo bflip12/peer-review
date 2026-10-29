@@ -5,7 +5,8 @@ paths:
 
 # React, TypeScript, and styling
 
-- Follow `docs/code-style.md`. Run its section 13 checklist before committing.
+- Follow `docs/code-style.md`. Run its section 14 checklist before committing.
+- Security rules for server code, actions, and secrets: `.claude/rules/security.md`.
 - Server components by default. `"use client"` only on the leaf that needs the browser.
   Reads go through `data/` functions in server components; writes through server actions
   (code-style section 9, ADR 0019).

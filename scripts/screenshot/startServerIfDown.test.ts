@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { startServerIfDown } from "./startServerIfDown";
 
-const servers: Server[] = [];
+const OPEN_SERVERS: Server[] = [];
 
 const getFreePort = async (): Promise<number> => {
   const server = createServer();
@@ -18,7 +18,7 @@ const getFreePort = async (): Promise<number> => {
 
 const listen = async (port: number): Promise<void> => {
   const server = createServer((_request, response) => response.end("ok"));
-  servers.push(server);
+  OPEN_SERVERS.push(server);
   await new Promise<void>((resolve) => server.listen(port, resolve));
 };
 
@@ -37,7 +37,9 @@ const mockServeCommand = (port: number): string[] => [
 
 afterEach(async () => {
   await Promise.all(
-    servers.splice(0).map((server) => new Promise((resolve) => server.close(resolve)))
+    OPEN_SERVERS.splice(0).map(
+      (server) => new Promise((resolve) => server.close(resolve))
+    )
   );
 });
 
@@ -58,11 +60,11 @@ describe("startServerIfDown", () => {
     const url = `http://localhost:${port}`;
 
     const stop = await startServerIfDown(url, mockServeCommand(port));
-    const upWhileRunning = await isUp(url);
+    const isUpWhileRunning = await isUp(url);
     stop();
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    expect([upWhileRunning, await isUp(url)]).toEqual([true, false]);
+    expect([isUpWhileRunning, await isUp(url)]).toEqual([true, false]);
   });
 
   it("fails when the command exits before the server responds", async () => {
