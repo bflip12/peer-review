@@ -1,0 +1,8 @@
+.wrapper {
+  --fallback-width: 4.5rem; /* About the width of "Sign in" */
+
+  width: var(--fallback-width);
+  height: var(--text-base);
+  margin-left: auto;
+  background: var(--color-placeholder-block);
+}

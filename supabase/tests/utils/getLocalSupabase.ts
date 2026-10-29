@@ -6,6 +6,8 @@ export type LocalSupabaseT = {
   dbUrl: string;
   anonKey: string;
   serviceRoleKey: string;
+  /** Mailpit, which catches the stack's auth emails. Its API is under `/api/v1`. */
+  mailUrl: string;
 };
 
 let cached: LocalSupabaseT | undefined;
@@ -34,7 +36,8 @@ export const getLocalSupabase = (): LocalSupabaseT => {
     apiUrl: status.API_URL,
     dbUrl: status.DB_URL,
     anonKey: status.ANON_KEY,
-    serviceRoleKey: status.SERVICE_ROLE_KEY
+    serviceRoleKey: status.SERVICE_ROLE_KEY,
+    mailUrl: status.MAILPIT_URL
   };
   return cached;
 };

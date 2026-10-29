@@ -1,0 +1,17 @@
+.wrapper {
+  /* Sized to its label in a column of full-width fields */
+  align-self: flex-start;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-5);
+  border: var(--rule-width) solid var(--color-text);
+  border-radius: 0;
+  background: var(--color-text);
+  color: var(--color-button-text);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.wrapper:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}

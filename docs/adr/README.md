@@ -63,3 +63,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0019](0019-styling-data-and-state.md) | Styling, data fetching, and state | Accepted |
 | [0020](0020-night-picker-one-list.md) | One result list in the night picker, and the event name field | Accepted |
 | [0021](0021-lint-enforcement-and-react-compiler.md) | Lint enforcement, Stylelint, and the React Compiler | Accepted |
+| [0022](0022-sign-in-links-and-sessions.md) | Sign-in links and sessions | Accepted |

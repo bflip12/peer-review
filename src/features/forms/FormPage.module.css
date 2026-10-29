@@ -1,0 +1,12 @@
+.wrapper {
+  --form-page-width: 28rem; /* About 50 characters of body text */
+
+  max-width: var(--form-page-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.intro {
+  color: var(--color-text-muted);
+}

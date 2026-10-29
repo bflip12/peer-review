@@ -4,6 +4,13 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-10-29
 
+- End-to-end tests run in CI's database job, after `npm run db:env`, since sign-in needs
+  the local stack (ADR 0022). `npm run db:start` now starts Mailpit, which catches the
+  stack's sign-in emails. New `npm run db:env` command. Reason: the tests follow real
+  sign-in emails.
+- `migrate.yml` applies migrations to the staging project too, in its own job, with the
+  `SUPABASE_STAGING_DB_URL` secret. Reason: preview deploys use staging (ADR 0018).
+
 - New `.claude/rules/security.md` for `src/**`: identity from `getClaims()` or
   `getUser()`, never `getSession()` on the server; only `NEXT_PUBLIC_*` reaches the
   browser; no service role key under `src/`; untrusted input in redirects and HTML.

@@ -5,7 +5,7 @@ import { AppShell } from "./AppShell";
 
 describe("AppShell", () => {
   it("links the wordmark to the home page with a readable name", () => {
-    render(<AppShell>Content</AppShell>);
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>Content</AppShell>);
 
     const result = screen.getByRole("link", { name: "PeerReview.club, home" });
 
@@ -13,7 +13,7 @@ describe("AppShell", () => {
   });
 
   it("puts the wordmark in the page header", () => {
-    render(<AppShell>Content</AppShell>);
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>Content</AppShell>);
 
     const result = screen.getByRole("banner");
 
@@ -24,7 +24,7 @@ describe("AppShell", () => {
 
   it("renders the page inside the main landmark", () => {
     render(
-      <AppShell>
+      <AppShell accountNav={<a href="/sign-in">Sign in</a>}>
         <p>Page content</p>
       </AppShell>
     );
@@ -36,7 +36,7 @@ describe("AppShell", () => {
   });
 
   it("starts with a skip link to the main content", () => {
-    render(<AppShell>Content</AppShell>);
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>Content</AppShell>);
 
     const result = screen.getAllByRole("link");
 
@@ -45,10 +45,18 @@ describe("AppShell", () => {
   });
 
   it("renders an empty main when there is no page content", () => {
-    render(<AppShell>{null}</AppShell>);
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>{null}</AppShell>);
 
     const result = screen.getByRole("main");
 
     expect(result).toBeEmptyDOMElement();
+  });
+
+  it("puts the account area in the header", () => {
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>Content</AppShell>);
+
+    const result = screen.getByRole("banner");
+
+    expect(result).toContainElement(screen.getByRole("link", { name: "Sign in" }));
   });
 });

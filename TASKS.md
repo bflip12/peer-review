@@ -18,7 +18,8 @@ order.
 
 - **Database URL secret.** The Migrate workflow connects with the `SUPABASE_DB_URL` repo
   secret (session pooler URL with the database password). Update it whenever the database
-  password changes, or Migrate fails at "List the migrations that will run".
+  password changes, or Migrate fails at "List the migrations that will run". The staging
+  project's goes in `SUPABASE_STAGING_DB_URL` the same way.
 
 Decided: the name is Peer Review and the domain is `peerreview.club`. The design is in
 `docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
@@ -26,18 +27,22 @@ design directions" (Screens page).
 
 ## Milestone 1: Accounts
 
-Before any of it: a second free Supabase project as staging for preview deploys, and the
-Supabase keys added by hand in Vercel per environment, production to
-`stcjavdqwjgdgudoudqv` and previews to staging (ADR 0018). Sign-in with magic link and
-Google, handle and display name setup (the `profiles` table is done), the sign-in privacy
-note, account deletion. Custom SMTP for magic links on `peerreview.club` with SPF and DKIM
-(Supabase's built-in sender allows 2 emails an hour and sends only to the project's team
-members), on a free tier (for example Resend or Postmark), with an ADR (new service). The
-handle and display name fields start empty; nothing is copied from the Google profile.
-The privacy page, since Google's consent screen asks for a privacy policy link
-(unverified for basic scopes). A signed-in option for `npm run screenshot`, so pages
-behind sign-in can be captured. Every later milestone that adds a table adds its column
-write tests the way `supabase/tests/profiles.test.ts` does.
+Done: the `profiles` table, and sign-in with an email link with handle and display name
+setup (ADR 0022). Left:
+- Hosted auth settings, by hand in each Supabase project: the Site URL and redirect allow
+  list, and the magic link and confirm signup templates from `supabase/templates/`.
+- Google sign-in, with the privacy page, since Google's consent screen asks for a privacy
+  policy link (unverified for basic scopes). Nothing is copied from the Google profile.
+- Custom SMTP for sign-in emails on `peerreview.club` with SPF and DKIM (Supabase's
+  built-in sender allows 2 emails an hour and sends only to the project's team members),
+  on a free tier (for example Resend or Postmark), with an ADR (new service). Forward the
+  user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count every user
+  against the server's IP.
+- A signed-in option for `npm run screenshot`, so pages behind sign-in can be captured.
+- Account deletion.
+
+Every later milestone that adds a table adds its column write tests the way
+`supabase/tests/profiles.test.ts` does.
 
 ## Milestone 2: Venues, DJs, collectives
 

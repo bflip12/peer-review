@@ -1,0 +1,32 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  --label-width: 6rem;
+
+  width: var(--label-width);
+  height: calc(var(--text-base) * var(--leading-body));
+  background: var(--color-placeholder-block);
+}
+
+.input {
+  height: 2.875rem; /* 46px, the field height in TextField.module.css */
+  background: var(--color-placeholder-block);
+}
+
+.button {
+  --button-width: 8rem;
+
+  width: var(--button-width);
+  height: var(--tap-target);
+  background: var(--color-placeholder-block);
+}
