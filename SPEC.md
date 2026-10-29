@@ -75,8 +75,8 @@ Online scene communities across many cities. Two consequences:
 - Names compare ignoring case and surrounding spaces.
 - Dates are read in the event city's timezone. "Today" in any rule means today in that
   city.
-- The name is the official name from the poster (ADR 0016). Wherever it is asked, the
-  field reads:
+- The name is the official name from the poster (ADR 0016, ADR 0020). Wherever it is
+  asked, the field reads:
   - Label: "Event name (optional)"
   - Placeholder: "Day Party"
   - Help text: "Use the official name from the poster. Leave it empty if the night didn't
@@ -101,22 +101,32 @@ Online scene communities across many cities. Two consequences:
 - An event with no logs and no Going markers left is deleted. If a log move caused it, the
   old URL redirects to the event the log moved to.
 
-**The night picker.** The first step of the log form and the Going form. Venue and
-collective nights work the same way.
+**The night picker** (ADR 0008, ADR 0020). The first step of the log form and the Going
+form. Venue and collective nights work the same way.
 - The date comes first and defaults to last night.
-- One search box matches venue names, collective names, event names, and DJs on lineups.
-- **Nights** lists existing events. Tapping one joins it. Nights on the chosen date come
-  first, then nights one day either side. Each row starts with the date and shows the
-  venue, collective, name, first three DJs, and the public log count when it is above zero.
-  A night with no lineup shows "No lineup yet".
-- **Start a new night** lists matching venues and collectives, then "Add a venue or
-  collective". Tapping one starts a new event, created when the log is saved. The form
-  shows the optional name field.
-- Starting a new night at a venue or collective that already has a night on that date
-  first shows that night with "Join". "No, it's a different party" then shows the name
-  field, required, with the label "Event name". Text under the field: "Tresor
-  already has a night on Sat 4 Oct. Add the name from the poster so people can tell the
-  two apart." If a collective is picked, the field starts with its name.
+- One search box, labelled "Where were you?" with the help text "Venue, collective, event
+  name, or a DJ who played." It matches venue names, collective names, event names, and
+  DJs on lineups.
+- The results are one list. Users never choose between joining and creating: each row
+  ends with what tapping it does, "Join" or "Start". In order:
+  1. Existing nights on the chosen date, with "Join". A matching venue or collective that
+     has a night on that date shows as that night, never as a separate "Start" row.
+  2. Matching venues and collectives with no night on that date, with "Start". The row
+     says "Venue" or "Collective", the city, and "No night logged on Sat 4 Oct yet".
+     Tapping one starts a new event, created when the log is saved.
+  3. Existing nights one day either side, with "Join".
+  4. "Add a venue or collective".
+- A night row starts with the date and shows the venue, collective, name, first three
+  DJs, and the public log count when it is above zero. A night with no lineup shows "No
+  lineup yet". A night that matched only through a DJ adds "DJ Stingray 313 on the
+  lineup".
+- When the search matches DJs but no venue or collective, the list shows the nights those
+  DJs played, then "A new night needs a venue or collective. Search for where it was."
+- Under the nights of a venue or collective on the chosen date: "A different party at
+  Tresor?". It shows the name field, required, with the label "Event name". Text under
+  the field: "Tresor already has a night on Sat 4 Oct. Add the name from the poster so
+  people can tell the two apart." If a collective is picked, the field starts with its
+  name.
 - Starting a new night at a venue or collective that has a night one day either side shows
   one line first: "Tresor has a night on Fri 3 Oct. Nights that run past midnight go under
   the date they started."

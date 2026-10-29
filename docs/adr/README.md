@@ -49,7 +49,7 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0005](0005-no-media-in-v1.md) | No photos or video in v1 | Accepted |
 | [0006](0006-no-ai-in-v1.md) | No AI features in v1 | Accepted |
 | [0007](0007-private-going-marker.md) | A private "Going" marker for future events | Accepted, amended by 0014 |
-| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010, 0013, 0014, and 0016 |
+| [0008](0008-night-picker-and-lineup-slots.md) | One night picker for every event, and lineup slots for b2b sets | Accepted, amended by 0010, 0013, 0014, 0016, and 0020 |
 | [0009](0009-locals-and-reversible-merges.md) | Locals, and merges that can be undone | Accepted, amended by 0010, 0012, 0013, and 0014 |
 | [0010](0010-data-model.md) | Data model shape, co-hosts, and enums for states that can grow | Accepted, amended by 0014 |
 | [0011](0011-creation-caps-and-dj-cities.md) | Daily caps on new catalog entries, and a city for DJs with the same name | Accepted |
@@ -57,7 +57,8 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0013](0013-lineup-corrections.md) | A lineup slot never gets a different DJ, and slot changes can be reverted | Accepted |
 | [0014](0014-merges-ship-with-undo.md) | Merges ship with undo after launch, and v1 has no averages or bulk revert | Accepted |
 | [0015](0015-original-logs.md) | A private original copy of each log | Accepted |
-| [0016](0016-event-names.md) | An event's name is the official name from the poster | Accepted |
+| [0016](0016-event-names.md) | An event's name is the official name from the poster | Accepted, amended by 0020 |
 | [0017](0017-explicit-grants-and-api-tests.md) | Explicit grants, and database tests through the API | Accepted |
 | [0018](0018-hosting-and-deploys.md) | Hosting and deploys | Accepted |
 | [0019](0019-styling-data-and-state.md) | Styling, data fetching, and state | Accepted |
+| [0020](0020-night-picker-one-list.md) | One result list in the night picker, and the event name field | Accepted |
