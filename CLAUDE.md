@@ -69,8 +69,12 @@ Before writing Next.js code, read the guide for it in `node_modules/next/dist/do
 ## Where the rest lives
 - `.claude/rules/voice.md`: writing voice for UI copy, docs, commits, and replies.
 - `.claude/rules/react.md`: loads for `src/**`. Code style, colors, Next.js exceptions.
+- `.claude/rules/security.md`: loads for `src/**`. Auth checks, secrets, what reaches the
+  browser, untrusted input.
 - `.claude/rules/database.md`: loads for `supabase/**` and `docs/DATA_MODEL.md`. Enums,
-  future-proofing checks, and value conventions for the schema.
+  future-proofing checks, value conventions, and SQL and policy style.
 - `.claude/rules/supabase.md`: loads for `supabase/**`. Migrations, grants, function
   security, and database tests.
+- `.claude/rules/workflows.md`: loads for `.github/**`. Pinned actions, permissions, and
+  secrets in GitHub Actions.
 - `docs/DATA_MODEL.md`: tables, constraints, indexes, and RLS visibility rules.
