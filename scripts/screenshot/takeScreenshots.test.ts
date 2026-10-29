@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const scriptPath = path.join(import.meta.dirname, "takeScreenshots.ts");
+const SCRIPT_PATH = path.join(import.meta.dirname, "takeScreenshots.ts");
 
 // Taller than both viewports, so a full-page capture is taller than the screen.
 const PAGE_HEIGHT = 2000;
@@ -36,7 +36,7 @@ describe("takeScreenshots", () => {
     routes: string[]
   ): Promise<{ status: number | null; stdout: string; stderr: string }> =>
     new Promise((resolve) => {
-      const child = spawn("node", [scriptPath, ...routes], {
+      const child = spawn("node", [SCRIPT_PATH, ...routes], {
         env: { ...process.env, SCREENSHOT_BASE_URL: baseUrl, SCREENSHOT_DIR: outputDir }
       });
       let stdout = "";

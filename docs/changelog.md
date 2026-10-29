@@ -2,6 +2,18 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-29
+
+- Lint fails on warnings, in CI and in the edit hook (ADR 0021). Reason: warnings exited 0,
+  so `exhaustive-deps` and every accessibility rule were never reported.
+- ESLint enforces the mechanical rules of `docs/code-style.md` (naming, `type`, return
+  types, arrow functions, named exports, no `React.FC` or `forwardRef`, `curly`,
+  floating promises, the full `jsx-a11y` set). Stylelint checks CSS, with colors only from
+  tokens. Reason: a lint error reaches Claude after every edit; a rule in a document only
+  when remembered.
+- The React Compiler is on. Code-style section 6 drops the rule that handlers a hook
+  returns use `useCallback` (was: every returned handler memoized by hand).
+
 ## 2026-10-27
 
 - `docs/code-style.md` sections 8 to 10 are rewritten for this stack (ADR 0019): CSS

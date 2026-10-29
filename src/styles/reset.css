@@ -10,6 +10,7 @@
 }
 
 html {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari on iOS reads only this name */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -49,7 +50,7 @@ h1 {
   font-size: var(--text-xl);
 }
 
-@media (min-width: 48rem) {
+@media (width >= 48rem) {
   h1 {
     font-size: var(--text-2xl);
   }

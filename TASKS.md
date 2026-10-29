@@ -24,6 +24,26 @@ Decided: the name is Peer Review and the domain is `peerreview.club`. The design
 `docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
 design directions" (Screens page).
 
+## Development rules
+
+Two PRs from a review of the rules against the stack. The first (lint enforcement,
+Stylelint, the React Compiler, ADR 0021) is in review. The second is docs only:
+- `docs/code-style.md`: Testing Library query priority (role, label, text, then test id)
+  in place of forwarding `data-testid`; drop "mixed-type collection" from section 12;
+  `T | null` for database values and `?:` for optional inputs in place of `Maybe<T>`; an
+  e2e section from Playwright's best practices; an accessibility section; React 19 and
+  Next 16 points (`ref` as a prop, `<Context>` as provider, generated `PageProps`, stable
+  keys, boolean conditions before `&&`, no effects for derived values).
+- `.claude/rules/security.md` for `src/**`: identity from `getClaims()` or `getUser()` on
+  the server, never `getSession()` (check against the installed supabase-js first); only
+  `NEXT_PUBLIC_*` reaches the browser; no service role key under `src/`; no untrusted
+  input in `dangerouslySetInnerHTML` or a redirect target.
+- SQL style in `.claude/rules/database.md`: lowercase keywords, snake_case, plural tables,
+  `_id` and `_at` names, index, constraint, and policy name patterns, a comment on every
+  table, `format()` with `%I` and `%L` for dynamic SQL.
+- `.claude/rules/workflows.md` for `.github/**`: actions pinned to a SHA, least
+  `permissions`, `persist-credentials: false`, a timeout per job, a comment per step.
+
 ## Milestone 1: Accounts
 
 Before any of it: a second free Supabase project as staging for preview deploys, and the
