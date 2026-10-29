@@ -9,8 +9,6 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **Design direction.** Collect 3 to 5 reference screenshots of sites, apps, or record
-  sleeves. Then install the frontend-design plugin and use them with it.
 - **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
   environment's network settings.
 
@@ -22,12 +20,9 @@ order.
   secret (session pooler URL with the database password). Update it whenever the database
   password changes, or Migrate fails at "List the migrations that will run".
 
-Decided: the name is Peer Review and the domain is `peerreview.club`.
-
-## Milestone 0: Setup
-
-8. Create the token file and `docs/style-guide.md` with the first styled component (the app
-   shell).
+Decided: the name is Peer Review and the domain is `peerreview.club`. The design is in
+`docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
+design directions" (Screens page).
 
 ## Milestone 1: Accounts
 
@@ -161,6 +156,8 @@ picked after the merge onto the original lineup. Adds `merges.undone_by`,
 
 ## Later
 
+- Dark mode: dark values for the color tokens, with their pairs added to the contrast
+  test in `src/styles/tokens.test.ts` (`docs/style-guide.md`, "Color")
 - Venue-claimed pages, with an opt-in public location
 - AI features: log assist, then venue review summaries, then visiting a city, each when
   its trigger in `docs/AI_FEATURES.md` is met

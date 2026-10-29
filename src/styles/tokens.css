@@ -1,0 +1,60 @@
+/*
+ * Design tokens. Every color, size, and space in the app comes from here.
+ * docs/style-guide.md says when to use each one. src/styles/tokens.test.ts checks the
+ * color pairs against WCAG AA, so a change here that breaks contrast fails the tests.
+ */
+
+:root {
+  /* Colors. Six-digit hex, so the contrast test can read them. */
+  --color-page: #f2f0eb;
+  --color-text: #191816;
+  --color-text-muted: #5d5a54;
+  --color-rule: #d3cfc6;
+  --color-control-border: #86827a;
+  --color-field: #fbfaf7;
+  --color-placeholder-block: #e2dfd8;
+  --color-danger: #8a2a1e;
+  --color-rule-strong: var(--color-text);
+  --color-button-text: var(--color-page);
+
+  /* Type. --font-plex-mono is set by next/font in the root layout. */
+  --font-mono: var(--font-plex-mono), "Courier New", monospace;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --text-xs: 0.6875rem; /* 11px: uppercase section labels, sub-rating cell labels */
+  --text-sm: 0.8125rem; /* 13px: dates, counts, help text */
+  --text-base: 0.9375rem; /* 15px: body and reviews */
+  --text-md: 1.0625rem; /* 17px: night names in lists, phone wordmark */
+  --text-lg: 1.25rem; /* 20px: desktop wordmark, night name on a log */
+  --text-xl: 1.375rem; /* 22px: page titles on phones */
+  --text-2xl: 1.75rem; /* 28px: page titles on desktop */
+  --leading-tight: 1.25;
+  --leading-body: 1.6;
+  --tracking-label: 0.06em;
+
+  /* Space. A 4px base. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 5rem;
+
+  /* Layout */
+  --page-max-width: 80rem; /* 1280px */
+  --gutter: var(--space-4);
+  --rule-width: 1px;
+  --tap-target: 2.75rem; /* 44px, the smallest touch target WCAG 2.5.5 asks for */
+  --focus-ring: 2px solid var(--color-text);
+}
+
+/* Desktop. Matches the 768px breakpoint in docs/style-guide.md; media queries cannot
+   read custom properties, so the number repeats there. */
+@media (min-width: 48rem) {
+  :root {
+    --gutter: var(--space-8);
+  }
+}

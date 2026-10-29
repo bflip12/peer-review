@@ -77,10 +77,11 @@ Online scene communities across many cities. Two consequences:
   city.
 - The name is the official name from the poster (ADR 0016). Wherever it is asked, the
   field reads:
-  - Label: "Name on the poster (optional)"
-  - Placeholder: "Halloween"
+  - Label: "Event name (optional)"
+  - Placeholder: "Day Party"
   - Help text: "Use the official name from the poster. Leave it empty if the night didn't
     have one."
+  - In the log form it sits below the review.
 - Anyone logging an event or marking Going on it can fill in its venue or name when it has
   none, and add a collective. The user who set the name can change or clear it until
   another user logs the night or marks Going on it after the name was set. Changing or
@@ -113,7 +114,7 @@ collective nights work the same way.
   shows the optional name field.
 - Starting a new night at a venue or collective that already has a night on that date
   first shows that night with "Join". "No, it's a different party" then shows the name
-  field, required, with the label "Name on the poster". Text under the field: "Tresor
+  field, required, with the label "Event name". Text under the field: "Tresor
   already has a night on Sat 4 Oct. Add the name from the poster so people can tell the
   two apart." If a collective is picked, the field starts with its name.
 - Starting a new night at a venue or collective that has a night one day either side shows

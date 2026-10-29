@@ -277,7 +277,7 @@ One night. See [Event identity](#event-identity).
 | `date` | date | Required. The night it started |
 | `city_id` | integer | Required. References `cities` |
 | `venue_id` | uuid | Optional. References `venues` |
-| `name` | text | Optional. The official name from the poster, "Halloween" (ADR 0016) |
+| `name` | text | Optional. The official name from the poster, "Day Party" (ADR 0016) |
 | `name_locked_at` | timestamptz | Set by a trigger when a user other than the name's setter logs the night or marks Going on it. Cleared when the name changes. Ends the setter's edit right |
 | `merged_into_id` | uuid | References `events` |
 | `hidden_at` | timestamptz | |

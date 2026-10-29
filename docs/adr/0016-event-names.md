@@ -69,3 +69,10 @@ with the "Day party" example is replaced by the text above. The rest of ADR 0008
   setter is read from `catalog_edits` (the latest `name` edit) or `creations` (when the
   name was set with the event), never from a column on `events`, since a public row must
   not show who did what.
+
+## Amendment (2026-10-29)
+Bobby changed the field while reviewing the log form mockups. The label is "Event name
+(optional)", and "Event name" where it is required. The placeholder is "Day Party". In
+the log form the field sits below the review, so it reads as optional. The help text is
+unchanged and carries the poster framing on its own. The required case's text under the
+field ("Add the name from the poster so people can tell the two apart") is unchanged.
