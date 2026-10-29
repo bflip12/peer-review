@@ -20,16 +20,19 @@ Do not guess a command that is not listed here. Node 22.18 or later, npm.
   1280px in `screenshots/`. Starts the dev server if nothing answers on port 3000.
 - `npm run db:start`, `npm run db:stop`: the local Supabase stack (Docker). `db:start`
   applies every migration. `npm run db:reset` reapplies them to an empty database.
+- `npm run db:env`: writes the local stack's Supabase URL and publishable key to
+  `.env.local`, which `npm run dev`, `npm run build`, and `npm run e2e` need.
 - `npm run db:types`: regenerates `src/lib/supabase/database.types.ts` from the local
   schema. `npm run test:db`: database tests in `supabase/tests/`, against the local stack.
 
-CI (`.github/workflows/ci.yml`) runs typecheck, lint, the format check, unit tests, the
-build, and e2e on every PR and every push to `main`, on the Node version in `.nvmrc`. A
-second job runs the database tests and checks the generated types are current.
+CI (`.github/workflows/ci.yml`) runs typecheck, lint, the format check, unit tests, and
+the build on every PR and every push to `main`, on the Node version in `.nvmrc`. A second
+job starts the local stack, runs the database tests, checks the generated types are
+current, and runs e2e, which signs in against the stack.
 
 Deploys (ADR 0018): Vercel deploys `main` to `peerreview.club` and each PR to a preview.
-`.github/workflows/migrate.yml` applies new migrations to the hosted Supabase project on
-merges to `main`. Never apply a migration by hand.
+`.github/workflows/migrate.yml` applies new migrations to the staging and production
+Supabase projects on merges to `main`. Never apply a migration by hand.
 
 In cloud sessions:
 - Prefix `npm test`, `npm run e2e`, and `npm run screenshot` with

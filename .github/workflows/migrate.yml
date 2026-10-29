@@ -1,7 +1,7 @@
-# Applies new migrations to the hosted Supabase project after they merge to main, then
-# runs the schema guard tests against it. Migrations are never applied by hand.
+# Applies new migrations to the hosted Supabase projects after they merge to main, then
+# runs the schema guard tests against each. Migrations are never applied by hand.
 # Vercel deploys the app at the same time, so every migration must work with the app
-# that is live (.claude/rules/supabase.md).
+# that is live (.claude/rules/supabase.md). Staging serves the preview deploys (ADR 0018).
 name: Migrate
 
 on:
@@ -14,24 +14,70 @@ on:
 
 # One run at a time, and a run in progress is never cancelled halfway through.
 concurrency:
-  group: migrate-production
+  group: migrate
   cancel-in-progress: false
 
 permissions:
   contents: read
 
-# The session pooler URL with the database password, from the dashboard's Connect
-# button. GitHub's runners have no IPv6, and the direct address is IPv6-only, so it must
-# be the pooler. No Supabase access token is needed: both steps talk to Postgres directly.
-env:
-  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-
+# Each job connects with its project's session pooler URL with the database password,
+# from the dashboard's Connect button. GitHub's runners have no IPv6, and the direct
+# address is IPv6-only, so it must be the pooler. No Supabase access token is needed:
+# both steps talk to Postgres directly. The two jobs are separate, not a matrix, so a
+# missing staging secret can never fall back to the production URL.
 jobs:
-  migrate:
+  staging:
+    name: Apply migrations to staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_STAGING_DB_URL }}
+    steps:
+      - name: Check the database URL secret is set
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Add the SUPABASE_STAGING_DB_URL repository secret."
+            exit 1
+          fi
+
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: List the migrations that will run
+        run: npx supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
+
+      - name: Apply migrations
+        run: npx supabase db push --db-url "$SUPABASE_DB_URL" --yes
+
+      # Postgres version, RLS on every table, and only listed functions callable.
+      - name: Check the hosted schema
+        run: npx vitest run --config vitest.db.config.mts supabase/tests/schema.test.ts
+
+  production:
     name: Apply migrations to production
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
     steps:
+      - name: Check the database URL secret is set
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Add the SUPABASE_DB_URL repository secret."
+            exit 1
+          fi
+
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

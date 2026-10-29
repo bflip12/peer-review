@@ -1,0 +1,45 @@
+.wrapper {
+  min-width: 0;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.link {
+  /* The line height makes the link a full touch target without padding */
+  display: inline-block;
+  line-height: var(--tap-target);
+  white-space: nowrap;
+}
+
+/* A 30-character handle does not fit beside the wordmark on a phone, so it is cut short */
+.handle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.banned {
+  line-height: var(--leading-tight);
+}
+
+/* Styled as a link, since the header has room for one button and that is "Log a night" */
+.signOut {
+  flex-shrink: 0;
+  min-height: var(--tap-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--rule-width);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.signOut:hover {
+  color: var(--color-text-muted);
+}
