@@ -11,9 +11,11 @@ order.
 
 - **Design direction.** References are in `docs/design/references/`. Bobby picked the old
   internet direction, styled after `mockups-1.webp`: IBM Plex Mono only, solid hairline
-  rules, small uppercase labels on fixed page sections. The feed is drawn with ink links
-  and with blue links in the Claude Design canvas; Bobby picks one, then come the other
-  four screens and task 8 (PR #23).
+  rules, small uppercase labels on fixed page sections, ink links. Feed, log page, event
+  page, log form, and profile are drawn in the Claude Design canvas at 375px and 1280px,
+  waiting on Bobby's approval; then task 8 (PR #23). Carry into code: a visible
+  `:focus-visible` ring on every control, the star picker as radio inputs with "4.5 out
+  of 5" as text, and field borders at #86827A (3.4:1 on paper).
 - **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
   environment's network settings.
 
