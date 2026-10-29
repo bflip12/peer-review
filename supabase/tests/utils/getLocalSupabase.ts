@@ -15,7 +15,9 @@ let cached: LocalSupabaseT | undefined;
  * running, with the command that starts it. Cached per test file.
  */
 export const getLocalSupabase = (): LocalSupabaseT => {
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
   let output: string;
   try {
     output = execFileSync("npx", ["supabase", "status", "--output", "json"], {

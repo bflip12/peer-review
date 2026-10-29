@@ -17,7 +17,8 @@ const mockInput = (filePath: unknown): string =>
     tool_input: { file_path: filePath }
   });
 
-// Stands in for the Prettier and ESLint processes. Each tool passes unless given a result.
+// Stands in for the Prettier, ESLint, and Stylelint processes. Each tool passes unless
+// given a result.
 const mockRunTool = (
   results: Partial<Record<ToolNameT, { status: number | null; output: string }>> = {}
 ): Mock<RunToolT> =>
@@ -99,7 +100,19 @@ describe("formatEditedFile", () => {
     ]);
   });
 
-  it("runs only Prettier on a file ESLint does not lint", () => {
+  it("runs Prettier then Stylelint on a CSS file", () => {
+    const runTool = mockRunTool();
+
+    const result = formatEditedFile("/repo/src/app/page.module.css", runTool);
+
+    expect(result).toEqual({ exitCode: 0, message: "" });
+    expect(runTool.mock.calls).toEqual([
+      ["prettier", "/repo/src/app/page.module.css"],
+      ["stylelint", "/repo/src/app/page.module.css"]
+    ]);
+  });
+
+  it("runs only Prettier on a file no linter covers", () => {
     const runTool = mockRunTool();
 
     const result = formatEditedFile("/repo/package.json", runTool);
@@ -131,6 +144,23 @@ describe("formatEditedFile", () => {
       exitCode: 2,
       message:
         "ESLint found errors it could not fix in /repo/src/app/page.tsx:\n1:1 error no-var"
+    });
+  });
+
+  it("reports Stylelint errors that --fix could not fix", () => {
+    const runTool = mockRunTool({
+      stylelint: {
+        status: 2,
+        output: "1:8 error scale-unlimited/declaration-strict-value"
+      }
+    });
+
+    const result = formatEditedFile("/repo/src/app/page.module.css", runTool);
+
+    expect(result).toEqual({
+      exitCode: 2,
+      message:
+        "Stylelint found errors it could not fix in /repo/src/app/page.module.css:\n1:8 error scale-unlimited/declaration-strict-value"
     });
   });
 
@@ -194,5 +224,29 @@ describe("formatEditedFile hook script", () => {
 
     expect(result.status).toBe(2);
     expect(result.stderr).toContain("@typescript-eslint/no-explicit-any");
+  });
+
+  it("exits 2 on ESLint warnings, which fail CI too", { timeout: 30_000 }, () => {
+    const filePath = writeTempFile(
+      "warning.tsx",
+      'import type { ReactElement } from "react";\n\nexport const Logo = (): ReactElement => <img src="/logo.png" alt="" />;\n'
+    );
+
+    const result = runScript(filePath);
+
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain("@next/next/no-img-element");
+  });
+
+  it("exits 2 with the Stylelint errors on stderr", { timeout: 30_000 }, () => {
+    const filePath = writeTempFile(
+      "lint.module.css",
+      ".wrapper {\n  color: #191816;\n}\n"
+    );
+
+    const result = runScript(filePath);
+
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain("scale-unlimited/declaration-strict-value");
   });
 });

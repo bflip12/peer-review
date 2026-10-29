@@ -1,5 +1,6 @@
 .wrapper {
   --header-height: 3.75rem; /* 60px on phones, from the approved mockups */
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -62,7 +63,7 @@
   padding: var(--space-5) var(--gutter) var(--space-6);
 }
 
-@media (min-width: 48rem) {
+@media (width >= 48rem) {
   .wrapper {
     --header-height: 4.5rem; /* 72px on desktop */
   }

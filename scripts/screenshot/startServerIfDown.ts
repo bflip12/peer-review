@@ -30,27 +30,33 @@ export const startServerIfDown = async (
   command: string[],
   { timeoutMs = SERVER_START_TIMEOUT_MS }: OptionsT = {}
 ): Promise<StopServerT> => {
-  if (await responds(baseUrl)) return () => {};
+  if (await responds(baseUrl)) {
+    return () => {};
+  }
 
   const [program, ...args] = command;
   const child = spawn(program, args, { detached: true, stdio: "ignore" });
   let exitCode: number | null = null;
-  let exited = false;
+  let hasExited = false;
   child.on("exit", (code) => {
-    exited = true;
+    hasExited = true;
     exitCode = code;
   });
 
   const stop: StopServerT = () => {
-    if (exited || child.pid === undefined) return;
+    if (hasExited || child.pid === undefined) {
+      return;
+    }
     // A negative pid signals the whole process group the detached child leads.
     process.kill(-child.pid, "SIGTERM");
   };
 
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    if (await responds(baseUrl)) return stop;
-    if (exited) {
+    if (await responds(baseUrl)) {
+      return stop;
+    }
+    if (hasExited) {
       throw new Error(
         `${command.join(" ")} exited with code ${exitCode} before ${baseUrl} responded.`
       );

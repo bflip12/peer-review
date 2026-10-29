@@ -34,21 +34,27 @@ export const createTestUser = async (): Promise<TestUserT> => {
     password,
     email_confirm: true
   });
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   const client = createAnonClient();
   const { error: signInError } = await client.auth.signInWithPassword({
     email,
     password
   });
-  if (signInError) throw signInError;
+  if (signInError) {
+    throw signInError;
+  }
   return { client, userId: data.user.id };
 };
 
 /** Deletes a user made by `createTestUser`, along with rows that cascade from it. */
 export const deleteTestUser = async (userId: string): Promise<void> => {
   const { error } = await createServiceClient().auth.admin.deleteUser(userId);
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 };
 
 /**

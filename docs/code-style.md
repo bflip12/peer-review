@@ -5,8 +5,10 @@ searchable tree, so they read as a single codebase.
 
 ## 1. Formatting
 
-Formatting is automated. Run Prettier and ESLint; never hand-format and never hand-sort
-imports. The settings, for reference:
+Formatting is automated. Run Prettier, ESLint, and Stylelint; never hand-format and never
+hand-sort imports. ESLint and Stylelint enforce most of the mechanical rules in this guide
+and fail on warnings (ADR 0021); this guide gives the reasons and covers what they cannot
+check. The Prettier settings, for reference:
 
 - `printWidth: 90`, `tabWidth: 2`, spaces, LF endings
 - double quotes, semicolons, no trailing commas
@@ -206,8 +208,10 @@ export const useRegionEditor = ({
 
 - Body order: state, refs, effects, handlers, derived values, return.
 - The return is a flat object literal, last in the body.
-- Handlers the hook returns are wrapped in `useCallback` with a complete dependency array.
-  Handlers used only inside the hook are plain functions.
+- The React Compiler memoizes components and hooks (ADR 0021). Do not add `useMemo` or
+  `useCallback` for performance. Use them only when a value's identity matters outside
+  render: an effect dependency that must not change every render, or a function that must
+  be created once, such as a debounced one.
 - Keep `react-hooks/exhaustive-deps` enabled. Fix each warning on its merits: add the
   dependency, move the value into a ref, or extract the function. When a dependency is
   deliberately left out, say why on that effect.
@@ -498,12 +502,12 @@ A test file sits beside every non-trivial module.
    caller could get wrong.
 4. Logic worth testing is in an exported pure function, not inside a hook body.
 5. No input is mutated.
-6. Handlers returned from a hook use `useCallback` with a complete dependency array, and
-   `exhaustive-deps` is clean or the omission is explained.
+6. No `useMemo` or `useCallback` for performance, and `exhaustive-deps` is clean or the
+   omission is explained.
 7. The hook returns one flat object, last in the body.
 8. Magic numbers are named constants with the reason in a comment.
 9. Styles are in a CSS Module beside the component, colors come from token variables, and
    client components are leaves that receive only the fields they render.
 10. Test file beside the code, names are verb phrases, empty case covered, whole result
     shapes asserted.
-11. Prettier and ESLint pass.
+11. `npm run lint` and `npm run format:check` pass.
