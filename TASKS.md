@@ -26,9 +26,6 @@ order.
   (Site URL and `https://www.peerreview.club/**`), or flip the redirect in Vercel. Then
   ADR 0018 and the docs name the same one.
 
-- **Resend limits.** Read the free plan's monthly and daily caps in Resend and record them
-  in ADR 0023 (unverified there).
-
 Decided: the name is Peer Review and the domain is `peerreview.club`. The design is in
 `docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
 design directions" (Screens page).

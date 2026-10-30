@@ -37,10 +37,9 @@ SMTP was set up. Auth needs an SMTP server that inboxes trust for `peerreview.cl
   records, not code.
 
 ## Consequences
-- Resend's free tier caps sending. From memory, about 3,000 emails a month and 100 a day;
-  unverified, since this session's network could not reach resend.com. Check the plan page
-  in Resend and record the figures here. Past the cap, sign-in stops working until the
-  next day or a paid plan.
+- Resend's free tier caps transactional email at 3,000 a month and 100 a day, with 10
+  API requests a second and 3 domains (Resend's usage page, 2026-10-30). Past a cap,
+  sign-in stops working until the next day or month, or a paid plan.
 - Both projects share one Resend account and its daily cap, so staging tests count
   against production's allowance.
 - DMARC is `p=none`, which only reports. Tighten to `p=quarantine` once sign-in email has
