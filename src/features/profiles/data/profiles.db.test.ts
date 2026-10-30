@@ -99,5 +99,25 @@ describe("profile data functions", () => {
         accountStatus: "active"
       });
     });
+
+    it("says the account was deleted when the session outlived it", async () => {
+      const { client, userId } = await newUser();
+      await runSql(`delete from auth.users where id = '${userId}'`);
+      users.splice(
+        users.findIndex((user) => user.userId === userId),
+        1
+      );
+
+      const result = await createProfile(client, {
+        handle: newHandle(),
+        displayName: null
+      });
+
+      expect(result).toEqual({
+        ok: false,
+        message:
+          "This account was deleted. Sign out, then sign in again to start a new one."
+      });
+    });
   });
 });

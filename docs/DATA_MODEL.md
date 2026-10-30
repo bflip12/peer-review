@@ -167,7 +167,9 @@ cascades. A deleted user's refresh token stops working at once. An access token 
 issued is refused at once when the project signs tokens with a shared secret (HS256),
 since `getClaims()` then asks Auth. With asymmetric signing keys, `getClaims()` checks the
 token itself, so it passes until it expires (an hour by default), but its writes fail:
-every user-owned row references `profiles`, which is gone. Both hosted projects use an ECC
+every user-owned row references `profiles`, which is gone. If that browser tries to pick
+a handle, the insert fails on `profiles_id_fkey` and the welcome form says the account
+was deleted. Both hosted projects use an ECC
 (P-256) signing key (checked in the Supabase dashboard, JWT Keys, 2026-10-30), so the
 hour applies there.
 
@@ -854,7 +856,8 @@ below passed on both:
   refused for `anon` (`42501`). For a user, it deletes their `auth.users`, `auth.sessions`,
   and `profiles` rows, leaves other users' rows, and their refresh token stops working.
   `postgres` owns it and may delete from `auth.users`; `schema.test.ts` checks the same on
-  the hosted projects after each Migrate run.
+  the hosted projects after each Migrate run, which passed on staging and production on
+  2026-10-30.
 
 ## Unverified
 

@@ -1,56 +1,16 @@
-import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
 
-import { getSignInLink } from "../supabase/tests/utils/getSignInLink";
+import { runSql } from "../supabase/tests/utils/testClients";
 import {
-  createServiceClient,
-  deleteTestUser,
-  runSql
-} from "../supabase/tests/utils/testClients";
+  deleteCreatedUsers,
+  newEmail,
+  newHandle,
+  openSignInLink,
+  RESEND_WAIT_MS,
+  signUp
+} from "./utils/signIn";
 
-// Auth refuses a second link to one address within max_frequency (1s in config.toml).
-const RESEND_WAIT_MS = 1_100;
-
-const CREATED_EMAILS: string[] = [];
-const newEmail = (): string => {
-  const email = `e2e-${randomUUID()}@example.com`;
-  CREATED_EMAILS.push(email);
-  return email;
-};
-
-// A handle no other test run uses.
-const newHandle = (): string => `e2e_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
-
-// Asks for a sign-in link on the sign-in page and opens it from the email.
-const openSignInLink = async (page: Page, email: string): Promise<void> => {
-  await page.goto("/sign-in");
-  await page.getByLabel("Email").fill(email);
-  await page.getByRole("button", { name: "Send sign-in link" }).click();
-  await expect(page.getByRole("status")).toContainText(
-    `We sent a sign-in link to ${email}.`
-  );
-  const link = await getSignInLink(email);
-  await page.goto(`${link.pathname}${link.search}`);
-};
-
-// Signs a new user in and picks a handle, ending on the home page.
-const signUp = async (page: Page, email: string, handle: string): Promise<void> => {
-  await openSignInLink(page, email);
-  await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByRole("heading", { name: "Pick a handle" })).toBeVisible();
-  await page.getByLabel("Handle").fill(handle);
-  await page.getByRole("button", { name: "Create profile" }).click();
-  await expect(page).toHaveURL("/");
-};
-
-test.afterAll(async () => {
-  const { data } = await createServiceClient().auth.admin.listUsers({ perPage: 1000 });
-  const ids = data.users
-    .filter((user) => user.email && CREATED_EMAILS.includes(user.email))
-    .map((user) => user.id);
-  await Promise.all(ids.map(deleteTestUser));
-});
+test.afterAll(deleteCreatedUsers);
 
 test.describe("sign-in", () => {
   test("signs up with a sign-in link, picks a handle, and signs out", async ({

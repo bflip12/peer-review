@@ -35,6 +35,11 @@ export const AccountNavView = ({
       {state.kind === "banned" && (
         <span className={styles.banned}>This account is banned.</span>
       )}
+      {state.kind !== "needsProfile" && (
+        <Link className={styles.link} href="/settings">
+          Settings
+        </Link>
+      )}
       <form action={signOutAction}>
         <button className={styles.signOut} type="submit">
           Sign out
