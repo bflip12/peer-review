@@ -12,11 +12,11 @@ const mockAction = (result: ActionResultT) =>
   vi.fn<FormActionT>(() => Promise.resolve(result));
 
 describe("ConfirmSignInForm", () => {
-  it("sends the link's token hash and type when the user presses Sign in", async () => {
+  it("sends the link's token hash and type when the user presses Continue", async () => {
     const action = mockAction({ ok: true, data: undefined });
     render(<ConfirmSignInForm tokenHash="abc123" action={action} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     const formData = action.mock.calls[0][1];
     expect(Object.fromEntries(formData)).toEqual({ tokenHash: "abc123", type: "email" });
@@ -42,7 +42,7 @@ describe("ConfirmSignInForm", () => {
       />
     );
 
-    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "This sign-in link has expired or was already used. Ask for a new one."

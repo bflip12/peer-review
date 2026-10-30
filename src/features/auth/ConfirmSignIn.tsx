@@ -10,7 +10,7 @@ export type ConfirmSignInPropsT = {
 };
 
 /**
- * The body of the page a sign-in link opens: the "Sign in" button, or a way to get a new
+ * The body of the page a sign-in link opens: the "Continue" button, or a way to get a new
  * link when this one is cut off. Reads the query, so it renders inside `<Suspense>`.
  */
 export const ConfirmSignIn = async ({
