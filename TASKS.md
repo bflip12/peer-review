@@ -36,7 +36,8 @@ Left:
   policy link (unverified for basic scopes). Nothing is copied from the Google profile.
 - Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count
   every user against the server's IP.
-- Account deletion.
+- Account deletion. The database function `delete_my_account` is in; the settings page
+  that calls it ships in the next PR, once Migrate has applied the function.
 
 Every later milestone that adds a table adds its column write tests the way
 `supabase/tests/profiles.test.ts` does.

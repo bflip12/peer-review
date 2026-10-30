@@ -4,7 +4,7 @@ import { runSql } from "./utils/testClients.ts";
 
 // Functions in `public` that the API roles may call. Each entry is a deliberate choice,
 // added in the migration that grants it, with a test calling it as anon and as a user.
-const EXPOSED_FUNCTIONS: string[] = [];
+const EXPOSED_FUNCTIONS: string[] = ["delete_my_account"];
 
 describe("Supabase Postgres", () => {
   it("runs Postgres 15 or later, which NULLS NOT DISTINCT needs", async () => {
@@ -38,5 +38,14 @@ describe("public schema", () => {
     const result = rows.map((row) => row.name);
 
     expect(result).toEqual(EXPOSED_FUNCTIONS);
+  });
+
+  it("lets delete_my_account's owner delete from auth.users", async () => {
+    const [result] = await runSql<{ canDelete: boolean }>(`
+      select has_table_privilege(p.proowner, 'auth.users', 'delete') as "canDelete"
+      from pg_proc p
+      where p.oid = 'public.delete_my_account()'::regprocedure`);
+
+    expect(result.canDelete).toBe(true);
   });
 });
