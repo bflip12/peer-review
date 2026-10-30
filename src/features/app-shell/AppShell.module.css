@@ -65,6 +65,23 @@
   padding: var(--space-5) var(--gutter) var(--space-6);
 }
 
+.footer {
+  border-top: var(--rule-width) solid var(--color-rule);
+}
+
+.footerContent {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  font-size: var(--text-sm);
+}
+
+.footerLink {
+  /* The line height makes the link a full touch target without padding */
+  display: inline-block;
+  line-height: var(--tap-target);
+}
+
 @media (width >= 48rem) {
   .wrapper {
     --header-height: 4.5rem; /* 72px on desktop */

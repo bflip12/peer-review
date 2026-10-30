@@ -150,7 +150,9 @@ One row per account, created when the user picks a handle after first sign-in.
 | `account_status_at` | timestamptz | When the status last changed. `NULL` until the first change |
 | `created_at` | timestamptz | |
 
-No email column, and no other table has one. Handles are unique through an index on
+No email column, and no other table has one. Google sign-in fills
+`auth.users.raw_user_meta_data` with the Google name and picture; the app never reads it
+(ADR 0024). Handles are unique through an index on
 `lower(handle)`. `id` defaults to `auth.uid()`, so a user's insert sends only the handle
 and display name.
 

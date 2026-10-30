@@ -22,6 +22,18 @@ describe("AppShell", () => {
     );
   });
 
+  it("links to the privacy page from the footer", () => {
+    render(<AppShell accountNav={<a href="/sign-in">Sign in</a>}>Content</AppShell>);
+
+    const result = screen.getByRole("contentinfo");
+
+    expect(result).toContainElement(screen.getByRole("link", { name: "Privacy" }));
+    expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+      "href",
+      "/privacy"
+    );
+  });
+
   it("renders the page inside the main landmark", () => {
     render(
       <AppShell accountNav={<a href="/sign-in">Sign in</a>}>

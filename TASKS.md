@@ -31,17 +31,20 @@ design directions" (Screens page).
 Done: the `profiles` table; sign-in with an email link, with handle and display name
 setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in both
 Supabase projects (ADR 0023); signed-in screenshots (`npm run screenshot -- --as=user`);
-and account deletion on `/settings`.
+account deletion on `/settings`; and Google sign-in with the privacy page (ADR 0024).
 Left:
-- Google sign-in, with the privacy page, since Google's consent screen asks for a privacy
-  policy link (unverified for basic scopes). Nothing is copied from the Google profile.
+- Google sign-in on the hosted projects: the Google Cloud consent screen and two OAuth
+  clients, the Google provider in both Supabase projects, `hello@peerreview.club` through
+  Cloudflare Email Routing, then a sign-in by hand on a preview and on production,
+  including one with an address that already has an email-link account (ADR 0024).
 - Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count
   every user against the server's IP.
 
 Every later milestone that adds a table adds its column write tests the way
 `supabase/tests/profiles.test.ts` does. A table holding data a user owns also
 cascades from `profiles`, and its milestone adds that data to the list on the settings
-page's "Delete account" section (`DeleteAccountSection`).
+page's "Delete account" section (`DeleteAccountSection`) and to the privacy page
+(`PrivacyPolicy`), with a new "Last updated" date.
 
 ## Milestone 2: Venues, DJs, collectives
 
