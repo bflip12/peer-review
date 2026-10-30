@@ -159,6 +159,18 @@ The read policy for signed-in users calls `private.is_admin()`: whether the call
 the caller's row without running the policy that calls it. The `private` schema holds
 helpers like it; the API does not serve it.
 
+Users delete their own account with `public.delete_my_account()`, which deletes their
+`auth.users` row. It is `security definer` because the app never holds the service role
+key, and only `authenticated` may call it. The delete cascades to Auth's sessions,
+refresh tokens, and identities, and to `profiles`, through which every user-owned table
+cascades. A deleted user's refresh token stops working at once. An access token already
+issued is refused at once when the project signs tokens with a shared secret (HS256),
+since `getClaims()` then asks Auth. With asymmetric signing keys, `getClaims()` checks the
+token itself, so it passes until it expires (an hour by default), but its writes fail:
+every user-owned row references `profiles`, which is gone. Both hosted projects use an ECC
+(P-256) signing key (checked in the Supabase dashboard, JWT Keys, 2026-10-30), so the
+hour applies there.
+
 #### moderator_cities
 
 The cities on a moderator's profile ("Berlin local"). Stored, not enforced in v1.
@@ -838,6 +850,11 @@ below passed on both:
   visitors, users, moderators, and banned admins, and shown to active admins and to
   their owner, who can no longer change them. No column in `public` or `graphql_public` has "mail" in its name, and the API
   refuses the `auth` schema (`PGRST106`).
+- `delete_my_account` (2026-10-30, local stack, `supabase/tests/deleteMyAccount.test.ts`):
+  refused for `anon` (`42501`). For a user, it deletes their `auth.users`, `auth.sessions`,
+  and `profiles` rows, leaves other users' rows, and their refresh token stops working.
+  `postgres` owns it and may delete from `auth.users`; `schema.test.ts` checks the same on
+  the hosted projects after each Migrate run.
 
 ## Unverified
 
