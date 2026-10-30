@@ -16,3 +16,9 @@ Applies to UI copy, error messages, labels, README, commit messages, docs, and r
 - Explain like a developer explaining to a developer: simple, concrete, short. Go deeper
   only when asked.
 - The voice rules apply to replies too: no editorializing adverbs ("silently", "quietly").
+- Name the service, and the project or environment, in every instruction and status line:
+  "Supabase, staging project: Authentication, URL Configuration", "Vercel, Production:
+  Environment Variables", "GitHub, repo settings: Secrets". Never "the project" or "the
+  settings" alone. Supabase has two projects (production `stcjavdqwjgdgudoudqv`, staging
+  `azjwibwhymzdlrrhlicy`), Vercel has two environments (Production, Preview), and the same
+  words mean different things in each.

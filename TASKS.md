@@ -21,24 +21,21 @@ order.
   password changes, or Migrate fails at "List the migrations that will run". The staging
   project's goes in `SUPABASE_STAGING_DB_URL` the same way.
 
-Decided: the name is Peer Review and the domain is `peerreview.club`. The design is in
+Decided: the name is Peer Review and the domain is `peerreview.club`, served at
+`www.peerreview.club`. The design is in
 `docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
 design directions" (Screens page).
 
 ## Milestone 1: Accounts
 
-Done: the `profiles` table, and sign-in with an email link with handle and display name
-setup (ADR 0022). Left:
-- Hosted auth settings, by hand in each Supabase project: the Site URL and redirect allow
-  list, and the magic link and confirm signup templates from `supabase/templates/`.
+Done: the `profiles` table; sign-in with an email link, with handle and display name
+setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in both
+Supabase projects (ADR 0023); and signed-in screenshots (`npm run screenshot -- --as=user`).
+Left:
 - Google sign-in, with the privacy page, since Google's consent screen asks for a privacy
   policy link (unverified for basic scopes). Nothing is copied from the Google profile.
-- Custom SMTP for sign-in emails on `peerreview.club` with SPF and DKIM (Supabase's
-  built-in sender allows 2 emails an hour and sends only to the project's team members),
-  on a free tier (for example Resend or Postmark), with an ADR (new service). Forward the
-  user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count every user
-  against the server's IP.
-- A signed-in option for `npm run screenshot`, so pages behind sign-in can be captured.
+- Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count
+  every user against the server's IP.
 - Account deletion.
 
 Every later milestone that adds a table adds its column write tests the way

@@ -26,6 +26,8 @@ Milestone 1 have to be tested on the real domain.
 ## Decision
 - Vercel Hobby with its Git integration: production from `main`, a preview per PR.
   `peerreview.club` points at Vercel through Cloudflare DNS, with Cloudflare's proxy off.
+  The main address is `www.peerreview.club`; Vercel redirects the bare domain to it (308),
+  and the production Supabase project's Site URL and redirect list name it (2026-10-30).
   Functions run in `yul1` (`vercel.json`).
 - Migrations reach the hosted project only through `.github/workflows/migrate.yml` on
   merges to `main`, which then runs the schema guard tests against it.

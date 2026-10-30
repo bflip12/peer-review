@@ -2,6 +2,18 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-10-30
+
+- `npm run screenshot` takes `--as=user` or `--as=new` to capture pages signed in. It
+  creates a user on the local stack, signs in through `/auth/confirm`, and deletes the user
+  afterwards. Captures now wait for the network to go quiet, so streamed content has
+  replaced its loading fallback. Reason: rule 3's screenshots must cover pages behind
+  sign-in.
+
+- `.claude/rules/voice.md`: replies name the service and the project or environment in
+  every instruction ("Supabase, staging project: ..."). Reason: setting up sign-in, steps
+  for Supabase, Vercel, and GitHub were mixed up when a reply said only "the project".
+
 ## 2026-10-29
 
 - End-to-end tests run in CI's database job, after `npm run db:env`, since sign-in needs

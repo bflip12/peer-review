@@ -544,9 +544,18 @@ state, read before calling the UI done, caught a header that wrapped on phones.
   longer change it.
 - I merged new code standards to `main` while the profiles PR was open, and had it
   brought up to them before merging.
+- Setting it up on production, I asked what the SMTP provider does and what the
+  alternatives are, then chose Resend ([ADR 0023](adr/0023-email-with-resend.md)). I had
+  the sign-in email restyled to match the site, the error and "Check your email" messages
+  made to stand out, and the link page's button renamed "Continue". I kept the button
+  after asking what the mail scanner problem is.
+- I asked for every instruction to name the service and project, after Supabase, Vercel,
+  and GitHub steps got mixed up (`.claude/rules/voice.md`).
 
 **Output.** [ADR 0022](adr/0022-sign-in-links-and-sessions.md),
 `supabase/migrations/20261029055304_create_profiles.sql`, `src/features/auth/`,
 `src/features/profiles/`, `src/proxy.ts`, `e2e/signIn.spec.ts`,
 [PR #25](https://github.com/bflip12/peer-review/pull/25),
-[PR #28](https://github.com/bflip12/peer-review/pull/28).
+[PR #28](https://github.com/bflip12/peer-review/pull/28),
+[PR #29](https://github.com/bflip12/peer-review/pull/29),
+[PR #30](https://github.com/bflip12/peer-review/pull/30).
