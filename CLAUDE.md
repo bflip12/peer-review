@@ -30,7 +30,8 @@ the build on every PR and every push to `main`, on the Node version in `.nvmrc`.
 job starts the local stack, runs the database tests, checks the generated types are
 current, and runs e2e, which signs in against the stack.
 
-Deploys (ADR 0018): Vercel deploys `main` to `peerreview.club` and each PR to a preview.
+Deploys (ADR 0018): Vercel deploys `main` to `www.peerreview.club` (the bare domain
+redirects there) and each PR to a preview.
 `.github/workflows/migrate.yml` applies new migrations to the staging and production
 Supabase projects on merges to `main`. Never apply a migration by hand.
 

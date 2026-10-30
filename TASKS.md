@@ -21,12 +21,8 @@ order.
   password changes, or Migrate fails at "List the migrations that will run". The staging
   project's goes in `SUPABASE_STAGING_DB_URL` the same way.
 
-- **Main address.** Vercel redirects `peerreview.club` to `www.peerreview.club`. Keep `www`
-  and set Supabase, production project, URL Configuration to `https://www.peerreview.club`
-  (Site URL and `https://www.peerreview.club/**`), or flip the redirect in Vercel. Then
-  ADR 0018 and the docs name the same one.
-
-Decided: the name is Peer Review and the domain is `peerreview.club`. The design is in
+Decided: the name is Peer Review and the domain is `peerreview.club`, served at
+`www.peerreview.club`. The design is in
 `docs/style-guide.md`, with the approved mockups in the Claude Design canvas "Peer Review
 design directions" (Screens page).
 
