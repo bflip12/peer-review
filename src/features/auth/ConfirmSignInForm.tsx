@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { ReactElement } from "react";
 
+import { FormError } from "@/features/forms/FormError";
 import { SubmitButton } from "@/features/forms/SubmitButton";
 
 import type { FormActionT } from "./auth.types";
@@ -15,7 +16,7 @@ export type ConfirmSignInFormPropsT = {
 };
 
 /**
- * The "Sign in" button on the page a sign-in link opens. On success the action redirects.
+ * The "Continue" button on the page a sign-in link opens. On success the action redirects.
  * On failure it says why and links to the sign-in page for a new link.
  */
 export const ConfirmSignInForm = ({
@@ -29,14 +30,12 @@ export const ConfirmSignInForm = ({
     <form className={styles.wrapper} action={formAction}>
       <input type="hidden" name="tokenHash" value={tokenHash} />
       <input type="hidden" name="type" value="email" />
-      <SubmitButton isPending={isPending}>Sign in</SubmitButton>
-      <div className={styles.status} role="status">
-        {failure && (
-          <>
-            {failure.message} <Link href="/sign-in">Get a new sign-in link</Link>
-          </>
-        )}
-      </div>
+      <SubmitButton isPending={isPending}>Continue</SubmitButton>
+      {failure && (
+        <FormError>
+          {failure.message} <Link href="/sign-in">Get a new sign-in link</Link>
+        </FormError>
+      )}
     </form>
   );
 };

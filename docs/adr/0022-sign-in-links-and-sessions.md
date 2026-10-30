@@ -35,7 +35,8 @@ shape how a link becomes a session and how the session stays current.
 ## Decision
 - Sign-in links use a token hash: `supabase/templates/` holds the templates, applied
   locally by `config.toml` and pasted into each hosted project by hand.
-- `/auth/confirm` signs in on the "Sign in" button press, through `confirmSignIn`.
+- `/auth/confirm` signs in on a button press, through `confirmSignIn`. The button says
+  "Continue" (2026-10-30, was "Sign in").
 - The link points at the origin the sign-in form was served from, so a preview deploy
   sends links to itself. Each project's redirect allow list must include its origins, or
   Auth falls back to the project's Site URL.

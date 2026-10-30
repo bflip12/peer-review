@@ -27,8 +27,8 @@ const openSignInLink = async (page: Page, email: string): Promise<void> => {
   await page.goto("/sign-in");
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Send sign-in link" }).click();
-  await expect(page.getByRole("status")).toHaveText(
-    "Check your email. The link in it signs you in."
+  await expect(page.getByRole("status")).toContainText(
+    `We sent a sign-in link to ${email}.`
   );
   const link = await getSignInLink(email);
   await page.goto(`${link.pathname}${link.search}`);
@@ -37,7 +37,7 @@ const openSignInLink = async (page: Page, email: string): Promise<void> => {
 // Signs a new user in and picks a handle, ending on the home page.
 const signUp = async (page: Page, email: string, handle: string): Promise<void> => {
   await openSignInLink(page, email);
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("heading", { name: "Pick a handle" })).toBeVisible();
   await page.getByLabel("Handle").fill(handle);
   await page.getByRole("button", { name: "Create profile" }).click();
@@ -62,7 +62,7 @@ test.describe("sign-in", () => {
     await expect(
       page.getByRole("heading", { name: "Sign in to Peer Review" })
     ).toBeVisible();
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL("/welcome");
     await expect(page.getByLabel("Handle")).toHaveValue("");
     await expect(page.getByLabel("Display name (optional)")).toHaveValue("");
@@ -85,7 +85,7 @@ test.describe("sign-in", () => {
     await new Promise((resolve) => setTimeout(resolve, RESEND_WAIT_MS));
 
     await openSignInLink(page, email);
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("banner").getByText(`@${handle}`)).toBeVisible();
@@ -95,14 +95,14 @@ test.describe("sign-in", () => {
     const email = newEmail();
     await openSignInLink(page, email);
     const usedLink = page.url();
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL("/welcome");
 
     const otherPage = await browser.newPage();
     await otherPage.goto(usedLink);
-    await otherPage.getByRole("button", { name: "Sign in" }).click();
+    await otherPage.getByRole("button", { name: "Continue" }).click();
 
-    await expect(otherPage.getByRole("status")).toContainText(
+    await expect(otherPage.getByRole("main").getByRole("alert")).toContainText(
       "This sign-in link has expired or was already used. Ask for a new one."
     );
     await expect(
@@ -115,7 +115,7 @@ test.describe("sign-in", () => {
     await page.goto("/auth/confirm");
 
     await expect(page.getByText("This sign-in link is incomplete.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sign in" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Continue" })).toHaveCount(0);
   });
 
   test("the welcome page sends a signed-out visitor to sign in", async ({ page }) => {

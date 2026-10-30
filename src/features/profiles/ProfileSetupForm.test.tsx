@@ -50,7 +50,7 @@ describe("ProfileSetupForm", () => {
     await userEvent.click(screen.getByRole("button", { name: "Create profile" }));
 
     const handle = screen.getByLabelText("Handle");
-    expect(await screen.findByRole("status")).toHaveTextContent("Choose another handle.");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Choose another handle.");
     expect(handle).toHaveAccessibleDescription(
       "2 to 30 letters, numbers, underscores (_), or dots (.). Shown as @handle. That handle is taken."
     );
