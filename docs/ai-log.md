@@ -559,3 +559,27 @@ state, read before calling the UI done, caught a header that wrapped on phones.
 [PR #28](https://github.com/bflip12/peer-review/pull/28),
 [PR #29](https://github.com/bflip12/peer-review/pull/29),
 [PR #30](https://github.com/bflip12/peer-review/pull/30).
+
+### Account deletion, before Google sign-in (2026-10-30)
+
+**Goal.** Let users delete their account, so the privacy page that comes with Google
+sign-in can point to a working control.
+
+**How I used AI.** Claude read auth-js's source before relying on it: `getClaims()` asks
+Auth for HS256 tokens but checks asymmetric ones itself, and `signOut()` ignores Auth's
+404 for a deleted user while still clearing the cookies. It split the work into two PRs
+because the project's deploy rule says a migration ships before the code that calls it.
+
+**My calls.**
+- The plan put Google sign-in next, with "email us to delete your account" on the privacy
+  page. I had deletion built first instead.
+- The privacy page's contact address will be a new one on the domain,
+  `hello@peerreview.club`.
+- I checked the JWT signing key on both Supabase projects myself. Both use ECC keys, so a
+  deleted user's token passes sign-in checks in other browsers for up to an hour, while
+  nothing it writes saves. That limit is recorded in `docs/DATA_MODEL.md`.
+
+**Output.** `supabase/migrations/20261030052159_delete_my_account.sql`,
+`src/features/account/`, `e2e/deleteAccount.spec.ts`,
+[PR #31](https://github.com/bflip12/peer-review/pull/31),
+[PR #32](https://github.com/bflip12/peer-review/pull/32).
