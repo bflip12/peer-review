@@ -28,10 +28,10 @@ design directions" (Screens page).
 
 ## Milestone 1: Accounts
 
-Done: the `profiles` table, sign-in with an email link with handle and display name
-setup (ADR 0022), and sign-in email through Resend with the hosted auth settings in both
-Supabase projects (ADR 0023). Left:
-- A signed-in option for `npm run screenshot`, so pages behind sign-in can be captured.
+Done: the `profiles` table; sign-in with an email link, with handle and display name
+setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in both
+Supabase projects (ADR 0023); and signed-in screenshots (`npm run screenshot -- --as=user`).
+Left:
 - Google sign-in, with the privacy page, since Google's consent screen asks for a privacy
   policy link (unverified for basic scopes). Nothing is copied from the Google profile.
 - Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count

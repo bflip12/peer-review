@@ -92,4 +92,14 @@ describe("takeScreenshots", () => {
       stderr: "Give at least one route, for example: npm run screenshot -- /\n"
     });
   });
+
+  it("exits 1 naming the accepted values when --as is unknown", async () => {
+    const result = await runScript(["--as=admin", "/"]);
+
+    expect(result).toEqual({
+      status: 1,
+      stdout: "",
+      stderr: 'Unknown --as value "admin". Use --as=user or --as=new.\n'
+    });
+  });
 });

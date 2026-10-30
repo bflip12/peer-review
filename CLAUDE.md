@@ -17,7 +17,9 @@ Do not guess a command that is not listed here. Node 22.18 or later, npm.
 - `npm run e2e`: Playwright, starting the dev server. With `CI` set it runs
   `npm run start`, so run `npm run build` first.
 - `npm run screenshot -- / /other/route`: full-page PNGs of each route at 375px and
-  1280px in `screenshots/`. Starts the dev server if nothing answers on port 3000.
+  1280px in `screenshots/`. Starts the dev server if nothing answers on port 3000. Add
+  `--as=user` to capture signed in as `@dj_rush`, or `--as=new` as a user who has not
+  picked a handle. Either needs the local stack (`npm run db:start`).
 - `npm run db:start`, `npm run db:stop`: the local Supabase stack (Docker). `db:start`
   applies every migration. `npm run db:reset` reapplies them to an empty database.
 - `npm run db:env`: writes the local stack's Supabase URL and publishable key to
