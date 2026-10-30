@@ -33,7 +33,19 @@ describe("SignInForm", () => {
     await submitEmail("dj@example.com");
 
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Check your email. The link in it signs you in."
+      "Check your emailWe sent a sign-in link to dj@example.com. Open it on this or any other device."
+    );
+  });
+
+  it("keeps naming the address the link went to while the field is edited", async () => {
+    render(<SignInForm action={mockAction({ ok: true, data: undefined })} />);
+    await submitEmail("dj@example.com");
+    await screen.findByText("Check your email");
+
+    await userEvent.type(screen.getByLabelText("Email"), "x");
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "We sent a sign-in link to dj@example.com."
     );
   });
 

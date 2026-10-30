@@ -27,8 +27,8 @@ const openSignInLink = async (page: Page, email: string): Promise<void> => {
   await page.goto("/sign-in");
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Send sign-in link" }).click();
-  await expect(page.getByRole("status")).toHaveText(
-    "Check your email. The link in it signs you in."
+  await expect(page.getByRole("status")).toContainText(
+    `We sent a sign-in link to ${email}.`
   );
   const link = await getSignInLink(email);
   await page.goto(`${link.pathname}${link.search}`);

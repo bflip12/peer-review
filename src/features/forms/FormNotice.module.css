@@ -1,0 +1,13 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: var(--rule-width) solid var(--color-text);
+  background: var(--color-field);
+  overflow-wrap: anywhere;
+}
+
+.title {
+  font-weight: var(--weight-medium);
+}
