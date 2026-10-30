@@ -167,7 +167,9 @@ cascades. A deleted user's refresh token stops working at once. An access token 
 issued is refused at once when the project signs tokens with a shared secret (HS256),
 since `getClaims()` then asks Auth. With asymmetric signing keys, `getClaims()` checks the
 token itself, so it passes until it expires (an hour by default), but its writes fail:
-every user-owned row references `profiles`, which is gone.
+every user-owned row references `profiles`, which is gone. Both hosted projects use an ECC
+(P-256) signing key (checked in the Supabase dashboard, JWT Keys, 2026-10-30), so the
+hour applies there.
 
 #### moderator_cities
 
@@ -860,5 +862,3 @@ below passed on both:
   was blocked by this session's network policy.
 - The functions and triggers named above are described, not written or run.
 - Whether the log save function or a trigger refreshes `log_snapshots` (Milestone 3).
-- Whether the hosted projects sign access tokens with HS256 or asymmetric keys, which
-  decides how long a deleted user's access token passes `getClaims()` (see `profiles`).
