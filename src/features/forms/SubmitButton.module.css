@@ -11,6 +11,11 @@
   cursor: pointer;
 }
 
+.danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+}
+
 .wrapper:disabled {
   cursor: progress;
   opacity: 0.6;

@@ -30,17 +30,18 @@ design directions" (Screens page).
 
 Done: the `profiles` table; sign-in with an email link, with handle and display name
 setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in both
-Supabase projects (ADR 0023); and signed-in screenshots (`npm run screenshot -- --as=user`).
+Supabase projects (ADR 0023); signed-in screenshots (`npm run screenshot -- --as=user`);
+and account deletion on `/settings`.
 Left:
 - Google sign-in, with the privacy page, since Google's consent screen asks for a privacy
   policy link (unverified for basic scopes). Nothing is copied from the Google profile.
 - Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count
   every user against the server's IP.
-- Account deletion. The database function `delete_my_account` is in; the settings page
-  that calls it ships in the next PR, once Migrate has applied the function.
 
 Every later milestone that adds a table adds its column write tests the way
-`supabase/tests/profiles.test.ts` does.
+`supabase/tests/profiles.test.ts` does. A table holding data a user owns also
+cascades from `profiles`, and its milestone adds that data to the list on the settings
+page's "Delete account" section (`DeleteAccountSection`).
 
 ## Milestone 2: Venues, DJs, collectives
 

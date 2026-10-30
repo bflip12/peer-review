@@ -26,6 +26,7 @@ describe("AccountNavView", () => {
       "href",
       "/welcome"
     );
+    expect(screen.queryByRole("link", { name: "Settings" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 
@@ -38,6 +39,10 @@ describe("AccountNavView", () => {
     );
 
     expect(screen.getByText("@dj_rush")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/settings"
+    );
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 
@@ -45,6 +50,10 @@ describe("AccountNavView", () => {
     render(<AccountNavView state={{ kind: "banned" }} signOutAction={mockSignOut} />);
 
     expect(screen.getByText("This account is banned.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/settings"
+    );
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 });

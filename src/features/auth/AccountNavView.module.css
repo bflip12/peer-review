@@ -14,12 +14,20 @@
   white-space: nowrap;
 }
 
-/* A 30-character handle does not fit beside the wordmark on a phone, so it is cut short */
+/* On phones the wordmark, "Settings", and "Sign out" leave no room for the handle, so it
+   shows from the desktop layout up, cut short if it still does not fit */
 .handle {
+  display: none;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (width >= 48rem) {
+  .handle {
+    display: inline;
+  }
 }
 
 .banned {

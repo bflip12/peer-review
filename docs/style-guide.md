@@ -80,12 +80,16 @@ screen ships.
 - **Header.** The wordmark "PeerReview" at weight 500 with ".club" at `--text-sm` and
   weight 400. Nav links join as their routes ship. "Log a night" is the one solid button
   in the header. The account area sits at the right: "Sign in" when signed out, the
-  handle and "Sign out" when signed in. "Sign out" is styled as a link, since the header's
-  one button is "Log a night". On phones a long handle is cut short with an ellipsis.
+  handle, "Settings", and "Sign out" when signed in. "Sign out" is styled as a link, since
+  the header's one button is "Log a night". On phones the handle is hidden, since the
+  wordmark and the two links fill the row; on desktop a long handle is cut short with an
+  ellipsis.
 - **Links.** Ink, underlined, 1px, offset 3px. Hover turns them muted. Night names,
   handles, venues, and DJs are links. Meta text is not.
 - **Buttons.** Square corners. Solid ink with page-colored text for the main action on a
-  screen, outlined ink for the rest. One solid button per area.
+  screen, outlined ink for the rest. One solid button per area. A destructive main action
+  ("Delete account") is solid `--color-danger` with page-colored text (7.59:1, the same
+  pair as danger text on the page).
 - **Rules.** `--color-rule-strong` under the header and over each section, `--color-rule`
   between rows.
 - **Ratings.** Stars followed by the number ("4.5"), with the number in muted text. The

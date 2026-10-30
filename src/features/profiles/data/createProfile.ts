@@ -9,11 +9,16 @@ import type { NewProfileT } from "../profiles.types";
 const UNIQUE_VIOLATION = "23505";
 const HANDLE_KEY = "profiles_handle_key";
 const PRIMARY_KEY = "profiles_pkey";
+// Postgres "foreign key violation": the auth user behind the session was deleted.
+const FOREIGN_KEY_VIOLATION = "23503";
+const USER_KEY = "profiles_id_fkey";
 
 /**
  * Creates the signed-in user's profile. The database sets the id from the session. A
  * taken handle comes back as a field error. A user who already has a profile (a second
- * tab, a double submit) gets success and keeps the profile they have.
+ * tab, a double submit) gets success and keeps the profile they have. A session left in
+ * another browser after the account was deleted gets a message, since its access token
+ * stays valid until it expires (`docs/DATA_MODEL.md`, profiles).
  */
 export const createProfile = async (
   supabase: SupabaseClientT,
@@ -33,6 +38,13 @@ export const createProfile = async (
       ok: false,
       message: "Choose another handle.",
       fieldErrors: { handle: ["That handle is taken."] }
+    };
+  }
+  if (error.code === FOREIGN_KEY_VIOLATION && error.message.includes(USER_KEY)) {
+    return {
+      ok: false,
+      message:
+        "This account was deleted. Sign out, then sign in again to start a new one."
     };
   }
   throw error;
