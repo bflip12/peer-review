@@ -45,4 +45,5 @@ SMTP was set up. Auth needs an SMTP server that inboxes trust for `peerreview.cl
 - DMARC is `p=none`, which only reports. Tighten to `p=quarantine` once sign-in email has
   run cleanly for a while.
 - Auth's per-IP limits still see the Vercel function's IP for every user. Forwarding the
-  user's IP (`Sb-Forwarded-For`) is left in `TASKS.md`.
+  user's IP (`Sb-Forwarded-For`) needs a secret key, so it waits for Milestone 9
+  (`TASKS.md`); until then the shared limits are raised (`docs/DATA_MODEL.md`).
