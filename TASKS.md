@@ -33,10 +33,9 @@ setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in
 Supabase projects (ADR 0023); signed-in screenshots (`npm run screenshot -- --as=user`);
 account deletion on `/settings`; and Google sign-in with the privacy page (ADR 0024).
 Left:
-- Google sign-in on the hosted projects: the Google Cloud consent screen and two OAuth
-  clients, the Google provider in both Supabase projects, `hello@peerreview.club` through
-  Cloudflare Email Routing, then a sign-in by hand on a preview and on production,
-  including one with an address that already has an email-link account (ADR 0024).
+- After Google sign-in deploys: sign in with Google by hand on `www.peerreview.club`.
+  Staging, the Google Cloud clients, both Supabase providers, and `hello@peerreview.club`
+  are set up and checked (ADR 0024).
 - Forward the user's IP to Auth (`Sb-Forwarded-For`) so its per-IP limits do not count
   every user against the server's IP.
 
@@ -131,9 +130,11 @@ Open Graph metadata and images for log, venue, and DJ pages.
 
 ## Milestone 9: Launch
 
-PWA manifest. Backups: the free tier keeps no downloadable backups (Supabase's production
-checklist), so a scheduled `pg_dump` of the app schemas, never `auth`, to private storage,
-with a tested restore.
+PWA manifest, with an app icon made from the wordmark, also used as the favicon and as
+the Google consent screen's logo (which starts Google's brand review, ADR 0024).
+Backups: the free tier keeps no downloadable backups (Supabase's production checklist),
+so a scheduled `pg_dump` of the app schemas, never `auth`, to private storage, with a
+tested restore.
 
 ## Milestone 10: Merges and undo
 

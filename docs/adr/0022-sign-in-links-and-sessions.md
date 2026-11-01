@@ -39,7 +39,11 @@ shape how a link becomes a session and how the session stays current.
   "Continue" (2026-10-30, was "Sign in").
 - The link points at the origin the sign-in form was served from, so a preview deploy
   sends links to itself. Each project's redirect allow list must include its origins, or
-  Auth falls back to the project's Site URL.
+  Auth falls back to the project's Site URL. The bare origin needs its own entry: a
+  `/**` pattern does not match an origin with no path (2026-11-01, staging links fell
+  back to its `localhost` Site URL). Staging lists `https://peer-review-*-peer-review3.vercel.app`
+  and `https://peer-review-*-peer-review3.vercel.app/**`, production
+  `https://www.peerreview.club` and `https://www.peerreview.club/**`.
 - `src/proxy.ts` refreshes the session before every page (`updateSession`), and writes
   the new cookies to both the request and the response.
 - Server code reads the user with `getClaims()` (`.claude/rules/security.md`), after

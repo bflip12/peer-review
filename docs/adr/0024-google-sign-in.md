@@ -26,9 +26,9 @@ the Google profile. Supabase Auth runs the Google side. Four choices shape the r
 
 **One account per email address**
 - Auth links a Google sign-in to an existing account with the same verified email
-  (Supabase's automatic identity linking, from its docs, not tested: a test cannot sign
-  in with Google). So someone who signed up with an email link and later uses Google
-  with the same address keeps one account.
+  (Supabase's automatic identity linking). Checked by hand on staging, 2026-11-01: an
+  account made with an email link, then a Google sign-in with the same address, landed
+  on home with the same handle. A test cannot sign in with Google.
 
 **Google OAuth clients**
 - **One client** listing both Supabase projects' callback URLs. Less setup.
@@ -57,8 +57,14 @@ the Google profile. Supabase Auth runs the Google side. Four choices shape the r
 - The Google consent screen shows the Supabase project's domain (`<ref>.supabase.co`),
   since Google redirects there. Showing `peerreview.club` needs a Supabase custom domain,
   a paid add-on.
-- The app is unverified with Google. Basic scopes (`email`, `profile`) are expected to
-  need no review; not checked yet, to be confirmed when the consent screen is set up.
+- The app is unverified with Google. With basic scopes and no logo, Google published it
+  without a review (2026-11-01). A logo would start Google's brand review, so it waits
+  for the app icon in Milestone 9.
 - A full Google round trip is checked by hand on a preview and on production, not in CI.
+  The first on staging passed on 2026-11-01.
+- The OAuth clients are "Supabase production" and "Supabase staging" in the Google Cloud
+  project "Peer Review", each with only its Supabase project's `/auth/v1/callback` as a
+  redirect URI. The consent screen lists `peerreview.club` and both Supabase project
+  domains as authorized domains.
 - Auth in a cloud session cannot reach Google: the session's proxy breaks TLS to
   `accounts.google.com`, so `/authorize` fails there. CI reaches it.
