@@ -836,10 +836,15 @@ below passed on both:
   the API until a migration grants it.
 - Supabase's generated TypeScript types turn an enum into a union of its values
   (`"venue" | "dj" | "collective"`).
-- Supabase Auth limits sign-ups and sign-ins to 30 requests per 5 minutes per IP by
-  default (ADR 0011), adjustable in the dashboard. Requests from the app's server count
-  against the server's IP unless it forwards the user's with `Sb-Forwarded-For`. From
-  Supabase's docs, not measured.
+- Supabase Auth's per-IP limits (Supabase's "Rate limits" docs, read 2026-11-01): sign-ins
+  (`/otp`) and link checks (`/verify`) default to 30 requests per 5 minutes, and `/token`
+  (code exchange, session refresh) to 150. Every request comes from the app's server, so
+  each per-IP limit is shared by all users. Forwarding the user's IP with
+  `Sb-Forwarded-For` works only on requests made with a secret key (`sb_secret_`), with
+  IP Address Forwarding turned on per project; publishable and legacy keys are ignored.
+  The app holds no secret key (`.claude/rules/security.md`), so until launch the shared
+  limits are raised instead: sign-ins and verifications to 150 per 5 minutes in both
+  Supabase projects (2026-11-01; `TASKS.md`, Milestone 9).
 
 - Hosted project (2026-10-27, first Migrate run): Postgres 15 or later, and RLS on every
   table in `public`. The project's "automatic RLS" option adds `public.rls_auto_enable()`,
