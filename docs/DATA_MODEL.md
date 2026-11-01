@@ -843,7 +843,8 @@ below passed on both:
   `Sb-Forwarded-For` works only on requests made with a secret key (`sb_secret_`), with
   IP Address Forwarding turned on per project; publishable and legacy keys are ignored.
   The app holds no secret key (`.claude/rules/security.md`), so until launch the shared
-  limits are raised in the dashboard instead (`TASKS.md`, Milestone 9).
+  limits are raised instead: sign-ins and verifications to 150 per 5 minutes in both
+  Supabase projects (2026-11-01; `TASKS.md`, Milestone 9).
 
 - Hosted project (2026-10-27, first Migrate run): Postgres 15 or later, and RLS on every
   table in `public`. The project's "automatic RLS" option adds `public.rls_auto_enable()`,

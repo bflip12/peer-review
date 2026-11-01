@@ -32,9 +32,9 @@ Done: the `profiles` table; sign-in with an email link, with handle and display 
 setup (ADR 0022); sign-in email through Resend, with the hosted auth settings in both
 Supabase projects (ADR 0023); signed-in screenshots (`npm run screenshot -- --as=user`);
 account deletion on `/settings`; and Google sign-in with the privacy page (ADR 0024).
-Left:
-- Raise Auth's shared per-IP limits in both Supabase projects (Authentication, Rate
-  Limits): sign-ins and verifications from 30 to 150 per 5 minutes (`docs/DATA_MODEL.md`).
+Auth's shared per-IP limits are raised to 150 per 5 minutes for sign-ins and
+verifications in both Supabase projects; per-user limits wait for Milestone 9.
+Milestone 1 is finished.
 
 Every later milestone that adds a table adds its column write tests the way
 `supabase/tests/profiles.test.ts` does. A table holding data a user owns also

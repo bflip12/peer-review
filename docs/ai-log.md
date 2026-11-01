@@ -608,3 +608,21 @@ preview.
 **Output.** [ADR 0024](adr/0024-google-sign-in.md), `src/app/auth/callback/route.ts`,
 `src/features/privacy/`, `supabase/tests/utils/createPkceCode.ts`,
 [PR #33](https://github.com/bflip12/peer-review/pull/33).
+
+### Auth rate limits, and the end of Milestone 1 (2026-11-01)
+
+**Goal.** Stop Auth's per-IP limits from counting every user against the server's IP.
+
+**How I used AI.** Claude's first plan rested on Supabase docs it could not reach and
+said so. Once I allowed the domain, it read the page, which said the forwarding header
+works only with a secret key, and it changed its recommendation.
+
+**My calls.**
+- I chose to do the task straight away rather than leave it for launch.
+- After reading the trade-off, I kept the secret key out of the app: the shared limits
+  were raised in both Supabase projects instead, and per-user limits moved to Milestone 9
+  with an ADR to come.
+
+**Output.** `docs/DATA_MODEL.md`, `TASKS.md`,
+[PR #34](https://github.com/bflip12/peer-review/pull/34). This finished Milestone 1:
+email and Google sign-in, handles, account deletion, and the privacy page.
