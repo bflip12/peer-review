@@ -39,7 +39,7 @@ export const DeleteAccountForm = ({
         isRequired
         onValueChange={setTyped}
       />
-      <SubmitButton tone="danger" isPending={isPending}>
+      <SubmitButton variant="danger" isPending={isPending}>
         Delete account
       </SubmitButton>
       {failure && <FormError>{failure.message}</FormError>}

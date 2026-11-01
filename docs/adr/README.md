@@ -65,3 +65,4 @@ What this makes easier, what it rules out, what has to be revisited and when.
 | [0021](0021-lint-enforcement-and-react-compiler.md) | Lint enforcement, Stylelint, and the React Compiler | Accepted |
 | [0022](0022-sign-in-links-and-sessions.md) | Sign-in links and sessions | Accepted |
 | [0023](0023-email-with-resend.md) | Sign-in email through Resend | Accepted |
+| [0024](0024-google-sign-in.md) | Google sign-in | Accepted |

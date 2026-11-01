@@ -13,8 +13,8 @@ export type AppShellPropsT = {
 };
 
 /**
- * The frame around every page: a skip link, the header with the wordmark, and the main
- * landmark the page renders into.
+ * The frame around every page: a skip link, the header with the wordmark, the main
+ * landmark the page renders into, and a footer linking to the privacy page.
  *
  * Pages render their content straight into it and must not add a second `<main>`. Nav
  * links join the header as their routes ship (Feed and Search in Milestone 3 and 4, the
@@ -37,5 +37,12 @@ export const AppShell = ({ children, accountNav }: AppShellPropsT): ReactElement
     <main className={styles.main} id="main">
       {children}
     </main>
+    <footer className={styles.footer}>
+      <div className={styles.footerContent}>
+        <Link className={styles.footerLink} href="/privacy">
+          Privacy
+        </Link>
+      </div>
+    </footer>
   </div>
 );

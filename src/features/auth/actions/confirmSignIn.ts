@@ -3,10 +3,10 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getProfile } from "@/features/profiles/data/getProfile";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
+import { getPathAfterSignIn } from "../data/getPathAfterSignIn";
 import { getSignedInUserId } from "../data/getSignedInUserId";
 import { verifySignInLink } from "../data/verifySignInLink";
 import { confirmSignInSchema } from "../schemas/confirmSignInSchema";
@@ -39,9 +39,9 @@ export const confirmSignIn = async (
   if (!userId) {
     throw new Error("confirmSignIn: no user after a verified sign-in link.");
   }
-  const profile = await getProfile(supabase, userId);
+  const path = await getPathAfterSignIn(supabase, userId);
   // The header in the root layout shows who is signed in. A redirect alone keeps the
   // layout as it was, so refresh it too.
   refresh();
-  redirect(profile ? "/" : "/welcome");
+  redirect(path);
 };

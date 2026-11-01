@@ -583,3 +583,28 @@ because the project's deploy rule says a migration ships before the code that ca
 `src/features/account/`, `e2e/deleteAccount.spec.ts`,
 [PR #31](https://github.com/bflip12/peer-review/pull/31),
 [PR #32](https://github.com/bflip12/peer-review/pull/32).
+
+### Google sign-in and the privacy page (2026-11-01)
+
+**Goal.** Sign in with Google, and a privacy page for Google's consent screen to link to.
+
+**How I used AI.** A test cannot sign in with Google, so Claude found a way to make a
+real sign-in code on the local stack (an email sign-in in the same code flow) and tested
+the exchange with it. It walked me through the Cloudflare, Google Cloud, and Supabase
+setup one step at a time, then had me check the parts tests cannot reach by hand on a
+preview.
+
+**My calls.**
+- The contact address forwards to my Gmail through Cloudflare. I asked why it could not
+  be a real inbox, and kept forwarding over a paid mailbox.
+- I asked for a logo on the Google consent screen. A logo starts Google's brand review,
+  so it waits for the app icon in Milestone 9.
+- I asked what Claude thought about one Google client or two, and went with two, one
+  per Supabase project.
+- My hand check on a preview found that email links from previews went to `localhost`:
+  the allow lists needed the bare origin beside the `/**` entry. Fixed in both Supabase
+  projects and recorded in [ADR 0022](adr/0022-sign-in-links-and-sessions.md).
+
+**Output.** [ADR 0024](adr/0024-google-sign-in.md), `src/app/auth/callback/route.ts`,
+`src/features/privacy/`, `supabase/tests/utils/createPkceCode.ts`,
+[PR #33](https://github.com/bflip12/peer-review/pull/33).

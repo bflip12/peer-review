@@ -5,21 +5,21 @@ import styles from "./SubmitButton.module.css";
 export type SubmitButtonPropsT = {
   children: ReactNode;
   isPending?: boolean;
-  tone?: "ink" | "danger";
+  variant?: "solid" | "outline" | "danger";
 };
 
 /**
- * The solid button that submits a form, the main action on its screen. While the form's
- * action runs it is disabled, so a second press cannot send the form twice. The danger
- * tone is for destructive actions only (`docs/style-guide.md`).
+ * The button that submits a form. Solid for the main action on its screen, outlined for
+ * the others, danger for destructive actions only (`docs/style-guide.md`). While the
+ * form's action runs it is disabled, so a second press cannot send the form twice.
  */
 export const SubmitButton = ({
   children,
   isPending = false,
-  tone = "ink"
+  variant = "solid"
 }: SubmitButtonPropsT): ReactElement => (
   <button
-    className={tone === "danger" ? `${styles.wrapper} ${styles.danger}` : styles.wrapper}
+    className={`${styles.wrapper} ${styles[variant]}`}
     type="submit"
     disabled={isPending}>
     {children}
