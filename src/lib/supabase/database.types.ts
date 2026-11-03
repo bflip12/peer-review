@@ -29,6 +29,64 @@ export type Database = {
   };
   public: {
     Tables: {
+      cities: {
+        Row: {
+          admin1_name: string | null;
+          ascii_name: string;
+          country_code: string;
+          id: number;
+          name: string;
+          population: number;
+          timezone: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          admin1_name?: string | null;
+          ascii_name: string;
+          country_code: string;
+          id: number;
+          name: string;
+          population: number;
+          timezone: string;
+        };
+        Update: {
+          admin1_name?: string | null;
+          ascii_name?: string;
+          country_code?: string;
+          id?: number;
+          name?: string;
+          population?: number;
+          timezone?: string;
+        };
+        Relationships: [];
+      };
+      city_names: {
+        Row: {
+          city_id: number;
+          language: string;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id: number;
+          language: string;
+          name: string;
+        };
+        Update: {
+          city_id?: number;
+          language?: string;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "city_names_city_id_fkey";
+            columns: ["city_id"];
+            isOneToOne: false;
+            referencedRelation: "cities";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       profiles: {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"];
@@ -66,6 +124,16 @@ export type Database = {
     };
     Functions: {
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
+      search_cities: {
+        Args: { max_results?: number; query: string };
+        Returns: {
+          admin1_name: string;
+          country_code: string;
+          id: number;
+          matched_name: string;
+          name: string;
+        }[];
+      };
     };
     Enums: {
       account_status: "active" | "banned";

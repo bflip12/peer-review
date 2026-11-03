@@ -4,7 +4,7 @@ import { runSql } from "./utils/testClients.ts";
 
 // Functions in `public` that the API roles may call. Each entry is a deliberate choice,
 // added in the migration that grants it, with a test calling it as anon and as a user.
-const EXPOSED_FUNCTIONS: string[] = ["delete_my_account"];
+const EXPOSED_FUNCTIONS: string[] = ["delete_my_account", "search_cities"];
 
 describe("Supabase Postgres", () => {
   it("runs Postgres 15 or later, which NULLS NOT DISTINCT needs", async () => {

@@ -9,9 +9,6 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **GeoNames download.** Before Milestone 2, allow `download.geonames.org` in the cloud
-  environment's network settings.
-
 - **Public repo.** This repo stays private. A public repo comes later, around launch,
   started fresh from `main` so the history carries no personal paths or work email.
   Notes that should stay private go in a separate private repo.
@@ -44,11 +41,21 @@ page's "Delete account" section (`DeleteAccountSection`) and to the privacy page
 
 ## Milestone 2: Venues, DJs, collectives
 
-Cities seed from the GeoNames cities export, with autocomplete. Pick the file (cities1000
-is the current lean), leave out district entries, and add `city_names` with English and
-local names so "Cologne" and "Köln" both match. A credit line with a link to geonames.org
-on the privacy page (required by the GeoNames CC BY 4.0 license). Sound systems seed.
-Venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
+Done: `cities` and `city_names`, seeded from GeoNames cities1000, with `search_cities` and
+the GeoNames credit on the privacy page (ADR 0025).
+
+Tasks, one PR each, in order:
+1. Lookups: the `sound_systems` and `link_platforms` seeds.
+2. `creations` with the daily cap trigger, `catalog_edits`, and the `used_by_others_at`
+   trigger.
+3. Venues, with the city picker. The picker calls `search_cities`. Its generated type
+   says `admin1_name` is a string, but it is null when GeoNames has no region, so the
+   picker's type marks it nullable. Show `matched_name` beside the name when they differ
+   ("Köln (Cologne)").
+4. DJs.
+5. Collectives.
+
+The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
 with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
 platform. DJ names containing "b2b" are refused. An optional home city on DJs, required
 when a new DJ's name matches one with no city, shown in DJ search and on the DJ page, with

@@ -190,19 +190,36 @@ Primary key `(profile_id, city_id)`.
 
 #### cities
 
-Seeded once from GeoNames (Milestone 2). Read-only for users.
+Seeded from the GeoNames cities1000 export (ADR 0025). Read-only for users. Districts
+(`PPLX`) and historical, abandoned, or destroyed places are left out.
 
 | Field | Type | Notes |
 |---|---|---|
 | `id` | integer | The GeoNames ID |
 | `name`, `ascii_name` | text | GeoNames main name and its ASCII form |
 | `country_code` | text | ISO 3166 two-letter code |
-| `admin1_name` | text | State or region, for "Portland, Oregon" vs "Portland, Maine" |
-| `population` | integer | Sorts autocomplete |
+| `admin1_name` | text | State or region, for "Portland, Oregon" vs "Portland, Maine". Null when GeoNames has none |
+| `population` | integer | 0 when unknown. Sorts search results |
 | `timezone` | text | IANA name, for example `Europe/Berlin`. Drives every date rule |
 
-Deferred to Milestone 2: which GeoNames file, leaving out district entries, and a
-`city_names` table with English and local names so "Cologne" and "Köln" both match.
+#### city_names
+
+English and local names of a city besides its main name, so "Cologne" and "Köln" both
+find the same city (ADR 0025). Read-only for users.
+
+| Field | Type | Notes |
+|---|---|---|
+| `city_id` | integer | References `cities`. Cascade |
+| `language` | text | ISO 639 code, `en` or one of the country's languages |
+| `name` | text | |
+
+Primary key `(city_id, language, name)`.
+
+`search_cities(query, max_results)` serves city autocomplete. It matches the main, ASCII,
+and other names, ignoring case and accents, and returns each city once with the name that
+matched. A name or a word in it starting with the query comes first, then any other match,
+each by population. Under 2 characters it returns nothing, and at 2 it matches only the
+start of a name. At most 20 rows.
 
 #### sound_systems
 
@@ -684,7 +701,7 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 |---|---|---|
 | `profiles` | Everyone. Banned profiles only to admins and their owner | Owner, while active: handle, display name. Admins: role, account status |
 | `moderator_cities` | Everyone | Admins |
-| `cities`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
+| `cities`, `city_names`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
 | `venues`, `artists`, `collectives`, `links`, `venue_sound_systems` | Everyone, unless hidden | Create: signed-in users, within the daily caps. Edit: the creator until `used_by_others_at`, then moderators and admins. Hide: admins |
 | `events`, `event_collectives` | Everyone, unless hidden. Pages list an event only once it has a visible log | Create through the create function. Fill empty fields: users logging it. Change set fields: moderators and admins |
 | `lineup_slots`, `slot_artists` | Everyone, except removed slots and hidden artists. Moderators and admins also see removed slots | Add: signed-in users. "b2b with" and remove: the adder until someone else picks it. After that, moderators and admins remove a slot, remove one artist, or switch to a same-name artist |
@@ -762,7 +779,8 @@ with the query it serves:
 | `creations (created_by, created_at desc)` | Daily caps |
 | `merge_changes (merge_id, seq)` | Undo, Milestone 10 (covered by the unique key) |
 | `venues (city_id)` | Duplicate suggestions within a city |
-| Trigram GIN on `cities.name`, `cities.ascii_name` | City autocomplete (Milestone 2) |
+| Trigram GIN on `private.fold_name()` of `cities.name`, `cities.ascii_name`, `city_names.name` | `search_cities`, 3 characters or more |
+| `left(private.fold_name(...), 2)` on the same three columns | `search_cities`, 2 characters |
 
 ## Hard to change later
 
@@ -786,7 +804,9 @@ Ordered by cost once there is real data.
    record format has to be right from the first merge. Merges and undo ship together for
    that reason (ADR 0014).
 8. **City IDs are GeoNames IDs.** A bigger GeoNames file only adds rows. A different source
-   would mean remapping every venue, collective, and event.
+   would mean remapping every venue, collective, and event. Which entries count as a city
+   (ADR 0025) is just as costly: leaving out Brooklyn later means moving its venues and
+   events to New York City.
 9. **`profiles.id` is the auth user ID, and email stays in `auth.users`.**
 10. **Original log copies record the night at each save.** A field left out of `night`
     cannot be filled in for past saves, and a log saved before the table existed has no
@@ -866,9 +886,13 @@ below passed on both:
   the hosted projects after each Migrate run, which passed on staging and production on
   2026-10-30.
 
+- Cities (2026-11-03, local stack, `supabase/tests/cities.test.ts`): `anon` and users
+  read `cities` and `city_names` and get `42501` on every write. Every seeded timezone is in
+  `pg_timezone_names`. `search_cities` finds Köln for "koln" and "Cologne", lists Portland,
+  Oregon before Portland, Maine, finds New York City for "york", treats `%` as text, and
+  caps results at 20. Timed as `anon`: 6 to 15 ms for 3 or more characters, 26 ms for 2.
+
 ## Unverified
 
-- GeoNames file sizes, district codes, timezone names, and main-name language. The download
-  was blocked by this session's network policy.
 - The functions and triggers named above are described, not written or run.
 - Whether the log save function or a trigger refreshes `log_snapshots` (Milestone 3).
