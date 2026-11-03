@@ -68,9 +68,9 @@ found that `TASKS.md` already planned a fresh repo at launch to drop an old emai
 first commit, and laid out three options: rewrite the history, start a new repo, or wait.
 
 **My calls.**
-- Public now, history included. The old email came from an old git sign-in, not from
-  anyone I worked for on this project, so it stays. Claude also noted that rewriting the
-  history would drop GitHub's verified signatures on every merged PR.
+- Public now, history included. The old email is left over from an earlier git setup,
+  and I'm fine with it showing. Claude also noted that rewriting the history would drop
+  GitHub's verified signatures on every merged PR.
 - Issues and pull requests limited to collaborators, and the code stays all rights
   reserved.
 - The app is about music nights, not club nights. That is now a writing rule.
