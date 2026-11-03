@@ -4,6 +4,16 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-11-03
 
+- `steward` skill: the safety-net check-in while CI runs waits twice the average CI run
+  (about 10 minutes), not an hour. Claude posts the Vercel preview link when the latest
+  commit's deployment is ready, and each "ready" message has a "What to test" list.
+  `.claude/rules/voice.md`: replies give times in Alberta time, never UTC. Reason: Bobby
+  tests each PR on its preview, and a 50-minute check-in left a green PR waiting.
+
+- `.claude/settings.json` allows `git checkout -b`, `git checkout -B`, and `git switch`
+  without asking. Reason: starting the next task's branch from `main` asked Bobby each
+  time.
+
 - New `steward` skill: Claude subscribes to each task's PR, fixes red CI, marks the PR
   ready when CI is green, and checks Migrate after the merge. It sends a push notification
   when a PR is ready, after Migrate, and when it needs Bobby's decision. `CLAUDE.md` rule 7
