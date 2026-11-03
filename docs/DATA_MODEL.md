@@ -10,7 +10,8 @@ Rules for changing the schema are in `.claude/rules/database.md`.
 ## Conventions
 
 - **Keys.** Every table has a UUID primary key named `id`, except join tables (composite
-  key), `cities` (GeoNames ID), `link_platforms` (a text ID such as `instagram`), and
+  key), `cities` (GeoNames ID), the seeded lookups `sound_systems` and `link_platforms`
+  (a text ID such as `funktion_one` or `instagram`, the same in every database), and
   `event_redirects` (`from_short_id`). `profiles.id` is the same value as `auth.users.id`.
 - **Short IDs.** Pages that can be shared (venues, DJs, collectives, events, logs) also have
   a `short_id`: a short random string, unique per table, used only in URLs. UUIDs never
@@ -223,20 +224,31 @@ start of a name. At most 20 rows.
 
 #### sound_systems
 
-Seeded lookup: Funktion-One, Void Acoustics, L-Acoustics, d&b audiotechnik, Danley, Martin
-Audio, Other. Fields: `id`, `name` (unique), `sort_order`.
+Seeded lookup of the sound system brands venues are tagged with. Read-only for users; a
+new brand is a new migration.
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | text | `funktion_one`, `void_acoustics`, `l_acoustics`, `d_and_b_audiotechnik`, `danley`, `martin_audio`, `other` |
+| `name` | text | Unique. "Funktion-One", "d&b audiotechnik" |
+| `sort_order` | smallint | Unique. Order in the venue form. Steps of 10, with Other at 1000 so it stays last |
 
 #### link_platforms
 
-Seeded lookup of link types and the domains each accepts.
+Seeded lookup of link types and the hosts each accepts. Read-only for users.
 
 | Field | Type | Notes |
 |---|---|---|
 | `id` | text | `instagram`, `resident_advisor`, `soundcloud`, `bandcamp`, `website` |
-| `label` | text | Shown in forms |
-| `allowed_hosts` | text[] | For example `{instagram.com, www.instagram.com}`. Empty means any http or https URL (`website`) |
-| `for_venues`, `for_artists`, `for_collectives` | boolean | Which forms show it. Venues: Instagram, Resident Advisor, website |
-| `sort_order` | smallint | |
+| `label` | text | Unique. Shown in forms and on pages |
+| `allowed_hosts` | text[] | Lowercase host names (check). `*.` at the start matches any subdomain (`*.bandcamp.com`). Empty means any http or https URL (`website`) |
+| `is_for_venues`, `is_for_artists`, `is_for_collectives` | boolean | Which forms show it. Venues: Instagram, Resident Advisor, website |
+| `sort_order` | smallint | Unique. Order in forms and on pages, with Website last |
+
+The seeded hosts: Instagram `instagram.com` and `www.instagram.com`; Resident Advisor
+`ra.co` and `www.ra.co` (not the old `residentadvisor.net`); SoundCloud `soundcloud.com`
+with `www.`, `m.`, and `on.` (short links); Bandcamp `*.bandcamp.com`. A Bandcamp page on
+the artist's own domain is refused in the Bandcamp field and goes in Website.
 
 A new platform (Discogs, Mixcloud) is a new row, not a column on three tables.
 
