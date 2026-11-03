@@ -87,6 +87,37 @@ export type Database = {
           }
         ];
       };
+      link_platforms: {
+        Row: {
+          allowed_hosts: string[];
+          id: string;
+          is_for_artists: boolean;
+          is_for_collectives: boolean;
+          is_for_venues: boolean;
+          label: string;
+          sort_order: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          allowed_hosts: string[];
+          id: string;
+          is_for_artists: boolean;
+          is_for_collectives: boolean;
+          is_for_venues: boolean;
+          label: string;
+          sort_order: number;
+        };
+        Update: {
+          allowed_hosts?: string[];
+          id?: string;
+          is_for_artists?: boolean;
+          is_for_collectives?: boolean;
+          is_for_venues?: boolean;
+          label?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"];
@@ -115,6 +146,25 @@ export type Database = {
           handle?: string;
           id?: string;
           role?: Database["public"]["Enums"]["role"];
+        };
+        Relationships: [];
+      };
+      sound_systems: {
+        Row: {
+          id: string;
+          name: string;
+          sort_order: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          id: string;
+          name: string;
+          sort_order: number;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          sort_order?: number;
         };
         Relationships: [];
       };

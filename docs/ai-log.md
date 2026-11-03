@@ -663,3 +663,21 @@ New York City.
 
 **Output.** [ADR 0025](adr/0025-city-data.md), `scripts/geonames/`,
 `supabase/tests/cities.test.ts`, [PR #35](https://github.com/bflip12/peer-review/pull/35).
+
+### Sound systems and link platforms (2026-11-03)
+
+**Goal.** Seed the two lookup lists the venue, DJ, and collective forms need: sound
+system brands, and the link sites with the hosts each link field accepts.
+
+**My calls.**
+- Text IDs (`funktion_one`, `instagram`) for sound systems instead of the UUID the data
+  model had, so every database shares them and code can name a row. The key is hard to
+  change once venues are tagged.
+- Resident Advisor links only on `ra.co`, not the old `residentadvisor.net`.
+- Bandcamp pages are subdomains, so `*.bandcamp.com` matches any of them. A page on an
+  artist's own domain is refused in the Bandcamp field. I asked what the user would see in
+  that case, and had the form error, with a hint to paste the `bandcamp.com` address or use
+  the website field, written into the venues task so it ships with the form.
+
+**Output.** `supabase/tests/lookups.test.ts`,
+[PR #37](https://github.com/bflip12/peer-review/pull/37).

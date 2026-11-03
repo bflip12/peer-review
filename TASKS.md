@@ -42,18 +42,23 @@ page's "Delete account" section (`DeleteAccountSection`) and to the privacy page
 ## Milestone 2: Venues, DJs, collectives
 
 Done: `cities` and `city_names`, seeded from GeoNames cities1000, with `search_cities` and
-the GeoNames credit on the privacy page (ADR 0025).
+the GeoNames credit on the privacy page (ADR 0025). The `sound_systems` and
+`link_platforms` lookups, with text IDs and the hosts each link field accepts.
 
 Tasks, one PR each, in order:
-1. Lookups: the `sound_systems` and `link_platforms` seeds.
-2. `creations` with the daily cap trigger, `catalog_edits`, and the `used_by_others_at`
+1. `creations` with the daily cap trigger, `catalog_edits`, and the `used_by_others_at`
    trigger.
-3. Venues, with the city picker. The picker calls `search_cities`. Its generated type
+2. Venues, with the city picker. The picker calls `search_cities`. Its generated type
    says `admin1_name` is a string, but it is null when GeoNames has no region, so the
    picker's type marks it nullable. Show `matched_name` beside the name when they differ
-   ("Köln (Cologne)").
-4. DJs.
-5. Collectives.
+   ("Köln (Cologne)"). The `links` table, with a trigger refusing a URL whose host is not
+   in the platform's `allowed_hosts`, and the same check in the form, with an error under
+   the field built from the platform's label: "Paste a Bandcamp link, such as
+   name.bandcamp.com." The Bandcamp error adds "Using your own domain? Paste your
+   name.bandcamp.com address, or add it as your website.", since custom domains are
+   refused.
+3. DJs.
+4. Collectives.
 
 The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
 with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
