@@ -4,6 +4,13 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-11-03
 
+- The repo goes public as it is, with its history, replacing the plan in `TASKS.md` (and
+  the line in ADR 0025's consequences) to start a fresh public repo at launch. New
+  `README.md` for visitors: what the app is, the stack, and where the ADRs and AI log
+  are. It says the project takes no issues or pull requests and the code is all rights
+  reserved. Reason: Bobby wants the repo in the portfolio now, and a fresh repo would drop the PR
+  history that shows how the work was done.
+
 - `steward` skill: the safety-net check-in while CI runs waits twice the average CI run
   (about 10 minutes), not an hour. Claude posts the Vercel preview link when the latest
   commit's deployment is ready, and each "ready" message has a "What to test" list.
