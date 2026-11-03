@@ -591,8 +591,11 @@ search never read it.
 |---|---|---|
 | `id` | uuid | |
 | `created_by` | uuid | References `profiles`. Cascade |
-| `event_id`, `lineup_slot_id`, `venue_id`, `artist_id`, `collective_id` | uuid | Exactly one is set (check). Cascade |
+| `event_id`, `lineup_slot_id`, `venue_id`, `artist_id`, `collective_id` | uuid | Exactly one is set (check). Each is unique: one creator per entry. Cascade |
 | `created_at` | timestamptz | |
+
+The five entry columns get their foreign keys in the migration that creates each table:
+venues, artists, and collectives in Milestone 2, events and lineup slots in Milestone 3.
 
 Kept apart from the rows themselves because row level security hides rows, not columns. A
 `created_by` column on `lineup_slots` would be readable by anyone, and would show that a
@@ -601,9 +604,11 @@ collectives) and slot removal right check this table.
 
 Daily caps (ADR 0011): a trigger before insert counts the user's rows of the same kind
 created in the last 24 hours and refuses the insert at the cap: 10 venues, 10 collectives,
-50 artists, 20 events. Lineup slots are not capped. Moderators and admins are exempt. The
-caps are constants in the trigger function. A per-user advisory lock stops two inserts at
-once from both passing (checked).
+50 artists, 20 events. Lineup slots are not capped. Active moderators and admins are
+exempt. The caps are constants in the trigger function. A per-user advisory lock stops two
+inserts at once from both passing (checked). A refusal has SQLSTATE `PR001`, with the kind
+(`venue`, `artist`, `collective`, `event`) as its detail, so the form shows "You've added
+10 venues today. You can add more tomorrow." without reading the message.
 
 #### catalog_edits
 
@@ -614,8 +619,8 @@ Each edit to a venue, DJ, collective, event, or lineup slot (ADR 0009, ADR 0013)
 | `id` | uuid | |
 | `entity_type` | `catalog_type` | |
 | `entity_id` | uuid | No foreign key: it can point at any of five tables |
-| `field` | text | `name`, `city_id`, `venue_id`, a link platform, a sound tag, a co-host, and for slots `removed` or `artists` |
-| `old_value`, `new_value` | jsonb | |
+| `field` | text | `name`, `city_id`, `venue_id`, a link platform, a sound tag, a co-host, and for slots `removed` or `artists`. Lowercase snake_case (check) |
+| `old_value`, `new_value` | jsonb | Null when the field was empty, or the edit cleared it. The two always differ (check) |
 | `edited_by` | uuid | References `profiles`. Set null on delete |
 | `reverts_edit_id` | uuid | Set when this edit is a revert. References `catalog_edits` |
 | `merge_id` | uuid | Milestone 10. Set when a merge made the edit |
@@ -788,6 +793,7 @@ with the query it serves:
 | `reports (status, created_at)` | Report queues |
 | `catalog_edits (entity_type, entity_id, created_at desc)` | History list per entry |
 | `catalog_edits (edited_by, created_at desc)` | "Recent edits" filtered by person (Later, ADR 0014) |
+| `catalog_edits (reverts_edit_id)` | Finding whether an edit was reverted |
 | `creations (created_by, created_at desc)` | Daily caps |
 | `merge_changes (merge_id, seq)` | Undo, Milestone 10 (covered by the unique key) |
 | `venues (city_id)` | Duplicate suggestions within a city |

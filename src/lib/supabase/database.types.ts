@@ -29,6 +29,58 @@ export type Database = {
   };
   public: {
     Tables: {
+      catalog_edits: {
+        Row: {
+          created_at: string;
+          edited_by: string | null;
+          entity_id: string;
+          entity_type: Database["public"]["Enums"]["catalog_type"];
+          field: string;
+          id: string;
+          new_value: Json | null;
+          old_value: Json | null;
+          reverts_edit_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          edited_by?: string | null;
+          entity_id: string;
+          entity_type: Database["public"]["Enums"]["catalog_type"];
+          field: string;
+          id?: string;
+          new_value?: Json | null;
+          old_value?: Json | null;
+          reverts_edit_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          edited_by?: string | null;
+          entity_id?: string;
+          entity_type?: Database["public"]["Enums"]["catalog_type"];
+          field?: string;
+          id?: string;
+          new_value?: Json | null;
+          old_value?: Json | null;
+          reverts_edit_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "catalog_edits_edited_by_fkey";
+            columns: ["edited_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "catalog_edits_reverts_edit_id_fkey";
+            columns: ["reverts_edit_id"];
+            isOneToOne: false;
+            referencedRelation: "catalog_edits";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       cities: {
         Row: {
           admin1_name: string | null;
@@ -83,6 +135,48 @@ export type Database = {
             columns: ["city_id"];
             isOneToOne: false;
             referencedRelation: "cities";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      creations: {
+        Row: {
+          artist_id: string | null;
+          collective_id: string | null;
+          created_at: string;
+          created_by: string;
+          event_id: string | null;
+          id: string;
+          lineup_slot_id: string | null;
+          venue_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          artist_id?: string | null;
+          collective_id?: string | null;
+          created_at?: string;
+          created_by?: string;
+          event_id?: string | null;
+          id?: string;
+          lineup_slot_id?: string | null;
+          venue_id?: string | null;
+        };
+        Update: {
+          artist_id?: string | null;
+          collective_id?: string | null;
+          created_at?: string;
+          created_by?: string;
+          event_id?: string | null;
+          id?: string;
+          lineup_slot_id?: string | null;
+          venue_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "creations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           }
         ];
@@ -187,6 +281,7 @@ export type Database = {
     };
     Enums: {
       account_status: "active" | "banned";
+      catalog_type: "venue" | "artist" | "collective" | "event" | "lineup_slot";
       role: "user" | "moderator" | "admin";
     };
     CompositeTypes: {
@@ -305,6 +400,7 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ["active", "banned"],
+      catalog_type: ["venue", "artist", "collective", "event", "lineup_slot"],
       role: ["user", "moderator", "admin"]
     }
   }
