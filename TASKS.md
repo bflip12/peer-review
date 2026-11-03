@@ -43,12 +43,12 @@ page's "Delete account" section (`DeleteAccountSection`) and to the privacy page
 
 Done: `cities` and `city_names`, seeded from GeoNames cities1000, with `search_cities` and
 the GeoNames credit on the privacy page (ADR 0025). The `sound_systems` and
-`link_platforms` lookups, with text IDs and the hosts each link field accepts.
+`link_platforms` lookups, with text IDs and the hosts each link field accepts. `creations`
+with the daily cap trigger, and `catalog_edits`, with their read rules. Their foreign keys
+come with each table, and the `used_by_others_at` trigger waits for Milestone 3.
 
 Tasks, one PR each, in order:
-1. `creations` with the daily cap trigger, `catalog_edits`, and the `used_by_others_at`
-   trigger.
-2. Venues, with the city picker. The picker calls `search_cities`. Its generated type
+1. Venues, with the city picker. The picker calls `search_cities`. Its generated type
    says `admin1_name` is a string, but it is null when GeoNames has no region, so the
    picker's type marks it nullable. Show `matched_name` beside the name when they differ
    ("Köln (Cologne)"). The `links` table, with a trigger refusing a URL whose host is not
@@ -56,9 +56,11 @@ Tasks, one PR each, in order:
    the field built from the platform's label: "Paste a Bandcamp link, such as
    name.bandcamp.com." The Bandcamp error adds "Using your own domain? Paste your
    name.bandcamp.com address, or add it as your website.", since custom domains are
-   refused.
-3. DJs.
-4. Collectives.
+   refused. Adds the `creations.venue_id` foreign key, and the trigger that writes a
+   `catalog_edits` row for each edit, shared by DJs and collectives. Adds created venues
+   and edits to the "Delete account" list and the privacy page.
+2. DJs, with the `creations.artist_id` foreign key.
+3. Collectives, with the `creations.collective_id` foreign key.
 
 The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
 with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
@@ -72,6 +74,9 @@ the first one (ADR 0009), so history and "Revert" in Milestone 6 have data to sh
 
 ## Milestone 3: Events and logs
 
+The `used_by_others_at` trigger (ADR 0009): set on a venue, DJ, or collective the first
+time a user other than its creator joins or starts a night with it, or adds or picks the
+DJ on a lineup. The `creations.event_id` and `creations.lineup_slot_id` foreign keys.
 Events with a venue, one or more co-host collectives, or both (ADR 0008, ADR 0010), with
 the venue and collective unnamed-night rules enforced by unique indexes. The night picker: date first,
 one search across venues, collectives, event names, and lineups, "Nights" and "Start a new
