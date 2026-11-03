@@ -69,10 +69,11 @@ Before writing Next.js code, read the guide for it in `node_modules/next/dist/do
 7. Work on a branch, never `main`. Commit as work progresses, as author Bobby
    Filippopoulos <bflip12@gmail.com> (committer stays Claude in cloud sessions, so GitHub
    verifies it), and push after each commit. Open a draft PR with a task's first commit;
-   mark it ready when the task is done. Merge only when CI is green on the PR's latest
-   commit. PRs are squash-merged, so `main` gets one commit per task, and the squash
-   message says what and why. GitHub deletes the branch on merge; the
-   next task starts a new one from `main` (in cloud sessions, the session's branch name).
+   mark it ready when the task is done (the `steward` skill runs the PR). Bobby merges,
+   only when CI is green on the PR's latest commit. PRs are squash-merged, so `main` gets
+   one commit per task, and the squash message says what and why. GitHub deletes the
+   branch on merge; the next task starts a new one from `main` (in cloud sessions, the
+   session's branch name).
 8. Architecture, new technology, or a major scope change: write an ADR in `docs/adr/`.
 9. Rule or workflow change: update the owning file, add a dated line to `docs/changelog.md`.
 10. Before marking a task's PR ready, run the `ai-log` skill. It updates `docs/ai-log.md`.
@@ -88,4 +89,6 @@ Before writing Next.js code, read the guide for it in `node_modules/next/dist/do
   security, and database tests.
 - `.claude/rules/workflows.md`: loads for `.github/**`. Pinned actions, permissions, and
   secrets in GitHub Actions.
+- `.claude/skills/steward/SKILL.md`: a task's PR from draft to merged and migrated, and
+  when Claude notifies Bobby.
 - `docs/DATA_MODEL.md`: tables, constraints, indexes, and RLS visibility rules.
