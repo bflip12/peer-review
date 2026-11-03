@@ -43,6 +43,22 @@ once per stage, because the same detail in every entry was getting too specific.
 
 **Output.** This file, `.claude/skills/ai-log/SKILL.md`, rule 10 in `CLAUDE.md`.
 
+### Claude runs each PR, I merge it (2026-11-03)
+
+**Goal.** Stop watching CI myself, without handing over the merge.
+
+**How I used AI.** A second skill, `steward`, runs each task's PR: Claude subscribes to
+the PR's CI and review events, fixes red CI on the branch, marks the PR ready, and checks
+the database migration run after I merge. It sends a push notification when a PR is
+ready, after the migrations, and when it needs my decision.
+
+**My calls.**
+- Claude proposed merging on its own once CI passed, if I had approved the task's plan.
+  I kept the merge as my step, so Claude stops at ready.
+- Notifications only for those three moments, nothing for routine progress.
+
+**Output.** `.claude/skills/steward/SKILL.md`, `CLAUDE.md` rule 7, `docs/changelog.md`.
+
 ## 2. Product concept
 
 I worked through the product with Claude in planning sessions. For each big question (the
