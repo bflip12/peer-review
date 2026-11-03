@@ -17,6 +17,19 @@ describe("PrivacyPolicy", () => {
     );
   });
 
+  it("credits GeoNames with links to the site and the license", () => {
+    render(<PrivacyPolicy />);
+
+    expect(screen.getByRole("link", { name: "GeoNames" })).toHaveAttribute(
+      "href",
+      "https://www.geonames.org/"
+    );
+    expect(screen.getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute(
+      "href",
+      "https://creativecommons.org/licenses/by/4.0/"
+    );
+  });
+
   it("has one heading per section under the page title", () => {
     render(<PrivacyPolicy />);
 
@@ -28,6 +41,7 @@ describe("PrivacyPolicy", () => {
       "Cookies",
       "Services that handle your data",
       "Deleting your account",
+      "City data",
       "Contact"
     ]);
   });

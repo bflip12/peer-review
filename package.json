@@ -20,7 +20,8 @@
     "db:reset": "supabase db reset",
     "db:env": "supabase status -o env --override-name api.url=NEXT_PUBLIC_SUPABASE_URL --override-name auth.publishable_key=NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY | grep ^NEXT_PUBLIC_ > .env.local",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts && prettier --write src/lib/supabase/database.types.ts",
-    "test:db": "vitest run --config vitest.db.config.mts"
+    "test:db": "vitest run --config vitest.db.config.mts",
+    "db:cities": "node scripts/geonames/buildCitiesMigration.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

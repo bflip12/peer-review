@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import styles from "./PrivacyPolicy.module.css";
 
 // Shown on the page. Change it with every edit to the text below.
-const LAST_UPDATED = "30 October 2026";
+const LAST_UPDATED = "3 November 2026";
 const CONTACT_EMAIL = "hello@peerreview.club";
 
 /**
@@ -61,6 +61,15 @@ export const PrivacyPolicy = (): ReactElement => (
       <p>
         In <Link href="/settings">Settings</Link>, &ldquo;Delete account&rdquo; deletes
         your account and profile straight away. It cannot be undone.
+      </p>
+    </section>
+
+    <section className={styles.section}>
+      <h2 className={styles.heading}>City data</h2>
+      <p>
+        The list of cities comes from <a href="https://www.geonames.org/">GeoNames</a>,
+        under the <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
+        license.
       </p>
     </section>
 
