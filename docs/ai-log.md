@@ -53,8 +53,8 @@ the database migration run after I merge. It sends a push notification when a PR
 ready, after the migrations, and when it needs my decision.
 
 **My calls.**
-- Claude proposed merging on its own once CI passed, if I had approved the task's plan.
-  I kept the merge as my step, so Claude stops at ready.
+- I first let Claude merge once CI passed on a plan I had approved, then took it back:
+  the merge stays my step, so Claude stops at ready.
 - Notifications only for those three moments, nothing for routine progress.
 
 **Output.** `.claude/skills/steward/SKILL.md`, `CLAUDE.md` rule 7, `docs/changelog.md`.
