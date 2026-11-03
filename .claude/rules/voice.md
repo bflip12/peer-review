@@ -16,6 +16,8 @@ Applies to UI copy, error messages, labels, README, commit messages, docs, and r
 - Explain like a developer explaining to a developer: simple, concrete, short. Go deeper
   only when asked.
 - The voice rules apply to replies too: no editorializing adverbs ("silently", "quietly").
+- Give times in Alberta time (`America/Edmonton`), never UTC: "8:10 pm". Cloud sessions
+  run on UTC, so convert.
 - Name the service, and the project or environment, in every instruction and status line:
   "Supabase, staging project: Authentication, URL Configuration", "Vercel, Production:
   Environment Variables", "GitHub, repo settings: Secrets". Never "the project" or "the
