@@ -4,6 +4,11 @@ Dated record of rule and style changes, newest first. Each entry says what chang
 
 ## 2026-11-03
 
+- `.claude/rules/voice.md`: the general term is "music night", never "club night".
+  `CLAUDE.md`, `SPEC.md`, and the README say "Letterboxd for music nights". ADRs and
+  past AI log entries keep their wording, since they record what was decided then.
+  Reason: Bobby wants the app referred to this way everywhere.
+
 - The repo goes public as it is, with its history, replacing the plan in `TASKS.md` (and
   the line in ADR 0025's consequences) to start a fresh public repo at launch. New
   `README.md` for visitors: what the app is, the stack, and where the ADRs and AI log

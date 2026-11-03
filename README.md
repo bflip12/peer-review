@@ -1,6 +1,6 @@
 # Peer Review
 
-Letterboxd for club nights. Log a night you went to, rate the sound, the venue, and each
+Letterboxd for music nights. Log a night you went to, rate the sound, the venue, and each
 DJ set, and read what other people thought. Built for the underground scene: house,
 techno, and rooms where the sound system matters.
 

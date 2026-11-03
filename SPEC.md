@@ -2,7 +2,7 @@
 
 ## What it is
 
-Letterboxd for club nights, aimed at the underground scene: house, techno, and rooms where
+Letterboxd for music nights, aimed at the underground scene: house, techno, and rooms where
 the sound system matters. Users log nights they attended, rate them, and read what others
 thought.
 

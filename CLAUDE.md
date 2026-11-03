@@ -1,6 +1,6 @@
 # Peer Review
 
-Letterboxd for club nights. Log a night, rate the sound, the venue and each DJ set, and
+Letterboxd for music nights. Log a night, rate the sound, the venue and each DJ set, and
 follow people. Product: `SPEC.md`. Backlog: `TASKS.md`. Decisions: `docs/adr/`.
 Owner: Bobby Filippopoulos, software developer.
 
