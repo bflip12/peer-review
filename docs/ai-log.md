@@ -626,3 +626,24 @@ works only with a secret key, and it changed its recommendation.
 **Output.** `docs/DATA_MODEL.md`, `TASKS.md`,
 [PR #34](https://github.com/bflip12/peer-review/pull/34). This finished Milestone 1:
 email and Google sign-in, handles, account deletion, and the privacy page.
+
+### Seeding world cities from GeoNames (2026-11-03)
+
+**Goal.** Give venues, events, and DJs one shared list of cities to pick from, so every
+Berlin night points at the same Berlin.
+
+**How I used AI.** Claude measured the real GeoNames files before proposing a schema:
+row counts per feature code, which codes mark districts, and how many English and local
+names survive the filter. It then timed the search as a signed-out user and changed the
+ranking and indexes when 2-letter queries took 640 ms and "york" listed small towns before
+New York City.
+
+**My calls.**
+- The full cities1000 file (162,026 cities) over the smaller exports. A venue in a small
+  town needs its town in the list.
+- I allowed the GeoNames domain in the cloud environment, so the seed is written by a
+  script and applied by the Migrate workflow, never loaded by hand.
+- The city picker waits for the venue form, so it ships with the first page that uses it.
+
+**Output.** [ADR 0025](adr/0025-city-data.md), `scripts/geonames/`,
+`supabase/tests/cities.test.ts`, [PR #35](https://github.com/bflip12/peer-review/pull/35).
