@@ -26,6 +26,9 @@ Do not guess a command that is not listed here. Node 22.18 or later, npm.
   `.env.local`, which `npm run dev`, `npm run build`, and `npm run e2e` need.
 - `npm run db:types`: regenerates `src/lib/supabase/database.types.ts` from the local
   schema. `npm run test:db`: database tests in `supabase/tests/`, against the local stack.
+- `npm run db:cities -- supabase/migrations/<timestamp>_seed_cities.sql`: downloads the
+  GeoNames files and writes the cities seed migration into that file (ADR 0025). Create the
+  file first with `npx supabase migration new seed_cities`. Needs `unzip`.
 
 CI (`.github/workflows/ci.yml`) runs typecheck, lint, the format check, unit tests, and
 the build on every PR and every push to `main`, on the Node version in `.nvmrc`. A second
@@ -44,6 +47,8 @@ In cloud sessions:
 - Start Docker before `db:start`: `(dockerd > /tmp/dockerd.log 2>&1 &)`.
 - Prefix `npm run db:start` and `npm run db:types` with
   `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io`. The default registry is blocked there.
+- Prefix `npm run db:cities` with `NODE_USE_ENV_PROXY=1`. Node's `fetch` ignores
+  `HTTPS_PROXY` without it, and the container reaches the internet only through the proxy.
 
 After each Edit or Write, a hook runs Prettier, then `eslint --fix` or `stylelint --fix`, on
 the file (`scripts/hooks/formatEditedFile.ts`). Errors and warnings it cannot fix come back
