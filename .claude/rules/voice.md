@@ -9,6 +9,8 @@ Applies to UI copy, error messages, labels, README, commit messages, docs, and r
 - Labels and titles state exactly what happens. No jargon label without saying what it
   means.
 - Do not explain basics the audience knows.
+- What users log are music nights. Say "music night" for the general term, never "club
+  night". "Club" is only for a venue that is a club.
 
 ## Replies to Bobby
 

@@ -59,6 +59,25 @@ ready, after the migrations, and when it needs my decision.
 
 **Output.** `.claude/skills/steward/SKILL.md`, `CLAUDE.md` rule 7, `docs/changelog.md`.
 
+### Making the repo public (2026-11-03)
+
+**Goal.** Show the repo in my portfolio now, while it stays a real product.
+
+**How I used AI.** I asked Claude whether to go public. It recommended going public, then
+found that `TASKS.md` already planned a fresh repo at launch to drop an old email on the
+first commit, and laid out three options: rewrite the history, start a new repo, or wait.
+
+**My calls.**
+- Public now, history included. The old email is left over from an earlier git setup,
+  and I'm fine with it showing. Claude also noted that rewriting the history would drop
+  GitHub's verified signatures on every merged PR.
+- Issues and pull requests limited to collaborators, and the code stays all rights
+  reserved.
+- The app is about music nights, not club nights. That is now a writing rule.
+
+**Output.** `README.md`, the "Public repo" entry in `TASKS.md`, `.claude/rules/voice.md`,
+`docs/changelog.md`, commits `fc47088` and `9ec4255`.
+
 ## 2. Product concept
 
 I worked through the product with Claude in planning sessions. For each big question (the

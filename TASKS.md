@@ -9,8 +9,10 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **Public repo.** This repo stays private. A public repo comes later, around launch,
-  started fresh from `main` so the history carries no personal paths or work email.
+- **Public repo.** This repo goes public as it is, history included, so it can be shown
+  in Bobby's portfolio (decided 2026-11-03). The README is written for visitors. Waiting
+  on Bobby, in GitHub, repo settings: General, Features, set Issues and Pull requests to
+  "Collaborators only", then Danger Zone, "Change repository visibility" to public.
   Notes that should stay private go in a separate private repo.
 
 - **Database URL secret.** The Migrate workflow connects with the `SUPABASE_DB_URL` repo
