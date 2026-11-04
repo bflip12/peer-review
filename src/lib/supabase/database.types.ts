@@ -178,6 +178,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "creations_venue_id_fkey";
+            columns: ["venue_id"];
+            isOneToOne: true;
+            referencedRelation: "venues";
+            referencedColumns: ["id"];
           }
         ];
       };
@@ -211,6 +218,49 @@ export type Database = {
           sort_order?: number;
         };
         Relationships: [];
+      };
+      links: {
+        Row: {
+          artist_id: string | null;
+          collective_id: string | null;
+          id: string;
+          platform_id: string;
+          url: string;
+          venue_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          artist_id?: string | null;
+          collective_id?: string | null;
+          id?: string;
+          platform_id: string;
+          url: string;
+          venue_id?: string | null;
+        };
+        Update: {
+          artist_id?: string | null;
+          collective_id?: string | null;
+          id?: string;
+          platform_id?: string;
+          url?: string;
+          venue_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "links_platform_id_fkey";
+            columns: ["platform_id"];
+            isOneToOne: false;
+            referencedRelation: "link_platforms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "links_venue_id_fkey";
+            columns: ["venue_id"];
+            isOneToOne: false;
+            referencedRelation: "venues";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       profiles: {
         Row: {
@@ -262,11 +312,106 @@ export type Database = {
         };
         Relationships: [];
       };
+      venue_sound_systems: {
+        Row: {
+          sound_system_id: string;
+          venue_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          sound_system_id: string;
+          venue_id: string;
+        };
+        Update: {
+          sound_system_id?: string;
+          venue_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "venue_sound_systems_sound_system_id_fkey";
+            columns: ["sound_system_id"];
+            isOneToOne: false;
+            referencedRelation: "sound_systems";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "venue_sound_systems_venue_id_fkey";
+            columns: ["venue_id"];
+            isOneToOne: false;
+            referencedRelation: "venues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      venues: {
+        Row: {
+          city_id: number;
+          created_at: string;
+          hidden_at: string | null;
+          id: string;
+          merged_into_id: string | null;
+          name: string;
+          short_id: string;
+          updated_at: string;
+          used_by_others_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id: number;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          merged_into_id?: string | null;
+          name: string;
+          short_id?: string;
+          updated_at?: string;
+          used_by_others_at?: string | null;
+        };
+        Update: {
+          city_id?: number;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          merged_into_id?: string | null;
+          name?: string;
+          short_id?: string;
+          updated_at?: string;
+          used_by_others_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "venues_city_id_fkey";
+            columns: ["city_id"];
+            isOneToOne: false;
+            referencedRelation: "cities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "venues_merged_into_id_fkey";
+            columns: ["merged_into_id"];
+            isOneToOne: false;
+            referencedRelation: "venues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      create_venue: {
+        Args: {
+          city_id: number;
+          links?: Json;
+          name: string;
+          sound_system_ids?: string[];
+        };
+        Returns: {
+          id: string;
+          short_id: string;
+        }[];
+      };
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       search_cities: {
         Args: { max_results?: number; query: string };
@@ -276,6 +421,14 @@ export type Database = {
           id: number;
           matched_name: string;
           name: string;
+        }[];
+      };
+      search_venues: {
+        Args: { city_id: number; max_results?: number; query: string };
+        Returns: {
+          id: string;
+          name: string;
+          short_id: string;
         }[];
       };
     };
