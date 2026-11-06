@@ -700,3 +700,20 @@ system brands, and the link sites with the hosts each link field accepts.
 
 **Output.** `supabase/tests/lookups.test.ts`,
 [PR #37](https://github.com/bflip12/peer-review/pull/37).
+
+### Venues, the first catalog entry (2026-11-06)
+
+**Goal.** Let a signed-in user add a venue and edit it, with the city picker, link checks,
+and a duplicate check, as the base the DJ and collective forms reuse.
+
+**My calls.**
+- Two PRs instead of one: the database first, then the form and pages. Each stays small
+  enough to review, and the database is live before any code uses it.
+- A basic venue page now, rather than waiting for Milestone 4, so a new venue has a page
+  to land on and "Edit" has a place to live.
+- `/venues/new` stays unlinked from the app until the night picker in Milestone 3 opens
+  it.
+
+**Output.** `supabase/migrations/20261104001731_create_venues.sql`, `src/features/venues/`,
+`e2e/venues.spec.ts`, [PR #41](https://github.com/bflip12/peer-review/pull/41),
+[PR #42](https://github.com/bflip12/peer-review/pull/42).
