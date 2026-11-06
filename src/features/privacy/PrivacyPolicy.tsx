@@ -25,9 +25,9 @@ export const PrivacyPolicy = (): ReactElement => (
         </li>
         <li>Your handle and display name. Anyone can see them.</li>
         <li>
-          Venues you add and edits you make to them. Anyone can see the venues. Who added
-          a venue is seen only by you, and by locals and admins. Who edited it is seen
-          only by locals and admins.
+          Venues and DJs you add, and edits you make to them. Anyone can see the venues
+          and DJs. Who added one is seen only by you, and by locals and admins. Who edited
+          it is seen only by locals and admins.
         </li>
       </ul>
     </section>
@@ -65,8 +65,8 @@ export const PrivacyPolicy = (): ReactElement => (
       <h2 className={styles.heading}>Deleting your account</h2>
       <p>
         In <Link href="/settings">Settings</Link>, &ldquo;Delete account&rdquo; deletes
-        your account and profile straight away. It cannot be undone. Venues you added and
-        edits you made stay, without the record that they were yours.
+        your account and profile straight away. It cannot be undone. Venues and DJs you
+        added, and edits you made, stay without the record that they were yours.
       </p>
     </section>
 
