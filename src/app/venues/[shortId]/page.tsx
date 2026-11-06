@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import type { ReactElement } from "react";
 
 import { VenueDetails } from "@/features/venues/VenueDetails";
-import { VenueDetailsFallback } from "@/features/venues/VenueDetailsFallback";
+import { DetailsFallback } from "@/features/catalog/DetailsFallback";
 
 export const metadata: Metadata = { title: "Venue · Peer Review" };
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Venue · Peer Review" };
  * city, which `VenueDetails` does for any missing or outdated slug.
  */
 const VenueShortPage = ({ params }: PageProps<"/venues/[shortId]">): ReactElement => (
-  <Suspense fallback={<VenueDetailsFallback />}>
+  <Suspense fallback={<DetailsFallback />}>
     <VenueDetails params={params} />
   </Suspense>
 );

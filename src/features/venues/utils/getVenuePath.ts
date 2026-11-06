@@ -1,4 +1,4 @@
-import { toSlug } from "./toSlug";
+import { toSlug } from "@/features/catalog/utils/toSlug";
 
 // Used when the name and city give no letters or digits, so the URL still has a slug.
 const FALLBACK_SLUG = "venue";

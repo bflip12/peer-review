@@ -1,4 +1,4 @@
-import type { LinkPlatformT } from "../venues.types";
+import type { LinkPlatformT } from "../catalog.types";
 
 // Labels read with "an": "an Instagram link".
 const VOWEL_PATTERN = /^[aeiou]/i;

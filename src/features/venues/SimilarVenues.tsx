@@ -2,10 +2,12 @@
 
 import type { ReactElement } from "react";
 
-import { useSearchResults } from "./hooks/useSearchResults";
+import type { CityT } from "@/features/catalog/catalog.types";
+import { useSearchResults } from "@/features/catalog/hooks/useSearchResults";
+
 import styles from "./SimilarVenues.module.css";
 import { getVenuePath } from "./utils/getVenuePath";
-import type { CityT, SimilarVenueT } from "./venues.types";
+import type { SimilarVenueT } from "./venues.types";
 
 // search_venues returns nothing under 2 characters.
 const MIN_NAME_LENGTH = 2;
