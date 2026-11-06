@@ -30,6 +30,16 @@ describe("PrivacyPolicy", () => {
     );
   });
 
+  it("lists venues and edits, and who sees that they are yours", () => {
+    render(<PrivacyPolicy />);
+
+    const result = screen.getByText(/^Venues you add and edits you make to them\./);
+
+    expect(result).toHaveTextContent(
+      "Who added a venue is seen only by you, and by locals and admins. Who edited it is seen only by locals and admins."
+    );
+  });
+
   it("has one heading per section under the page title", () => {
     render(<PrivacyPolicy />);
 

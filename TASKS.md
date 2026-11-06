@@ -43,29 +43,19 @@ the GeoNames credit on the privacy page (ADR 0025). The `sound_systems` and
 with the daily cap trigger, and `catalog_edits`, with their read rules. Their foreign keys
 come with each table, and the `used_by_others_at` trigger waits for Milestone 3.
 
-Venues are split into two PRs. The database is done: `venues`, `venue_sound_systems`, and
-`links` with the host check trigger (`PR002`), `create_venue`, `search_venues`, the
-`creations.venue_id` foreign key, and the `catalog_edits` triggers for names, cities,
-links, and tags, which DJs and collectives reuse. Left for the form PR: the city picker,
-`/venues/new` (not linked from the app until the night picker in Milestone 3), a basic
-venue page at `/venues/<short_id>/<name-city>` with "Edit" for whoever may edit, and the
-"Delete account" list and privacy page. The DJ task adds a database test of the
-`*.bandcamp.com` wildcard, since venues offer no platform that uses one.
+Venues are done: `venues`, `venue_sound_systems`, and `links` with the host check trigger
+(`PR002`), `create_venue`, `search_venues`, and the `catalog_edits` triggers, which DJs and
+collectives reuse. The city picker (`CityPicker`, calling `/api/cities`), `/venues/new` with
+the similar-venue check (not linked from the app until the night picker in Milestone 3),
+the venue page at `/venues/<short_id>/<name-city>`, and `/venues/<short_id>/edit` for
+whoever may edit. The venue page's title is "Venue · Peer Review" until Milestone 8 adds
+per-page metadata.
 
 Tasks, one PR each, in order:
-1. Venues, with the city picker. The picker calls `search_cities`. Its generated type
-   says `admin1_name` is a string, but it is null when GeoNames has no region, so the
-   picker's type marks it nullable. Show `matched_name` beside the name when they differ
-   ("Köln (Cologne)"). The `links` table, with a trigger refusing a URL whose host is not
-   in the platform's `allowed_hosts`, and the same check in the form, with an error under
-   the field built from the platform's label: "Paste a Bandcamp link, such as
-   name.bandcamp.com." The Bandcamp error adds "Using your own domain? Paste your
-   name.bandcamp.com address, or add it as your website.", since custom domains are
-   refused. Adds the `creations.venue_id` foreign key, and the trigger that writes a
-   `catalog_edits` row for each edit, shared by DJs and collectives. Adds created venues
-   and edits to the "Delete account" list and the privacy page.
-2. DJs, with the `creations.artist_id` foreign key.
-3. Collectives, with the `creations.collective_id` foreign key.
+1. DJs, with the `creations.artist_id` foreign key. Reuse `CityPicker`, the link checks
+   in `src/features/venues/utils/`, and `record_entry_edit('artist')`. Add a database test
+   of the `*.bandcamp.com` wildcard, since venues offer no platform that uses one.
+2. Collectives, with the `creations.collective_id` foreign key.
 
 The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
 with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
@@ -186,6 +176,10 @@ picked after the merge onto the original lineup. Adds `merges.undone_by`,
 
 ## Later
 
+- Venue form: replace the sound system checkboxes. Seven checkboxes take a lot of room,
+  and a venue's system is often not one of the listed brands. Decide the input (search
+  and add from the list, or let users add a brand) before DJs and collectives copy the
+  form.
 - Dark mode: dark values for the color tokens, with their pairs added to the contrast
   test in `src/styles/tokens.test.ts` (`docs/style-guide.md`, "Color")
 - Venue-claimed pages, with an opt-in public location
