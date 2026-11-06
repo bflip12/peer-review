@@ -176,6 +176,10 @@ picked after the merge onto the original lineup. Adds `merges.undone_by`,
 
 ## Later
 
+- Venue form: replace the sound system checkboxes. Seven checkboxes take a lot of room,
+  and a venue's system is often not one of the listed brands. Decide the input (search
+  and add from the list, or let users add a brand) before DJs and collectives copy the
+  form.
 - Dark mode: dark values for the color tokens, with their pairs added to the contrast
   test in `src/styles/tokens.test.ts` (`docs/style-guide.md`, "Color")
 - Venue-claimed pages, with an opt-in public location
