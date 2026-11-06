@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { LinkPlatformT } from "../venues.types";
+import type { LinkPlatformT } from "@/features/catalog/catalog.types";
+
 import { getVenueWriteFailure } from "./getVenueWriteFailure";
 
 const mockPlatforms: LinkPlatformT[] = [

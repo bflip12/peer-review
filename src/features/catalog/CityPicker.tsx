@@ -3,11 +3,11 @@
 import { useState } from "react";
 import type { ChangeEvent, KeyboardEvent, ReactElement } from "react";
 
+import type { CityOptionT, CityT } from "./catalog.types";
 import styles from "./CityPicker.module.css";
 import { useSearchResults } from "./hooks/useSearchResults";
 import { getCityLabel } from "./utils/getCityLabel";
 import { getNextOptionIndex } from "./utils/getNextOptionIndex";
-import type { CityOptionT, CityT } from "./venues.types";
 
 // search_cities returns nothing under 2 characters.
 const MIN_QUERY_LENGTH = 2;
@@ -16,7 +16,10 @@ export type CityPickerPropsT = {
   label: string;
   name: string;
   initialCity?: CityT;
+  /** Shown above the typing hint, such as what the city means for this entry. */
+  helpText?: string;
   errors?: string[];
+  isRequired?: boolean;
   onCityChange?: (city: CityT | null) => void;
 };
 
@@ -24,13 +27,16 @@ export type CityPickerPropsT = {
  * A city field that searches the city list as the user types (ARIA combobox with a
  * listbox). The chosen city's ID is sent in a hidden input named `name`; typed text alone
  * sends nothing, so the form cannot save a city that is not in the list. Arrow keys move
- * through the results, Enter picks one, and Escape closes the list.
+ * through the results, Enter picks one, and Escape closes the list. Clearing the text
+ * clears the city, so an optional city can be removed.
  */
 export const CityPicker = ({
   label,
   name,
   initialCity,
+  helpText,
   errors = [],
+  isRequired = false,
   onCityChange
 }: CityPickerPropsT): ReactElement => {
   const [city, setCity] = useState<CityT | null>(initialCity ?? null);
@@ -122,6 +128,7 @@ export const CityPicker = ({
           aria-activedescendant={
             activeOption ? `${listId}-${activeOption.id}` : undefined
           }
+          aria-required={isRequired || undefined}
           aria-invalid={hasErrors || undefined}
           aria-describedby={describedBy}
           onChange={handleChange}
@@ -158,6 +165,7 @@ export const CityPicker = ({
       </div>
       <input type="hidden" name={name} value={city?.id ?? ""} />
       <p className={styles.help} id={helpId} aria-live="polite">
+        {helpText && <>{helpText} </>}
         {hasNoResults
           ? "No city matches. Check the spelling, or try the name in English."
           : "Type at least 2 letters, then pick the city from the list."}

@@ -2,7 +2,7 @@ import "server-only";
 
 import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 
-import type { CityOptionT } from "../venues.types";
+import type { CityOptionT } from "../catalog.types";
 
 // Enough to fill the picker's list on a phone without scrolling far.
 const MAX_CITY_RESULTS = 8;

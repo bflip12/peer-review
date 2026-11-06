@@ -3,13 +3,13 @@ import { Suspense } from "react";
 import type { ReactElement } from "react";
 
 import { VenueDetails } from "@/features/venues/VenueDetails";
-import { VenueDetailsFallback } from "@/features/venues/VenueDetailsFallback";
+import { DetailsFallback } from "@/features/catalog/DetailsFallback";
 
 export const metadata: Metadata = { title: "Venue · Peer Review" };
 
 /** A venue's page, at `/venues/<short_id>/<name-city>`. */
 const VenuePage = ({ params }: PageProps<"/venues/[shortId]/[slug]">): ReactElement => (
-  <Suspense fallback={<VenueDetailsFallback />}>
+  <Suspense fallback={<DetailsFallback />}>
     <VenueDetails params={params} />
   </Suspense>
 );

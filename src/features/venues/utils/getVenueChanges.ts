@@ -1,15 +1,15 @@
+import type { LinkChangesT } from "@/features/catalog/utils/getLinkChanges";
+import { getLinkChanges } from "@/features/catalog/utils/getLinkChanges";
+
 import type { VenueInputT } from "../venues.types";
 
 /** A venue's editable values, as the edit form starts with them. */
 export type VenueValuesT = VenueInputT;
 
 /** What an edit changes, as the writes that make it. Empty lists mean nothing to do. */
-export type VenueChangesT = {
+export type VenueChangesT = LinkChangesT & {
   /** The changed columns of the venue row, or null when name and city stay. */
   venue: { name?: string; city_id?: number } | null;
-  linksToInsert: { platformId: string; url: string }[];
-  linksToUpdate: { platformId: string; url: string }[];
-  linksToDelete: string[];
   soundSystemsToAdd: string[];
   soundSystemsToRemove: string[];
 };
@@ -32,32 +32,11 @@ export const getVenueChanges = (
     venue.city_id = next.cityId;
   }
 
-  const platformIds = new Set([
-    ...Object.keys(current.links),
-    ...Object.keys(next.links)
-  ]);
-  const linksToInsert: VenueChangesT["linksToInsert"] = [];
-  const linksToUpdate: VenueChangesT["linksToUpdate"] = [];
-  const linksToDelete: string[] = [];
-  for (const platformId of [...platformIds].sort()) {
-    const before = current.links[platformId];
-    const after = next.links[platformId];
-    if (before === undefined && after !== undefined) {
-      linksToInsert.push({ platformId, url: after });
-    } else if (before !== undefined && after === undefined) {
-      linksToDelete.push(platformId);
-    } else if (before !== undefined && after !== undefined && before !== after) {
-      linksToUpdate.push({ platformId, url: after });
-    }
-  }
-
   const currentTags = new Set(current.soundSystemIds);
   const nextTags = new Set(next.soundSystemIds);
   return {
     venue: Object.keys(venue).length > 0 ? venue : null,
-    linksToInsert,
-    linksToUpdate,
-    linksToDelete,
+    ...getLinkChanges(current.links, next.links),
     soundSystemsToAdd: [...nextTags].filter((id) => !currentTags.has(id)).sort(),
     soundSystemsToRemove: [...currentTags].filter((id) => !nextTags.has(id)).sort()
   };

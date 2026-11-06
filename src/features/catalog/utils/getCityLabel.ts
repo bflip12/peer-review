@@ -1,4 +1,4 @@
-import type { CityOptionT, CityT } from "../venues.types";
+import type { CityOptionT, CityT } from "../catalog.types";
 
 /**
  * How a city reads in the picker and on a venue page.

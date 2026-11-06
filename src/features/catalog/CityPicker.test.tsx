@@ -2,8 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { CityOptionT } from "./catalog.types";
 import { CityPicker } from "./CityPicker";
-import type { CityOptionT } from "./venues.types";
 
 const mockKoln: CityOptionT = {
   id: 2886242,
@@ -159,5 +159,36 @@ describe("CityPicker", () => {
       "true"
     );
     expect(screen.getByText("Pick the venue's city from the list.")).toBeInTheDocument();
+  });
+
+  it("shows the help text before the typing hint, and marks a required field", () => {
+    render(
+      <form aria-label="DJ">
+        <CityPicker
+          label="Where they're based"
+          name="cityId"
+          helpText="Not where you saw them."
+          isRequired
+        />
+      </form>
+    );
+
+    const input = screen.getByRole("combobox", { name: "Where they're based" });
+    expect(input).toHaveAttribute("aria-required", "true");
+    expect(input).toHaveAccessibleDescription(
+      "Not where you saw them. Type at least 2 letters, then pick the city from the list."
+    );
+  });
+
+  it("leaves an optional field unmarked", () => {
+    render(
+      <form aria-label="DJ">
+        <CityPicker label="Where they're based" name="cityId" />
+      </form>
+    );
+
+    expect(
+      screen.getByRole("combobox", { name: "Where they're based" })
+    ).not.toHaveAttribute("aria-required");
   });
 });

@@ -1,10 +1,11 @@
 import "server-only";
 
+import type { LinkPlatformT } from "@/features/catalog/catalog.types";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
 import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 
 import { getVenueWriteFailure } from "../utils/getVenueWriteFailure";
-import type { LinkPlatformT, VenueInputT } from "../venues.types";
+import type { VenueInputT } from "../venues.types";
 
 /**
  * Adds a venue as the signed-in user, with its links and tags, in one transaction
