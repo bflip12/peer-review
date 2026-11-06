@@ -1,0 +1,60 @@
+.wrapper {
+  --venue-width: 40rem; /* 640px, the review width in docs/style-guide.md */
+
+  max-width: var(--venue-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.city {
+  font-size: var(--text-md);
+}
+
+.region {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.edit {
+  align-self: flex-start;
+  min-height: var(--tap-target);
+  display: inline-flex;
+  align-items: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: var(--rule-width) solid var(--color-rule-strong);
+}
+
+.label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  min-height: var(--tap-target);
+  display: flex;
+  align-items: center;
+  border-bottom: var(--rule-width) solid var(--color-rule);
+}

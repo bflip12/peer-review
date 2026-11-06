@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import styles from "./PrivacyPolicy.module.css";
 
 // Shown on the page. Change it with every edit to the text below.
-const LAST_UPDATED = "3 November 2026";
+const LAST_UPDATED = "6 November 2026";
 const CONTACT_EMAIL = "hello@peerreview.club";
 
 /**
@@ -24,6 +24,11 @@ export const PrivacyPolicy = (): ReactElement => (
           or search returns it.
         </li>
         <li>Your handle and display name. Anyone can see them.</li>
+        <li>
+          Venues you add and edits you make to them. Anyone can see the venues. Who added
+          a venue is seen only by you, and by locals and admins. Who edited it is seen
+          only by locals and admins.
+        </li>
       </ul>
     </section>
 
@@ -60,7 +65,8 @@ export const PrivacyPolicy = (): ReactElement => (
       <h2 className={styles.heading}>Deleting your account</h2>
       <p>
         In <Link href="/settings">Settings</Link>, &ldquo;Delete account&rdquo; deletes
-        your account and profile straight away. It cannot be undone.
+        your account and profile straight away. It cannot be undone. Venues you added and
+        edits you made stay, without the record that they were yours.
       </p>
     </section>
 

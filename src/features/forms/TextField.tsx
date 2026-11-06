@@ -6,7 +6,7 @@ export type TextFieldPropsT = {
   label: string;
   name: string;
   value: string;
-  type?: "text" | "email";
+  type?: "text" | "email" | "url";
   autoComplete?: string;
   helpText?: string;
   errors?: string[];
