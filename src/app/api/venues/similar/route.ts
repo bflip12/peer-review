@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { getSignedInUserId } from "@/features/auth/data/getSignedInUserId";
-import { findSimilarVenues } from "@/features/venues/data/findSimilarVenues";
 import { getSearchQueryParam } from "@/features/catalog/utils/getSearchQueryParam";
+import { findSimilarVenues } from "@/features/venues/data/findSimilarVenues";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
 const cityIdSchema = z.coerce.number().int().positive();

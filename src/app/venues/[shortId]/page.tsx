@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import type { ReactElement } from "react";
 
-import { VenueDetails } from "@/features/venues/VenueDetails";
 import { DetailsFallback } from "@/features/catalog/DetailsFallback";
+import { VenueDetails } from "@/features/venues/VenueDetails";
 
 export const metadata: Metadata = { title: "Venue · Peer Review" };
 

@@ -717,3 +717,21 @@ and a duplicate check, as the base the DJ and collective forms reuse.
 **Output.** `supabase/migrations/20261104001731_create_venues.sql`, `src/features/venues/`,
 `e2e/venues.spec.ts`, [PR #41](https://github.com/bflip12/peer-review/pull/41),
 [PR #42](https://github.com/bflip12/peer-review/pull/42).
+
+### DJs, and which duplicates count (2026-11-06)
+
+**Goal.** Let a signed-in user add and edit a DJ, with the optional home city from ADR 0011
+and a duplicate check that tells two artists with one name apart.
+
+**My calls.**
+- Claude proposed showing near matches ("Rush" for "DJ Rush") as a separate list. I pointed
+  out that "Rush" may be a different artist from "DJ Rush", depending on where they're
+  based. So near matches only show DJs in the picked city or with no city. Exact matches
+  show in any city, since those decide whether the new DJ needs a city.
+- "Use this DJ" opens the DJ's page for now. Lineups in Milestone 3 make it pick the DJ.
+- The city picker and link checks moved to a shared folder before the DJ form used them,
+  so collectives reuse them as well.
+
+**Output.** `supabase/migrations/20261106063049_create_artists.sql`, `src/features/djs/`,
+`src/features/catalog/`, `e2e/djs.spec.ts`,
+[PR #43](https://github.com/bflip12/peer-review/pull/43).

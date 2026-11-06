@@ -20,8 +20,8 @@ export const DeleteAccountSection = (): ReactElement => (
       Your handle becomes free for anyone to take.
     </p>
     <p>
-      Venues you added and edits you made stay on Peer Review for everyone to use. The
-      record that you added or edited them is deleted.
+      Venues and DJs you added, and edits you made, stay on Peer Review for everyone to
+      use. The record that you added or edited them is deleted.
     </p>
     <Suspense fallback={<FormFallback fieldCount={1} />}>
       <DeleteAccount />
