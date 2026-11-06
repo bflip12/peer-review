@@ -44,7 +44,7 @@ export const findSimilarDjs = async (
           : {
               id: cityId,
               name: artist.home_city_name,
-              admin1Name: (artist.home_city_admin1_name) ?? null,
+              admin1Name: artist.home_city_admin1_name ?? null,
               countryCode: artist.home_city_country_code
             },
       linkLabels: artist.link_platform_ids.flatMap((id) => {
