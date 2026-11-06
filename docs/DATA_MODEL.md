@@ -303,6 +303,28 @@ rows not merged (checked). A second "DJ Rush" needs a city when the first has no
 renaming a DJ or changing their city into a taken pair is refused. The form requires the
 city in exactly that case, so it and the index agree.
 
+A name containing "b2b" in any case is refused by its own check, `artists_name_b2b_check`,
+so the form tells that refusal apart from a blank or long name. A taken name and city is a
+unique violation on `artists_name_city_id_key`.
+
+`create_artist(name, city_id, links)` is the only way to add a DJ. It writes the DJ, their
+`creations` row, and their links in one transaction, the same as `create_venue`. `city_id`
+may be null. Signed-in users with an active profile only.
+
+`search_artists(query, city_id, max_results)` serves the duplicate check before a new DJ
+is added. Two kinds of match, exact first:
+- Exact: the same name ignoring case and surrounding spaces, the rule the unique index
+  uses. Returned whatever their city, with `is_exact` true, so the form can require a city
+  when one of them has none.
+- Near: a name containing the query or with a trigram similarity of 0.3 or more, ignoring
+  case and accents ("Rush" finds "DJ Rush"). With a `city_id`, only DJs in that city or
+  with no city, since a DJ based elsewhere is likely someone else.
+
+Each row has the DJ's city (`home_city_*`, since `city_id` is the parameter) and the
+platform IDs of their links in form order. The generated types call the city columns
+strings, but they are null for a DJ with no city. Merged DJs are left out. Under 2
+characters it returns nothing. At most 10 rows. Signed-in users only.
+
 #### collectives
 
 | Field | Type | Notes |
@@ -930,6 +952,13 @@ below passed on both:
   `pg_timezone_names`. `search_cities` finds Köln for "koln" and "Cologne", lists Portland,
   Oregon before Portland, Maine, finds New York City for "york", treats `%` as text, and
   caps results at 20. Timed as `anon`: 6 to 15 ms for 3 or more characters, 26 ms for 2.
+- `artists` (2026-11-06, local stack, `supabase/tests/artists.test.ts` and
+  `artistLinksAndSearch.test.ts`): the name and city index refuses a second DJ with the
+  same name and no city in any case or spacing, allows the name with a city, refuses the
+  same city twice, ignores merged DJs, and refuses renaming or moving a DJ into a taken
+  pair. "b2b" is refused in any case, "B 2 B" is not. The 51st DJ in 24 hours is refused.
+  The Bandcamp field accepts `djrush.bandcamp.com` and refuses `bandcamp.com`,
+  `evilbandcamp.com`, the DJ's own domain, and a user name before a Bandcamp host.
 
 ## Unverified
 

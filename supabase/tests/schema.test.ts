@@ -5,8 +5,10 @@ import { runSql } from "./utils/testClients.ts";
 // Functions in `public` that the API roles may call. Each entry is a deliberate choice,
 // added in the migration that grants it, with a test calling it as anon and as a user.
 const EXPOSED_FUNCTIONS: string[] = [
+  "create_artist",
   "create_venue",
   "delete_my_account",
+  "search_artists",
   "search_cities",
   "search_venues"
 ];
