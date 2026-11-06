@@ -267,6 +267,17 @@ A new platform (Discogs, Mixcloud) is a new row, not a column on three tables.
 
 Unique on `(id, city_id)`, so events can reference both together.
 
+`create_venue(name, city_id, links, sound_system_ids)` is the only way to add a venue. It
+writes the venue, its `creations` row, its links (`links` maps platform IDs to URLs), and
+its tags in one transaction, so the daily cap applies and a refused link saves nothing.
+Signed-in users with an active profile only. A `short_id` collision is retried with a new
+value.
+
+`search_venues(query, city_id, max_results)` serves the duplicate check before a new venue
+is added. It returns venues in the city whose name contains the query or has a trigram
+similarity of 0.3 or more, ignoring case and accents, closest first. Merged venues are left
+out. Under 2 characters it returns nothing. At most 10 rows. Signed-in users only.
+
 #### venue_sound_systems
 
 `venue_id` (cascade) and `sound_system_id`. Primary key on both.
@@ -312,9 +323,14 @@ city in exactly that case, so it and the index agree.
 | `id` | uuid | |
 | `venue_id`, `artist_id`, `collective_id` | uuid | Exactly one is set (check). Cascade |
 | `platform_id` | text | References `link_platforms` |
-| `url` | text | Host must be in the platform's `allowed_hosts` (trigger) |
+| `url` | text | An http or https URL. Host must be in the platform's `allowed_hosts`, and the platform must be offered for the owner's kind (trigger) |
 
 One link per platform per entry: unique on each owner column plus `platform_id`.
+
+The host check reads the host after `://`, lowercased, without a port or a trailing dot.
+A URL with a user name before the host (`https://instagram.com@example.com`) is refused,
+since its real host is after the `@`. A refusal has SQLSTATE `PR002`, with the platform
+ID as its detail, so the form shows its message without reading the text.
 
 ### Events and lineups
 
@@ -619,12 +635,17 @@ Each edit to a venue, DJ, collective, event, or lineup slot (ADR 0009, ADR 0013)
 | `id` | uuid | |
 | `entity_type` | `catalog_type` | |
 | `entity_id` | uuid | No foreign key: it can point at any of five tables |
-| `field` | text | `name`, `city_id`, `venue_id`, a link platform, a sound tag, a co-host, and for slots `removed` or `artists`. Lowercase snake_case (check) |
+| `field` | text | `name`, `city_id`, `venue_id`, a link platform (values are URLs), `sound_system` (values are sound system IDs), a co-host, and for slots `removed` or `artists`. Lowercase snake_case (check) |
 | `old_value`, `new_value` | jsonb | Null when the field was empty, or the edit cleared it. The two always differ (check) |
 | `edited_by` | uuid | References `profiles`. Set null on delete |
 | `reverts_edit_id` | uuid | Set when this edit is a revert. References `catalog_edits` |
 | `merge_id` | uuid | Milestone 10. Set when a merge made the edit |
 | `created_at` | timestamptz | |
+
+Written by triggers on the entry tables, `links`, and `venue_sound_systems`, one row per
+changed field. Changes in the transaction that created the entry are its creation, not
+edits, and write nothing; the trigger tells them apart because the entry's `created_at`
+is that transaction's `now()`.
 
 Readable by moderators and admins. A slot's edits are listed in its event's history. A
 revert that would leave two live slots with the same artists on one event is refused.
@@ -754,7 +775,7 @@ listed is written only by defaults, triggers, or database functions. Enforcement
 | `lineup_slots`, `slot_artists` | Through the lineup functions only | Through the lineup functions only | `removed_at` and every other column |
 | `reports` | Insert: target, `reason`, `description`, `duplicate_of_id` | Within their queue: `status` | `reporter_id`, `resolved_by`, `resolved_at`, `created_at` |
 | `notices` | `action` | | Every other column, including `acted_at` |
-| `links`, `venue_sound_systems` | Insert and delete, for whoever may edit the entry | Insert and delete | `id` |
+| `links`, `venue_sound_systems` | Insert and delete, for whoever may edit the entry. `links.url` can also change in place, so a changed link is one edit | The same | `id`. A link's owner and `platform_id` never change |
 | `follows`, `likes`, `going` | Insert and delete only | | Every column |
 
 ### Averages and counts

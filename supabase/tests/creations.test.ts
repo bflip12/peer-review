@@ -28,8 +28,23 @@ const KIND_COLUMNS: Record<KindT, string> = {
   lineup_slot: "lineup_slot_id"
 };
 
-// Inserts creations rows as `postgres`, the way the create functions will. The entries
-// they point at do not exist yet, so the ids are random. `ageHours` backdates the rows.
+// GeoNames ID of Berlin, the city of the venues these tests create.
+const BERLIN = 2950159;
+
+// Ids of new entries of a kind, as SQL. Venues exist from Milestone 2, so their creations
+// rows point at new venue rows. The other entries' tables do not exist yet, so their ids
+// are random.
+const newEntryIds = (kind: KindT, count: number): string =>
+  kind === "venue"
+    ? `with entries as (
+        insert into public.venues (name, city_id)
+        select 'Creations test', ${BERLIN} from generate_series(1, ${count})
+        returning id
+      )`
+    : `with entries as (select gen_random_uuid() as id from generate_series(1, ${count}))`;
+
+// Inserts creations rows as `postgres`, the way the create functions will. `ageHours`
+// backdates the rows.
 const insertCreations = async (
   userId: string,
   kind: KindT,
@@ -37,9 +52,9 @@ const insertCreations = async (
   ageHours = 0
 ): Promise<void> => {
   await runSql(`
+    ${newEntryIds(kind, count)}
     insert into public.creations (created_by, ${KIND_COLUMNS[kind]}, created_at)
-    select '${userId}', gen_random_uuid(), now() - interval '${ageHours} hours'
-    from generate_series(1, ${count})`);
+    select '${userId}', id, now() - interval '${ageHours} hours' from entries`);
 };
 
 // The Postgres error code of a statement, or null when it succeeds.
@@ -198,8 +213,9 @@ describe("creations", () => {
       const first = new pg.Client({ connectionString: dbUrl });
       const second = new pg.Client({ connectionString: dbUrl });
       await Promise.all([first.connect(), second.connect()]);
-      const insert = `insert into public.creations (created_by, venue_id)
-        values ('${alice.userId}', gen_random_uuid())`;
+      const insert = `${newEntryIds("venue", 1)}
+        insert into public.creations (created_by, venue_id)
+        select '${alice.userId}', id from entries`;
 
       try {
         await first.query("begin");

@@ -9,12 +9,6 @@ order.
 
 ## Decisions waiting on Bobby
 
-- **Public repo.** This repo goes public as it is, history included, so it can be shown
-  in Bobby's portfolio (decided 2026-11-03). The README is written for visitors. Waiting
-  on Bobby, in GitHub, repo settings: General, Features, set Issues and Pull requests to
-  "Collaborators only", then Danger Zone, "Change repository visibility" to public.
-  Notes that should stay private go in a separate private repo.
-
 - **Database URL secret.** The Migrate workflow connects with the `SUPABASE_DB_URL` repo
   secret (session pooler URL with the database password). Update it whenever the database
   password changes, or Migrate fails at "List the migrations that will run". The staging
@@ -48,6 +42,15 @@ the GeoNames credit on the privacy page (ADR 0025). The `sound_systems` and
 `link_platforms` lookups, with text IDs and the hosts each link field accepts. `creations`
 with the daily cap trigger, and `catalog_edits`, with their read rules. Their foreign keys
 come with each table, and the `used_by_others_at` trigger waits for Milestone 3.
+
+Venues are split into two PRs. The database is done: `venues`, `venue_sound_systems`, and
+`links` with the host check trigger (`PR002`), `create_venue`, `search_venues`, the
+`creations.venue_id` foreign key, and the `catalog_edits` triggers for names, cities,
+links, and tags, which DJs and collectives reuse. Left for the form PR: the city picker,
+`/venues/new` (not linked from the app until the night picker in Milestone 3), a basic
+venue page at `/venues/<short_id>/<name-city>` with "Edit" for whoever may edit, and the
+"Delete account" list and privacy page. The DJ task adds a database test of the
+`*.bandcamp.com` wildcard, since venues offer no platform that uses one.
 
 Tasks, one PR each, in order:
 1. Venues, with the city picker. The picker calls `search_cities`. Its generated type
