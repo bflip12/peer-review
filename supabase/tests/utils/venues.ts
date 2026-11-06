@@ -30,9 +30,14 @@ export type VenueArgsT = {
   sound_system_ids?: string[];
 };
 
-/** A name no other test run uses, so searches find only this run's venues. */
-export const newName = (prefix: string): string =>
-  `${prefix} ${randomUUID().replaceAll("-", "").slice(0, 8)}`;
+/**
+ * 8 random characters no other test run uses. Never "b2b", which DJ names refuse.
+ */
+export const newSuffix = (): string =>
+  randomUUID().replaceAll("-", "").slice(0, 8).replaceAll("b2b", "b3b");
+
+/** A name no other test run uses, so searches find only this run's entries. */
+export const newName = (prefix: string): string => `${prefix} ${newSuffix()}`;
 
 /** Gives a test user a profile, as the user would after first sign-in. */
 export const createProfile = async (user: TestUserT): Promise<void> => {

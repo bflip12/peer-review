@@ -29,6 +29,58 @@ export type Database = {
   };
   public: {
     Tables: {
+      artists: {
+        Row: {
+          city_id: number | null;
+          created_at: string;
+          hidden_at: string | null;
+          id: string;
+          merged_into_id: string | null;
+          name: string;
+          short_id: string;
+          updated_at: string;
+          used_by_others_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id?: number | null;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          merged_into_id?: string | null;
+          name: string;
+          short_id?: string;
+          updated_at?: string;
+          used_by_others_at?: string | null;
+        };
+        Update: {
+          city_id?: number | null;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          merged_into_id?: string | null;
+          name?: string;
+          short_id?: string;
+          updated_at?: string;
+          used_by_others_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "artists_city_id_fkey";
+            columns: ["city_id"];
+            isOneToOne: false;
+            referencedRelation: "cities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "artists_merged_into_id_fkey";
+            columns: ["merged_into_id"];
+            isOneToOne: false;
+            referencedRelation: "artists";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       catalog_edits: {
         Row: {
           created_at: string;
@@ -173,6 +225,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "creations_artist_id_fkey";
+            columns: ["artist_id"];
+            isOneToOne: true;
+            referencedRelation: "artists";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "creations_created_by_fkey";
             columns: ["created_by"];
             isOneToOne: false;
@@ -246,6 +305,13 @@ export type Database = {
           venue_id?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "links_artist_id_fkey";
+            columns: ["artist_id"];
+            isOneToOne: false;
+            referencedRelation: "artists";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "links_platform_id_fkey";
             columns: ["platform_id"];
@@ -400,6 +466,13 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_artist: {
+        Args: { city_id?: number; links?: Json; name: string };
+        Returns: {
+          id: string;
+          short_id: string;
+        }[];
+      };
       create_venue: {
         Args: {
           city_id: number;
@@ -413,6 +486,20 @@ export type Database = {
         }[];
       };
       delete_my_account: { Args: Record<PropertyKey, never>; Returns: undefined };
+      search_artists: {
+        Args: { city_id?: number; max_results?: number; query: string };
+        Returns: {
+          home_city_admin1_name: string;
+          home_city_country_code: string;
+          home_city_id: number;
+          home_city_name: string;
+          id: string;
+          is_exact: boolean;
+          link_platform_ids: string[];
+          name: string;
+          short_id: string;
+        }[];
+      };
       search_cities: {
         Args: { max_results?: number; query: string };
         Returns: {

@@ -31,17 +31,29 @@ const KIND_COLUMNS: Record<KindT, string> = {
 // GeoNames ID of Berlin, the city of the venues these tests create.
 const BERLIN = 2950159;
 
-// Ids of new entries of a kind, as SQL. Venues exist from Milestone 2, so their creations
-// rows point at new venue rows. The other entries' tables do not exist yet, so their ids
-// are random.
-const newEntryIds = (kind: KindT, count: number): string =>
-  kind === "venue"
-    ? `with entries as (
+// Ids of new entries of a kind, as SQL. Venues and DJs exist from Milestone 2, so their
+// creations rows point at new rows. DJ names are unique per city, so each gets its own,
+// without "b2b", which DJ names refuse.
+// The other entries' tables do not exist yet, so their ids are random.
+const newEntryIds = (kind: KindT, count: number): string => {
+  switch (kind) {
+    case "venue":
+      return `with entries as (
         insert into public.venues (name, city_id)
         select 'Creations test', ${BERLIN} from generate_series(1, ${count})
         returning id
-      )`
-    : `with entries as (select gen_random_uuid() as id from generate_series(1, ${count}))`;
+      )`;
+    case "artist":
+      return `with entries as (
+        insert into public.artists (name)
+        select 'Creations test ' || replace(gen_random_uuid()::text, 'b2b', 'b3b')
+        from generate_series(1, ${count})
+        returning id
+      )`;
+    default:
+      return `with entries as (select gen_random_uuid() as id from generate_series(1, ${count}))`;
+  }
+};
 
 // Inserts creations rows as `postgres`, the way the create functions will. `ageHours`
 // backdates the rows.
