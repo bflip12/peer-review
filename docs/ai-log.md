@@ -734,4 +734,5 @@ and a duplicate check that tells two artists with one name apart.
 
 **Output.** `supabase/migrations/20261106063049_create_artists.sql`, `src/features/djs/`,
 `src/features/catalog/`, `e2e/djs.spec.ts`,
-[PR #43](https://github.com/bflip12/peer-review/pull/43).
+[PR #43](https://github.com/bflip12/peer-review/pull/43),
+[PR #44](https://github.com/bflip12/peer-review/pull/44).
