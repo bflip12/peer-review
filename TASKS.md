@@ -51,10 +51,26 @@ the venue page at `/venues/<short_id>/<name-city>`, and `/venues/<short_id>/edit
 whoever may edit. The venue page's title is "Venue · Peer Review" until Milestone 8 adds
 per-page metadata.
 
+DJs are split into two PRs, like venues. The database is done: `artists` with the name and
+city index and the b2b check, the `creations.artist_id` and `links.artist_id` foreign keys,
+`create_artist`, `search_artists` (exact name matches in any city, flagged, then near
+matches in the picked city or with no city), and the links policies covering venues and
+DJs. Left for the form PR:
+- Move `CityPicker`, the link utils, `toSlug`, `getNextOptionIndex`, `useSearchResults`,
+  and the city types from `src/features/venues/` to `src/features/catalog/`.
+- `/djs/new` (not linked from the app until lineups in Milestone 3), with "Where they're
+  based" and the five link fields. The duplicate check: exact matches as "There's already
+  a DJ called …" with "Use this DJ" (opens the DJ page until lineups exist), then
+  "Different person?" and "Add as a new DJ", with the city required when one of them has
+  no city. Near matches as a separate "Already on Peer Review?" list. Messages for b2b, a
+  taken name and city, the cap, and link hosts. `search_artists`' generated type calls the
+  `home_city_*` columns strings; they are null for a DJ with no city.
+- The DJ page at `/djs/<short_id>/<name>` with the city under the name, and
+  `/djs/<short_id>/edit` for whoever may edit.
+- The "Delete account" list and the privacy page.
+
 Tasks, one PR each, in order:
-1. DJs, with the `creations.artist_id` foreign key. Reuse `CityPicker`, the link checks
-   in `src/features/venues/utils/`, and `record_entry_edit('artist')`. Add a database test
-   of the `*.bandcamp.com` wildcard, since venues offer no platform that uses one.
+1. DJs: the form PR above.
 2. Collectives, with the `creations.collective_id` foreign key.
 
 The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
