@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { searchCities } from "@/features/catalog/data/searchCities";
 import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 
 import { createAnonClient, runSql } from "../../../../supabase/tests/utils/testClients";
@@ -16,7 +17,6 @@ import { findSimilarVenues } from "./findSimilarVenues";
 import { getCanEditVenue } from "./getCanEditVenue";
 import { getVenue } from "./getVenue";
 import { getVenueFormOptions } from "./getVenueFormOptions";
-import { searchCities } from "./searchCities";
 import { updateVenue } from "./updateVenue";
 
 // GeoNames ID of Singapore, a city with no region.

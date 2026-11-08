@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { CityOptionT } from "../venues.types";
+import type { CityOptionT } from "../catalog.types";
 import { getCityLabel } from "./getCityLabel";
 
 const mockKoln: CityOptionT = {

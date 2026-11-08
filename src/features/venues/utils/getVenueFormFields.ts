@@ -1,5 +1,5 @@
-import type { LinkPlatformT } from "../venues.types";
-import { getLinkFieldName } from "./getLinkFieldName";
+import type { LinkPlatformT } from "@/features/catalog/catalog.types";
+import { getLinkFormFields } from "@/features/catalog/utils/getLinkFormFields";
 
 // FormData.get returns a File for a file input. The venue form has none, so a File is
 // treated as an empty field rather than trusted.
@@ -16,14 +16,10 @@ export const getVenueFormFields = (
   formData: FormData,
   platforms: LinkPlatformT[]
 ): Record<string, unknown> => {
-  const fields: Record<string, unknown> = {
+  return {
     name: toText(formData.get("name")),
     cityId: toText(formData.get("cityId")),
-    soundSystemIds: formData.getAll("soundSystemIds").map(toText)
+    soundSystemIds: formData.getAll("soundSystemIds").map(toText),
+    ...getLinkFormFields(formData, platforms)
   };
-  for (const platform of platforms) {
-    const fieldName = getLinkFieldName(platform.id);
-    fields[fieldName] = toText(formData.get(fieldName));
-  }
-  return fields;
 };
