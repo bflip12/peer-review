@@ -2,12 +2,13 @@ import "server-only";
 
 import type { PostgrestError } from "@supabase/supabase-js";
 
+import type { LinkPlatformT } from "@/features/catalog/catalog.types";
+import { writeLinkChanges } from "@/features/catalog/data/writeLinkChanges";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
 import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 
 import type { VenueChangesT } from "../utils/getVenueChanges";
 import { getVenueWriteFailure } from "../utils/getVenueWriteFailure";
-import type { LinkPlatformT } from "../venues.types";
 
 const NO_LONGER_EDITABLE =
   "You can no longer edit this venue. Someone else has picked it, so locals keep it up to date.";
@@ -52,43 +53,15 @@ export const updateVenue = async (
     }
   }
 
-  for (const link of changes.linksToUpdate) {
-    const { data, error } = await supabase
-      .from("links")
-      .update({ url: link.url })
-      .eq("venue_id", venueId)
-      .eq("platform_id", link.platformId)
-      .select("id");
-    if (error) {
-      return fail(error);
-    }
-    if (data.length === 0) {
-      return { ok: false, message: NO_LONGER_EDITABLE };
-    }
+  const links = await writeLinkChanges(supabase, {
+    owner: { column: "venue_id", id: venueId },
+    changes
+  });
+  if (links === "noRow") {
+    return { ok: false, message: NO_LONGER_EDITABLE };
   }
-
-  if (changes.linksToDelete.length > 0) {
-    const { error } = await supabase
-      .from("links")
-      .delete()
-      .eq("venue_id", venueId)
-      .in("platform_id", changes.linksToDelete);
-    if (error) {
-      return fail(error);
-    }
-  }
-
-  if (changes.linksToInsert.length > 0) {
-    const { error } = await supabase.from("links").insert(
-      changes.linksToInsert.map((link) => ({
-        venue_id: venueId,
-        platform_id: link.platformId,
-        url: link.url
-      }))
-    );
-    if (error) {
-      return fail(error);
-    }
+  if (links !== "done") {
+    return fail(links);
   }
 
   if (changes.soundSystemsToRemove.length > 0) {

@@ -3,16 +3,17 @@
 import { useActionState, useState } from "react";
 import type { ReactElement } from "react";
 
+import type { CityT } from "@/features/catalog/catalog.types";
+import { CityPicker } from "@/features/catalog/CityPicker";
+import { getLinkFieldName } from "@/features/catalog/utils/getLinkFieldName";
 import { FormError } from "@/features/forms/FormError";
 import { SubmitButton } from "@/features/forms/SubmitButton";
 import { TextField } from "@/features/forms/TextField";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
 
-import { CityPicker } from "./CityPicker";
 import { SimilarVenues } from "./SimilarVenues";
-import { getLinkFieldName } from "./utils/getLinkFieldName";
 import styles from "./VenueForm.module.css";
-import type { CityT, VenueFormOptionsT } from "./venues.types";
+import type { VenueFormOptionsT } from "./venues.types";
 
 /** A server action the venue form submits, through `useActionState`. */
 export type VenueFormActionT = (

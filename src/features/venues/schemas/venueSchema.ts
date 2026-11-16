@@ -1,10 +1,9 @@
 import { z } from "zod";
 
-import { getLinkErrorMessage } from "../utils/getLinkErrorMessage";
-import { getLinkFieldName } from "../utils/getLinkFieldName";
-import { isAllowedLinkUrl } from "../utils/isAllowedLinkUrl";
-import { normalizeLinkUrl } from "../utils/normalizeLinkUrl";
-import type { LinkPlatformT, VenueFormOptionsT, VenueInputT } from "../venues.types";
+import { getLinkSchema } from "@/features/catalog/schemas/getLinkSchema";
+import { getLinkFieldName } from "@/features/catalog/utils/getLinkFieldName";
+
+import type { VenueFormOptionsT, VenueInputT } from "../venues.types";
 
 // The same limit as venues_name_check (migration create_venues).
 const NAME_MAX_LENGTH = 100;
@@ -23,14 +22,6 @@ const cityIdSchema = z.coerce
   .number({ error: "Pick the venue's city from the list." })
   .int("Pick the venue's city from the list.")
   .positive("Pick the venue's city from the list.");
-
-const getLinkSchema = (platform: LinkPlatformT): z.ZodType<string | null, string> =>
-  z
-    .string()
-    .transform(normalizeLinkUrl)
-    .refine((url) => url === null || isAllowedLinkUrl(platform, url), {
-      error: getLinkErrorMessage(platform)
-    });
 
 /**
  * The venue form, for adding and editing. Built from the form's options, so a link field

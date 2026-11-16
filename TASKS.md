@@ -51,27 +51,20 @@ the venue page at `/venues/<short_id>/<name-city>`, and `/venues/<short_id>/edit
 whoever may edit. The venue page's title is "Venue · Peer Review" until Milestone 8 adds
 per-page metadata.
 
-DJs are split into two PRs, like venues. The database is done: `artists` with the name and
-city index and the b2b check, the `creations.artist_id` and `links.artist_id` foreign keys,
-`create_artist`, `search_artists` (exact name matches in any city, flagged, then near
-matches in the picked city or with no city), and the links policies covering venues and
-DJs. Left for the form PR:
-- Move `CityPicker`, the link utils, `toSlug`, `getNextOptionIndex`, `useSearchResults`,
-  and the city types from `src/features/venues/` to `src/features/catalog/`.
-- `/djs/new` (not linked from the app until lineups in Milestone 3), with "Where they're
-  based" and the five link fields. The duplicate check: exact matches as "There's already
-  a DJ called …" with "Use this DJ" (opens the DJ page until lineups exist), then
-  "Different person?" and "Add as a new DJ", with the city required when one of them has
-  no city. Near matches as a separate "Already on Peer Review?" list. Messages for b2b, a
-  taken name and city, the cap, and link hosts. `search_artists`' generated type calls the
-  `home_city_*` columns strings; they are null for a DJ with no city.
-- The DJ page at `/djs/<short_id>/<name>` with the city under the name, and
-  `/djs/<short_id>/edit` for whoever may edit.
-- The "Delete account" list and the privacy page.
+DJs are done: `artists` with the name and city index and the b2b check, `create_artist`,
+`search_artists` (exact name matches in any city, flagged, then near matches in the picked
+city or with no city), and the links policies covering venues and DJs. `/djs/new` (not
+linked from the app until lineups in Milestone 3) shows DJs with the same name with "Use
+this DJ" (opens the DJ page until lineups exist) and requires a city when one of them has
+none, and lists similar names apart. The DJ page at `/djs/<short_id>/<name>` and
+`/djs/<short_id>/edit`. The code venues, DJs, and collectives share (city picker, link
+checks and writes) is in `src/features/catalog/`. The DJ page's title is "DJ · Peer
+Review" until Milestone 8.
 
 Tasks, one PR each, in order:
-1. DJs: the form PR above.
-2. Collectives, with the `creations.collective_id` foreign key.
+1. Collectives, with the `creations.collective_id` foreign key. Reuse
+   `src/features/catalog/`, and add `collective_id` to `LinkOwnerT` in
+   `writeLinkChanges` and to the `links` policies.
 
 The milestone as a whole: venues with name, city, links, and sound tags. DJs and collectives. Search-first creation
 with fuzzy duplicate suggestions. Links in a `links` table, validated by domain per
@@ -96,7 +89,7 @@ night" groups, nights one day either side, the optional name field with the post
 "Join" before a required name, and the past-midnight line. Events created only when a log is saved, with
 the concurrent-save case joining instead of failing, and counting toward the daily event cap
 (ADR 0011). Lineup slots with one or more artists,
-b2b detection in DJ search, "b2b with" and slot removal by the user who added it until
+b2b detection in DJ search, "Use this DJ" on the DJ form picking the DJ instead of opening their page, "b2b with" and slot removal by the user who added it until
 someone else picks it, with removal setting `removed_at` (ADR 0013). Log form with the
 overall rating, review, and privacy first, and a collapsed section for sound, venue, and
 "Which sets did you listen to?". At most 3 logs per user per date, enforced by a trigger.

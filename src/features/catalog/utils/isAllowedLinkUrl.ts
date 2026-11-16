@@ -1,4 +1,4 @@
-import type { LinkPlatformT } from "../venues.types";
+import type { LinkPlatformT } from "../catalog.types";
 
 // The same limits as links_url_check and the host check trigger (migration create_venues).
 const URL_PATTERN = /^https?:\/\/\S+$/;

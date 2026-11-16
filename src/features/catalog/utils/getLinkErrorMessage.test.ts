@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { LinkPlatformT } from "../venues.types";
+import type { LinkPlatformT } from "../catalog.types";
 import { getLinkErrorMessage } from "./getLinkErrorMessage";
 
 const mockInstagram: LinkPlatformT = {

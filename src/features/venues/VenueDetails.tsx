@@ -3,11 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import type { ReactElement } from "react";
 
 import { getSignedInUserId } from "@/features/auth/data/getSignedInUserId";
+import { getCityLabel } from "@/features/catalog/utils/getCityLabel";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
 import { getCanEditVenue } from "./data/getCanEditVenue";
 import { getVenue } from "./data/getVenue";
-import { getCityLabel } from "./utils/getCityLabel";
 import { getVenuePath } from "./utils/getVenuePath";
 import styles from "./VenueDetails.module.css";
 

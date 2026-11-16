@@ -1,11 +1,4 @@
-/** A link field on the venue form: a platform from `link_platforms` that venues offer. */
-export type LinkPlatformT = {
-  /** The platform's text ID, such as `instagram`. Also the form field's key. */
-  id: string;
-  label: string;
-  /** Hosts a link may use. `*.` at the start matches any subdomain. Empty accepts any. */
-  allowedHosts: string[];
-};
+import type { CityT, EntryLinkT, LinkPlatformT } from "@/features/catalog/catalog.types";
 
 /** A sound system brand a venue can be tagged with. */
 export type SoundSystemT = {
@@ -19,39 +12,13 @@ export type VenueFormOptionsT = {
   soundSystems: SoundSystemT[];
 };
 
-/** A city in the picker's results, from `search_cities`. */
-export type CityOptionT = {
-  id: number;
-  name: string;
-  /** Null when GeoNames has no region, though the generated type says string. */
-  admin1Name: string | null;
-  countryCode: string;
-  /** The name the query matched: the main name, its ASCII form, or another name. */
-  matchedName: string;
-};
-
-/** A city as a venue shows it. */
-export type CityT = {
-  id: number;
-  name: string;
-  admin1Name: string | null;
-  countryCode: string;
-};
-
-/** A venue link, by platform. */
-export type VenueLinkT = {
-  platformId: string;
-  label: string;
-  url: string;
-};
-
 /** A venue with everything its page shows. */
 export type VenueT = {
   id: string;
   shortId: string;
   name: string;
   city: CityT;
-  links: VenueLinkT[];
+  links: EntryLinkT[];
   soundSystems: SoundSystemT[];
 };
 

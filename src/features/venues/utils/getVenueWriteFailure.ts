@@ -1,8 +1,7 @@
+import type { LinkPlatformT } from "@/features/catalog/catalog.types";
+import { getLinkErrorMessage } from "@/features/catalog/utils/getLinkErrorMessage";
+import { getLinkFieldName } from "@/features/catalog/utils/getLinkFieldName";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
-
-import type { LinkPlatformT } from "../venues.types";
-import { getLinkErrorMessage } from "./getLinkErrorMessage";
-import { getLinkFieldName } from "./getLinkFieldName";
 
 // SQLSTATEs the venue triggers raise (migrations create_creations_and_catalog_edits and
 // create_venues), with the kind or the platform ID in the detail.

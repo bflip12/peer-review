@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
-import { searchCities } from "@/features/venues/data/searchCities";
-import { getSearchQueryParam } from "@/features/venues/utils/getSearchQueryParam";
+import { searchCities } from "@/features/catalog/data/searchCities";
+import { getSearchQueryParam } from "@/features/catalog/utils/getSearchQueryParam";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
 /**
