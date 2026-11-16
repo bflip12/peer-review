@@ -65,10 +65,14 @@ describe("venue data functions", () => {
   });
 
   describe("getVenueFormOptions", () => {
-    it("returns the venue link platforms and every sound system, in form order", () => {
+    // Brands users added (ADR 0026), including other test runs', sort after the seeded ones,
+    // so only the first seven are checked.
+    it("returns the venue link platforms and the seeded sound systems first, in form order", () => {
       const result = {
         platforms: options.platforms.map((platform) => platform.id),
-        soundSystems: options.soundSystems.map((soundSystem) => soundSystem.id)
+        soundSystems: options.soundSystems
+          .slice(0, 7)
+          .map((soundSystem) => soundSystem.id)
       };
 
       expect(result).toEqual({

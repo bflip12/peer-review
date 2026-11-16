@@ -62,7 +62,16 @@ checks and writes) is in `src/features/catalog/`. The DJ page's title is "DJ · 
 Review" until Milestone 8.
 
 Tasks, one PR each, in order:
-1. Collectives, with the `creations.collective_id` foreign key. Reuse
+1. Sound systems users add (ADR 0026), in two PRs like venues. The database is done:
+   `create_sound_system`, `search_sound_systems`, the folded-name index, and the daily
+   cap of 10. Left for the form PR: replace the venue form's checkboxes with a search
+   field, `SoundSystemPicker` in `src/features/venues/`, a combobox calling
+   `/api/sound-systems?q=`. Picks show as tags with a remove button; the venue's brands
+   start as tags on the edit form. When no brand matches, the last row is "Add …", which
+   calls `create_sound_system` and adds the returned brand as a tag. The cap message
+   ("You've added 10 sound systems today. You can add more tomorrow.") shows under the
+   field. The privacy page and "Delete account" add the brands a user adds.
+2. Collectives, with the `creations.collective_id` foreign key. Reuse
    `src/features/catalog/`, and add `collective_id` to `LinkOwnerT` in
    `writeLinkChanges` and to the `links` policies.
 
@@ -185,10 +194,6 @@ picked after the merge onto the original lineup. Adds `merges.undone_by`,
 
 ## Later
 
-- Venue form: replace the sound system checkboxes. Seven checkboxes take a lot of room,
-  and a venue's system is often not one of the listed brands. Decide the input (search
-  and add from the list, or let users add a brand) before DJs and collectives copy the
-  form.
 - Dark mode: dark values for the color tokens, with their pairs added to the contrast
   test in `src/styles/tokens.test.ts` (`docs/style-guide.md`, "Color")
 - Venue-claimed pages, with an opt-in public location

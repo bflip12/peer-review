@@ -41,10 +41,12 @@ describe("lookups", () => {
     ["a signed-out visitor", createAnonClient],
     ["a signed-in user", () => user.client]
   ])("as %s", (_role, client) => {
-    it("reads the sound systems in order, with Other last", async () => {
+    // User-added brands (ADR 0026) have no sort order, so only the seeded ones are read.
+    it("reads the seeded sound systems in order, with Other last", async () => {
       const result = await client()
         .from("sound_systems")
         .select("id, name")
+        .not("sort_order", "is", null)
         .order("sort_order");
 
       expect(result.data).toEqual([

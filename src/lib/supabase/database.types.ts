@@ -200,6 +200,7 @@ export type Database = {
           event_id: string | null;
           id: string;
           lineup_slot_id: string | null;
+          sound_system_id: string | null;
           venue_id: string | null;
         };
         ComputedFields: never;
@@ -211,6 +212,7 @@ export type Database = {
           event_id?: string | null;
           id?: string;
           lineup_slot_id?: string | null;
+          sound_system_id?: string | null;
           venue_id?: string | null;
         };
         Update: {
@@ -221,6 +223,7 @@ export type Database = {
           event_id?: string | null;
           id?: string;
           lineup_slot_id?: string | null;
+          sound_system_id?: string | null;
           venue_id?: string | null;
         };
         Relationships: [
@@ -236,6 +239,13 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "creations_sound_system_id_fkey";
+            columns: ["sound_system_id"];
+            isOneToOne: true;
+            referencedRelation: "sound_systems";
             referencedColumns: ["id"];
           },
           {
@@ -363,18 +373,18 @@ export type Database = {
         Row: {
           id: string;
           name: string;
-          sort_order: number;
+          sort_order: number | null;
         };
         ComputedFields: never;
         Insert: {
           id: string;
           name: string;
-          sort_order: number;
+          sort_order?: number | null;
         };
         Update: {
           id?: string;
           name?: string;
-          sort_order?: number;
+          sort_order?: number | null;
         };
         Relationships: [];
       };
@@ -473,6 +483,13 @@ export type Database = {
           short_id: string;
         }[];
       };
+      create_sound_system: {
+        Args: { brand_name: string };
+        Returns: {
+          id: string;
+          name: string;
+        }[];
+      };
       create_venue: {
         Args: {
           city_id: number;
@@ -510,6 +527,13 @@ export type Database = {
           name: string;
         }[];
       };
+      search_sound_systems: {
+        Args: { max_results?: number; query: string };
+        Returns: {
+          id: string;
+          name: string;
+        }[];
+      };
       search_venues: {
         Args: { city_id: number; max_results?: number; query: string };
         Returns: {
@@ -521,7 +545,8 @@ export type Database = {
     };
     Enums: {
       account_status: "active" | "banned";
-      catalog_type: "venue" | "artist" | "collective" | "event" | "lineup_slot";
+      catalog_type:
+        "venue" | "artist" | "collective" | "event" | "lineup_slot" | "sound_system";
       role: "user" | "moderator" | "admin";
     };
     CompositeTypes: {
@@ -640,7 +665,14 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ["active", "banned"],
-      catalog_type: ["venue", "artist", "collective", "event", "lineup_slot"],
+      catalog_type: [
+        "venue",
+        "artist",
+        "collective",
+        "event",
+        "lineup_slot",
+        "sound_system"
+      ],
       role: ["user", "moderator", "admin"]
     }
   }

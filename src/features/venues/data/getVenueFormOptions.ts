@@ -6,16 +6,17 @@ import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 import type { VenueFormOptionsT } from "../venues.types";
 
 /**
- * The venue form's link fields and sound system tags, each in its form order. Both lists
- * are seeded lookups that everyone can read, so a new platform or brand shows up in the
- * form without a code change.
+ * The venue form's link fields and sound system tags, each in its form order. Everyone
+ * can read both lists, so a new platform, or a brand a user adds, shows up in the form
+ * without a code change.
  */
 export const getVenueFormOptions = async (
   supabase: SupabaseClientT
 ): Promise<VenueFormOptionsT> => {
   const [platforms, soundSystems] = await Promise.all([
     getLinkPlatforms(supabase, "venue"),
-    supabase.from("sound_systems").select("id, name").order("sort_order")
+    // Seeded brands in their set order, then brands users added (ADR 0026) by name.
+    supabase.from("sound_systems").select("id, name").order("sort_order").order("name")
   ]);
   if (soundSystems.error) {
     throw soundSystems.error;
