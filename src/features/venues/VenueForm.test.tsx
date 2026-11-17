@@ -6,7 +6,7 @@ import type { ActionResultT } from "@/lib/actions/actionResult.types";
 
 import type { VenueFormActionT } from "./VenueForm";
 import { VenueForm } from "./VenueForm";
-import type { VenueFormOptionsT } from "./venues.types";
+import type { SoundSystemT, VenueFormOptionsT } from "./venues.types";
 
 const mockOptions: VenueFormOptionsT = {
   platforms: [
@@ -23,12 +23,20 @@ const mockValues = {
   name: "Tresor",
   city: { id: 2950159, name: "Berlin", admin1Name: "State of Berlin", countryCode: "DE" },
   links: { instagram: "https://instagram.com/tresorberlin" },
-  soundSystemIds: ["funktion_one"]
+  soundSystems: [{ id: "funktion_one", name: "Funktion-One" }]
 };
 
 // Stands in for the addVenue and saveVenueEdits server actions.
 const mockAction = (result: ActionResultT) =>
   vi.fn<VenueFormActionT>(() => Promise.resolve(result));
+
+// Stands in for the addSoundSystem server action, which these tests do not exercise.
+const mockAddSoundSystem = vi.fn(() =>
+  Promise.resolve<ActionResultT<SoundSystemT>>({
+    ok: true,
+    data: { id: "other", name: "Other" }
+  })
+);
 
 // Stands in for the autocomplete routes, which these tests do not exercise.
 const mockFetch = vi.fn<typeof fetch>(() => Promise.resolve(Response.json([])));
@@ -42,12 +50,13 @@ describe("VenueForm", () => {
     vi.unstubAllGlobals();
   });
 
-  it("starts empty when adding, with a link field per platform and a checkbox per brand", () => {
+  it("starts empty when adding, with a link field per platform and no brands picked", () => {
     render(
       <VenueForm
         action={mockAction({ ok: true, data: undefined })}
         options={mockOptions}
         submitLabel="Add venue"
+        addSoundSystem={mockAddSoundSystem}
       />
     );
 
@@ -55,9 +64,8 @@ describe("VenueForm", () => {
     expect(screen.getByRole("combobox", { name: "City" })).toHaveValue("");
     expect(screen.getByRole("textbox", { name: "Instagram" })).toHaveValue("");
     expect(screen.getByRole("textbox", { name: "Website" })).toHaveValue("");
-    expect(
-      screen.getAllByRole("checkbox").map((box) => box.getAttribute("value"))
-    ).toEqual(["funktion_one", "other"]);
+    expect(screen.getByRole("combobox", { name: "Brands" })).toHaveValue("");
+    expect(screen.queryByRole("list", { name: "Brands: picked" })).toBeNull();
   });
 
   it("starts with the venue's values when editing, and sends them unchanged", async () => {
@@ -67,6 +75,7 @@ describe("VenueForm", () => {
         action={action}
         options={mockOptions}
         submitLabel="Save venue"
+        addSoundSystem={mockAddSoundSystem}
         initialValues={mockValues}
       />
     );
@@ -99,6 +108,7 @@ describe("VenueForm", () => {
         })}
         options={mockOptions}
         submitLabel="Add venue"
+        addSoundSystem={mockAddSoundSystem}
       />
     );
 
@@ -129,6 +139,7 @@ describe("VenueForm", () => {
         })}
         options={mockOptions}
         submitLabel="Add venue"
+        addSoundSystem={mockAddSoundSystem}
       />
     );
 

@@ -5,6 +5,7 @@ import { getSignedInUserId } from "@/features/auth/data/getSignedInUserId";
 import { getProfile } from "@/features/profiles/data/getProfile";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
+import { addSoundSystem } from "./actions/addSoundSystem";
 import { addVenue } from "./actions/addVenue";
 import { getVenueFormOptions } from "./data/getVenueFormOptions";
 import { VenueForm } from "./VenueForm";
@@ -28,5 +29,12 @@ export const NewVenue = async (): Promise<ReactElement> => {
   if (!profile) {
     redirect("/welcome");
   }
-  return <VenueForm action={addVenue} options={options} submitLabel="Add venue" />;
+  return (
+    <VenueForm
+      action={addVenue}
+      options={options}
+      submitLabel="Add venue"
+      addSoundSystem={addSoundSystem}
+    />
+  );
 };
