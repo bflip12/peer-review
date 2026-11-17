@@ -6,10 +6,12 @@ import { runSql } from "./utils/testClients.ts";
 // added in the migration that grants it, with a test calling it as anon and as a user.
 const EXPOSED_FUNCTIONS: string[] = [
   "create_artist",
+  "create_sound_system",
   "create_venue",
   "delete_my_account",
   "search_artists",
   "search_cities",
+  "search_sound_systems",
   "search_venues"
 ];
 

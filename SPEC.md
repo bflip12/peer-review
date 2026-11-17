@@ -59,8 +59,11 @@ Online scene communities across many cities. Two consequences:
   venues today. You can add more tomorrow."
 - Each link field accepts only its own domain. The Instagram field accepts only
   instagram.com links.
-- Sound system tags come from a seeded list: Funktion-One, Void Acoustics, L-Acoustics,
-  d&b audiotechnik, Danley, Martin Audio, Other.
+- Sound system tags come from a shared list of brands, seeded with Funktion-One, Void
+  Acoustics, L-Acoustics, d&b audiotechnik, Danley, Martin Audio, and Other. The venue
+  form searches it; when no brand matches, "Add …" adds the brand for everyone (ADR 0026).
+  A name differing only in case, spaces, or punctuation picks the listed brand. At most 10
+  new brands per user per day.
 
 ### 3. Events
 - An event is a date (the night it started), a city, a venue, one or more collectives, or

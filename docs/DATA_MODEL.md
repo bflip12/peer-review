@@ -10,8 +10,9 @@ Rules for changing the schema are in `.claude/rules/database.md`.
 ## Conventions
 
 - **Keys.** Every table has a UUID primary key named `id`, except join tables (composite
-  key), `cities` (GeoNames ID), the seeded lookups `sound_systems` and `link_platforms`
-  (a text ID such as `funktion_one` or `instagram`, the same in every database), and
+  key), `cities` (GeoNames ID), the lookups `sound_systems` and `link_platforms`
+  (a text ID such as `funktion_one` or `instagram`, the same in every database for seeded
+  rows; brands users add get `b_` and a short ID), and
   `event_redirects` (`from_short_id`). `profiles.id` is the same value as `auth.users.id`.
 - **Short IDs.** Pages that can be shared (venues, DJs, collectives, events, logs) also have
   a `short_id`: a short random string, unique per table, used only in URLs. UUIDs never
@@ -130,7 +131,7 @@ value instead of changing a column's type.
 | `notice_action` | `log_it`, `didnt_go`, `dismissed` | `notices.action` | `keep` and `switch` are added in Milestone 10 |
 | `report_reason` | `duplicate`, `didnt_play`, `wrong_info`, `spam`, `abusive`, `other` | `reports.reason` | |
 | `report_status` | `open`, `actioned`, `dismissed` | `reports.status` | |
-| `catalog_type` | `venue`, `artist`, `collective`, `event`, `lineup_slot` | `merges`, `catalog_edits` | `lineup_slot` for slot changes (ADR 0013). Never a merge type |
+| `catalog_type` | `venue`, `artist`, `collective`, `event`, `lineup_slot`, `sound_system` | `merges`, `catalog_edits`, the daily cap trigger | `lineup_slot` for slot changes (ADR 0013). Never a merge type. `sound_system` for brands users add (ADR 0026) |
 | `merge_change_type` | See [merge_changes](#merge_changes) | `merge_changes.change_type` | Milestone 10 |
 
 ## Tables
@@ -224,14 +225,29 @@ start of a name. At most 20 rows.
 
 #### sound_systems
 
-Seeded lookup of the sound system brands venues are tagged with. Read-only for users; a
-new brand is a new migration.
+The sound system brands venues are tagged with: seven seeded brands, and the ones users
+add (ADR 0026). Users add a brand only through `create_sound_system`.
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | text | `funktion_one`, `void_acoustics`, `l_acoustics`, `d_and_b_audiotechnik`, `danley`, `martin_audio`, `other` |
-| `name` | text | Unique. "Funktion-One", "d&b audiotechnik" |
-| `sort_order` | smallint | Unique. Order in the venue form. Steps of 10, with Other at 1000 so it stays last |
+| `id` | text | Seeded: `funktion_one`, `void_acoustics`, `l_acoustics`, `d_and_b_audiotechnik`, `danley`, `martin_audio`, `other`. User-added: `b_` and a short ID |
+| `name` | text | Unique. "Funktion-One", "d&b audiotechnik". At most 50 characters, no surrounding spaces |
+| `sort_order` | smallint | Unique. Order of the seeded brands, in steps of 10, with Other at 1000. Null for user-added brands, which sort by name after the seeded ones |
+
+No two brands fold to the same name: a unique index on `private.fold_brand(name)`, which
+lowercases, drops accents, and removes spaces and punctuation, so "Funktion One" is
+Funktion-One. A name that folds to nothing ("--") is refused.
+
+`create_sound_system(brand_name)` trims the name and returns the brand that folds to the
+same name when there is one, writing nothing. Otherwise it adds the brand with a
+`creations` row, so the daily cap of 10 brands applies. Signed-in users with an active
+profile only.
+
+`search_sound_systems(query, max_results)` serves the venue form's search: brands whose
+name contains the query, matches it without spaces and punctuation, or has a trigram
+similarity of 0.3 or more. The same folded name first, then names starting with the
+query, then the closest. Nothing for an empty query. At most 20 rows. Signed-in users
+only.
 
 #### link_platforms
 
@@ -629,7 +645,8 @@ search never read it.
 |---|---|---|
 | `id` | uuid | |
 | `created_by` | uuid | References `profiles`. Cascade |
-| `event_id`, `lineup_slot_id`, `venue_id`, `artist_id`, `collective_id` | uuid | Exactly one is set (check). Each is unique: one creator per entry. Cascade |
+| `event_id`, `lineup_slot_id`, `venue_id`, `artist_id`, `collective_id` | uuid | Exactly one of these or `sound_system_id` is set (check). Each is unique: one creator per entry. Cascade |
+| `sound_system_id` | text | A brand the user added (ADR 0026). Unique. Cascade |
 | `created_at` | timestamptz | |
 
 The five entry columns get their foreign keys in the migration that creates each table:
@@ -642,10 +659,10 @@ collectives) and slot removal right check this table.
 
 Daily caps (ADR 0011): a trigger before insert counts the user's rows of the same kind
 created in the last 24 hours and refuses the insert at the cap: 10 venues, 10 collectives,
-50 artists, 20 events. Lineup slots are not capped. Active moderators and admins are
+50 artists, 20 events, 10 sound system brands. Lineup slots are not capped. Active moderators and admins are
 exempt. The caps are constants in the trigger function. A per-user advisory lock stops two
 inserts at once from both passing (checked). A refusal has SQLSTATE `PR001`, with the kind
-(`venue`, `artist`, `collective`, `event`) as its detail, so the form shows "You've added
+(`venue`, `artist`, `collective`, `event`, `sound_system`) as its detail, so the form shows "You've added
 10 venues today. You can add more tomorrow." without reading the message.
 
 #### catalog_edits
@@ -761,7 +778,8 @@ author's `account_status` is `active`, and its event is not hidden or merged.
 |---|---|---|
 | `profiles` | Everyone. Banned profiles only to admins and their owner | Owner, while active: handle, display name. Admins: role, account status |
 | `moderator_cities` | Everyone | Admins |
-| `cities`, `city_names`, `sound_systems`, `link_platforms` | Everyone | Nobody (seeded) |
+| `cities`, `city_names`, `link_platforms` | Everyone | Nobody (seeded) |
+| `sound_systems` | Everyone | Add: signed-in users, through `create_sound_system`, within the daily cap. Change: nobody until Milestone 6 |
 | `venues`, `artists`, `collectives`, `links`, `venue_sound_systems` | Everyone, unless hidden | Create: signed-in users, within the daily caps. Edit: the creator until `used_by_others_at`, then moderators and admins. Hide: admins |
 | `events`, `event_collectives` | Everyone, unless hidden. Pages list an event only once it has a visible log | Create through the create function. Fill empty fields: users logging it. Change set fields: moderators and admins |
 | `lineup_slots`, `slot_artists` | Everyone, except removed slots and hidden artists. Moderators and admins also see removed slots | Add: signed-in users. "b2b with" and remove: the adder until someone else picks it. After that, moderators and admins remove a slot, remove one artist, or switch to a same-name artist |

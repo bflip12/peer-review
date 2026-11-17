@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClientT } from "@/lib/supabase/supabase.types";
 
+import { compareSoundSystems } from "../utils/compareSoundSystems";
 import type { VenueT } from "../venues.types";
 
 // The same alphabet as private.new_short_id (migration create_venues). Anything else
@@ -54,7 +55,7 @@ export const getVenue = async (
       })),
     soundSystems: data.venue_sound_systems
       .map((tag) => tag.sound_system)
-      .sort((a, b) => a.sort_order - b.sort_order)
+      .sort(compareSoundSystems)
       .map((soundSystem) => ({ id: soundSystem.id, name: soundSystem.name }))
   };
 };
