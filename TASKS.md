@@ -51,6 +51,11 @@ the venue page at `/venues/<short_id>/<name-city>`, and `/venues/<short_id>/edit
 whoever may edit. The venue page's title is "Venue · Peer Review" until Milestone 8 adds
 per-page metadata.
 
+Sound systems users add are done (ADR 0026): `create_sound_system`, `search_sound_systems`,
+the folded-name index, and the daily cap of 10. The venue form's `SoundSystemPicker`
+searches the list (`/api/sound-systems`), shows picks as tags, and adds an unlisted brand
+for everyone with "Add …".
+
 DJs are done: `artists` with the name and city index and the b2b check, `create_artist`,
 `search_artists` (exact name matches in any city, flagged, then near matches in the picked
 city or with no city), and the links policies covering venues and DJs. `/djs/new` (not
@@ -62,15 +67,9 @@ checks and writes) is in `src/features/catalog/`. The DJ page's title is "DJ · 
 Review" until Milestone 8.
 
 Tasks, one PR each, in order:
-1. Sound systems users add (ADR 0026), in two PRs like venues. The database is done:
-   `create_sound_system`, `search_sound_systems`, the folded-name index, and the daily
-   cap of 10. Left for the form PR: replace the venue form's checkboxes with a search
-   field, `SoundSystemPicker` in `src/features/venues/`, a combobox calling
-   `/api/sound-systems?q=`. Picks show as tags with a remove button; the venue's brands
-   start as tags on the edit form. When no brand matches, the last row is "Add …", which
-   calls `create_sound_system` and adds the returned brand as a tag. The cap message
-   ("You've added 10 sound systems today. You can add more tomorrow.") shows under the
-   field. The privacy page and "Delete account" add the brands a user adds.
+1. Upgrade Next.js. `next build` and `next dev` stop once on 16.4.2 with a notice of a
+   known security vulnerability, then run on a retry. Find the advisory, check whether it
+   affects this app, and propose the upgrade.
 2. Collectives, with the `creations.collective_id` foreign key. Reuse
    `src/features/catalog/`, and add `collective_id` to `LinkOwnerT` in
    `writeLinkChanges` and to the `links` policies.

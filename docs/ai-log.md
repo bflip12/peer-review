@@ -736,3 +736,21 @@ and a duplicate check that tells two artists with one name apart.
 `src/features/catalog/`, `e2e/djs.spec.ts`,
 [PR #43](https://github.com/bflip12/peer-review/pull/43),
 [PR #44](https://github.com/bflip12/peer-review/pull/44).
+
+### Sound systems users add (2026-11-17)
+
+**Goal.** Replace the venue form's seven sound system checkboxes, which took a lot of room
+and missed many venues' real systems.
+
+**My calls.**
+- A search field where a brand that is not listed can be added for everyone, over Claude's
+  first suggestion of a fixed list with "Other" for anything missing. Users who don't care
+  skip the field.
+- Brands already on a venue show first, as tags on the edit form.
+- Claude proposed the safeguards that come with a shared list (a folded-name duplicate
+  check, a daily cap, cleanup by locals later), and I accepted them. The decision is
+  [ADR 0026](adr/0026-user-added-sound-systems.md).
+
+**Output.** [PR #45](https://github.com/bflip12/peer-review/pull/45),
+[PR #46](https://github.com/bflip12/peer-review/pull/46),
+`src/features/venues/SoundSystemPicker.tsx`.

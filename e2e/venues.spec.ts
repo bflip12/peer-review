@@ -31,7 +31,8 @@ test.describe("venues", () => {
       page.getByText("Paste an Instagram link, such as instagram.com/name.")
     ).toBeVisible();
     await page.getByRole("textbox", { name: "Instagram" }).fill("instagram.com/e2e");
-    await page.getByRole("checkbox", { name: "Funktion-One" }).check();
+    await page.getByRole("combobox", { name: "Brands" }).fill("funk");
+    await page.getByRole("option", { name: "Funktion-One" }).click();
     await page.getByRole("button", { name: "Add venue" }).click();
 
     await expect(page).toHaveURL(/\/venues\/[2-9a-hjkmnp-z]{8}\/e2e-[0-9a-f]+-koln$/);
@@ -48,7 +49,7 @@ test.describe("venues", () => {
     await page.getByRole("link", { name: "Edit venue" }).click();
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(name);
     await page.getByRole("textbox", { name: "Name" }).fill(`${name} Club`);
-    await page.getByRole("checkbox", { name: "Funktion-One" }).uncheck();
+    await page.getByRole("button", { name: "Remove Funktion-One" }).click();
     await page.getByRole("button", { name: "Save venue" }).click();
 
     await expect(page).toHaveURL(/-club-koln$/);
@@ -81,6 +82,27 @@ test.describe("venues", () => {
 
     const similar = page.getByRole("region", { name: "Already on Peer Review?" });
     await expect(similar.getByRole("link", { name: `${name} Club` })).toBeVisible();
+  });
+
+  test("adds a sound system brand that is not listed, and tags the venue with it", async ({
+    page
+  }) => {
+    const name = newVenueName();
+    const brand = `Brand ${randomUUID().slice(0, 8)}`;
+    await signUp(page, newEmail(), newHandle());
+    await page.goto("/venues/new");
+    await page.getByRole("textbox", { name: "Name" }).fill(name);
+    await pickCity(page, "Berlin", "Berlin");
+
+    await page.getByRole("combobox", { name: "Brands" }).fill(brand);
+    await page.getByRole("option", { name: `Add “${brand}”` }).click();
+    await expect(page.getByRole("button", { name: `Remove ${brand}` })).toBeVisible();
+    await page.getByRole("button", { name: "Add venue" }).click();
+
+    await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Sound system" }).getByText(brand)
+    ).toBeVisible();
   });
 
   test("sends a signed-out visitor from the add page to sign in", async ({ page }) => {
