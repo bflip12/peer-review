@@ -12,8 +12,10 @@ import { TextField } from "@/features/forms/TextField";
 import type { ActionResultT } from "@/lib/actions/actionResult.types";
 
 import { SimilarVenues } from "./SimilarVenues";
+import type { AddSoundSystemT } from "./SoundSystemPicker";
+import { SoundSystemPicker } from "./SoundSystemPicker";
 import styles from "./VenueForm.module.css";
-import type { VenueFormOptionsT } from "./venues.types";
+import type { SoundSystemT, VenueFormOptionsT } from "./venues.types";
 
 /** A server action the venue form submits, through `useActionState`. */
 export type VenueFormActionT = (
@@ -26,13 +28,15 @@ export type VenueFormValuesT = {
   name: string;
   city: CityT;
   links: Record<string, string>;
-  soundSystemIds: string[];
+  soundSystems: SoundSystemT[];
 };
 
 export type VenueFormPropsT = {
   action: VenueFormActionT;
   options: VenueFormOptionsT;
   submitLabel: string;
+  /** The sound system field's "Add …", the `addSoundSystem` server action. */
+  addSoundSystem: AddSoundSystemT;
   initialValues?: VenueFormValuesT;
 };
 
@@ -46,27 +50,15 @@ export const VenueForm = ({
   action,
   options,
   submitLabel,
+  addSoundSystem,
   initialValues
 }: VenueFormPropsT): ReactElement => {
   const [result, formAction, isPending] = useActionState(action, null);
   const [name, setName] = useState(initialValues?.name ?? "");
   const [city, setCity] = useState<CityT | null>(initialValues?.city ?? null);
   const [links, setLinks] = useState<Record<string, string>>(initialValues?.links ?? {});
-  const [soundSystemIds, setSoundSystemIds] = useState(
-    new Set(initialValues?.soundSystemIds ?? [])
-  );
   const failure = result?.ok === false ? result : null;
   const isNew = initialValues === undefined;
-
-  const handleSoundSystemToggle = (id: string, isChecked: boolean): void => {
-    const next = new Set(soundSystemIds);
-    if (isChecked) {
-      next.add(id);
-    } else {
-      next.delete(id);
-    }
-    setSoundSystemIds(next);
-  };
 
   return (
     <form className={styles.wrapper} action={formAction} noValidate>
@@ -108,30 +100,15 @@ export const VenueForm = ({
           );
         })}
       </fieldset>
-      <fieldset className={styles.group} aria-describedby="sound-systems-help">
+      <fieldset className={styles.group}>
         <legend className={styles.legend}>Sound system (optional)</legend>
-        <p className={styles.help} id="sound-systems-help">
-          Pick every brand the venue uses.
-        </p>
-        <div className={styles.checkboxes}>
-          {options.soundSystems.map((soundSystem) => (
-            <label className={styles.checkbox} key={soundSystem.id}>
-              <input
-                type="checkbox"
-                name="soundSystemIds"
-                value={soundSystem.id}
-                checked={soundSystemIds.has(soundSystem.id)}
-                onChange={(event) => {
-                  handleSoundSystemToggle(soundSystem.id, event.target.checked);
-                }}
-              />
-              {soundSystem.name}
-            </label>
-          ))}
-        </div>
-        {failure?.fieldErrors?.soundSystemIds && (
-          <p className={styles.error}>{failure.fieldErrors.soundSystemIds.join(" ")}</p>
-        )}
+        <SoundSystemPicker
+          label="Brands"
+          name="soundSystemIds"
+          addSoundSystem={addSoundSystem}
+          initialSoundSystems={initialValues?.soundSystems}
+          errors={failure?.fieldErrors?.soundSystemIds}
+        />
       </fieldset>
       <SubmitButton isPending={isPending}>{submitLabel}</SubmitButton>
       {failure && <FormError>{failure.message}</FormError>}

@@ -2,6 +2,14 @@
 
 Dated record of rule and style changes, newest first. Each entry says what changed and why.
 
+## 2026-11-18
+
+- `.claude/rules/voice.md`: status and PR updates use a fixed, skimmable layout. Header
+  lines, then Checks (a table), Changed, You do (with a "Why" line and a reason per step),
+  Then I, and Note. One line per item, with code formatting for files and functions.
+  Reason: Bobby found the long lists hard to skim and wants each line recognizable by
+  the kind of thing it is.
+
 ## 2026-11-03
 
 - `.claude/rules/voice.md`: the general term is "music night", never "club night".

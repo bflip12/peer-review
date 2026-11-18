@@ -30,12 +30,10 @@ describe("PrivacyPolicy", () => {
     );
   });
 
-  it("lists venues, DJs, and edits, and who sees that they are yours", () => {
+  it("lists venues, DJs, brands, and edits, and who sees that they are yours", () => {
     render(<PrivacyPolicy />);
 
-    const result = screen.getByText(
-      /^Venues and DJs you add, and edits you make to them\./
-    );
+    const result = screen.getByText(/^Venues, DJs, and sound system brands you add/);
 
     expect(result).toHaveTextContent(
       "Who added one is seen only by you, and by locals and admins. Who edited it is seen only by locals and admins."

@@ -26,3 +26,21 @@ Applies to UI copy, error messages, labels, README, commit messages, docs, and r
   settings" alone. Supabase has two projects (production `stcjavdqwjgdgudoudqv`, staging
   `azjwibwhymzdlrrhlicy`), Vercel has two environments (Production, Preview), and the same
   words mean different things in each.
+
+### Status and PR updates
+
+Updates on a PR, a task, or a deploy are built to skim. Questions and explanations stay
+short prose.
+
+- Start with header lines: `**PR** <link> · <state> · <CI>`, and `**Blocked on** …` when
+  something blocks it.
+- Then these sections, in this order, leaving out any that are empty:
+  - **Checks**: a table of check and result (unit, database, e2e, screenshots).
+  - **Changed**: one line per item, starting with what it is in code formatting (a file,
+    component, function, or table) or a short label, then what changed.
+  - **You do**: starts with `· Why:` and one line on what goes wrong without it. Numbered
+    steps, each naming the service and place, then its reason in one short sentence.
+  - **Then I**: what happens after.
+  - **Note**: anything else worth knowing, one line each.
+- Results that line up (checks, before and after, options) go in a table.
+- One line per item. Add a reason only where it changes what Bobby does.

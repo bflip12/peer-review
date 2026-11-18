@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { getSignedInUserId } from "@/features/auth/data/getSignedInUserId";
 import { createServerSupabaseClient } from "@/lib/supabase/createServerSupabaseClient";
 
+import { addSoundSystem } from "./actions/addSoundSystem";
 import { saveVenueEdits } from "./actions/saveVenueEdits";
 import { getCanEditVenue } from "./data/getCanEditVenue";
 import { getVenue } from "./data/getVenue";
@@ -43,11 +44,12 @@ export const EditVenue = async ({ params }: EditVenuePropsT): Promise<ReactEleme
       action={saveVenueEdits.bind(null, venue.shortId)}
       options={options}
       submitLabel="Save venue"
+      addSoundSystem={addSoundSystem}
       initialValues={{
         name: values.name,
         city: venue.city,
         links: values.links,
-        soundSystemIds: values.soundSystemIds
+        soundSystems: venue.soundSystems
       }}
     />
   );
